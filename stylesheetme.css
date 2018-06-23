@@ -1,0 +1,67 @@
+/*
+CSS for All About Me
+*/
+
+h1 {
+	color: green;
+	font-size: large;
+	fonr-weight: normal;
+}
+
+body {
+	font-family: Verdana, Helvetica, Arial, sans-serif;
+	background-color: #DCDCDC;
+}
+
+p {
+	font-size: small;
+}
+
+ul {
+	font-size: medium;
+	color: orange;
+}
+
+a {
+	font-weight: normal;
+}
+
+a:link {
+	color: black;
+}
+
+a;visited {
+	color: green;
+}
+
+a:hover {
+	text-decoration: none;
+	color: red;
+	backgorund-color: aqua;
+}
+
+a:active {
+	color: blue;
+	background color: aqua;
+}
+
+#header {
+		border: 2px solid blue;
+		background-color: #00FFFF;
+}
+
+#trojanphotos {
+		border: 3px solid orange;
+		width: 150px;	
+}
+
+#bodycontent {
+		font-size: small;
+		color: black;
+}
+
+ol {
+	color: blue;
+}
+
+	
