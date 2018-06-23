@@ -3044,7 +3044,7 @@ html.no-csstransitions .home-content__main {
     background-image: url("../images/atldt.jpg");
     background-repeat: no-repeat;
     background-position: center, center;
-    background-size: 135%;
+    /*background-size: 135%;*/
     padding-top: 13.2rem;
     padding-bottom: 12rem;
     color: rgba(255, 255, 255, 0.5);
