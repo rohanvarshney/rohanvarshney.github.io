@@ -3045,7 +3045,6 @@ html.no-csstransitions .home-content__main {
     background-repeat: no-repeat;
     background-position: center, center;
     background-size: 135%;
-    min-width: 800px;
     padding-top: 13.2rem;
     padding-bottom: 12rem;
     color: rgba(255, 255, 255, 0.5);
