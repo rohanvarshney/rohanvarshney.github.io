@@ -1,26 +1,322 @@
-<html>
-<head><title>Who Am I?</title></head>
-<link href="stylesheetme.css"rel="stylesheet" type="text/css" />
-<body>
-<div id = "header">
-<h1><center>Who Am I?</center></h1>
-</div>
-<div id = "navigation">
-<p>
-<ul>
-<li><a href = "home.html"><b>Home</b></a></li>
-<li><a href = "info.html">About Me</a></li>
-<li><a href = "likes.html">What I Like</a></li>
-<li><a href = "dislikes.html">What I Do Not Like Like</a></li>
-<li><a href = "favweb.html">Favorite Websites</a></li>
-<li><a href = "contact.html">How to Reach Me</a></li>
-<ul>
-</p>
-</div>
+<!DOCTYPE html>
+<!--[if lt IE 9 ]><html class="no-js oldie" lang="en"> <![endif]-->
+<!--[if IE 9 ]><html class="no-js oldie ie9" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+
+<head>
+
+    <!--- basic page needs
+   ================================================== -->
+    <meta charset="utf-8">
+    <title>Style Guide - Hola</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- mobile specific metas
+   ================================================== -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- CSS
+   ================================================== -->
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/vendor.css">
+    <link rel="stylesheet" href="css/main.css">
+
+    <style type="text/css" media="screen">
+        .s-styles { 
+             background: white;
+              padding-top: 15rem;
+              padding-bottom: 12rem;
+        }
+     </style> 
+
+    <!-- script
+   ================================================== -->
+    <script src="js/modernizr.js"></script>
+    <script src="js/pace.min.js"></script>
+
+    <!-- favicons
+	================================================== -->
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+
+</head>
+
+<body id="top">
+
+    <!-- header
+    ================================================== -->
+    <header class="s-header">
+
+        <div class="header-logo">
+            <a class="site-logo" href="index.html"><img src="images/logo.png" alt="Homepage"></a>
+        </div>
+
+        <nav class="header-nav-wrap">
+            <ul class="header-nav">
+                <li><a href="index.html#home" title="home">Home</a></li>
+                <!--<li><a href="index.html#about" title="about">About</a></li>
+                <li><a href="index.html#works" title="works">Works</a></li>-->
+                <li><a href="index.html#contact" title="contact">Contact</a></li>	
+            </ul>
+        </nav>
+
+        <a class="header-menu-toggle" href="#0"><span>Menu</span></a>
+
+   </header> <!-- end s-header -->
+
+
+   <!-- home
+   ================================================== -->
+   <section id="home" class="s-home page-hero target-section" data-parallax="scroll" data-image-src="images/jacksonville.jpg" data-natural-width=3000 data-natural-height=2000 data-position-y=center>
+    
+        <div class="overlay"></div>
+        <div class="shadow-overlay"></div>
+
+        <div class="home-content">
+
+            <div class="row home-content__main">
+
+                <h3>Hello there!</h3>
+
+                <h1>
+                    I am Rohan Varshney. <br>
+                    I am a student, music lover, <br>
+                    and programmer.
+                </h1>
+
+                <div class="home-content__buttons">
+                    <a href="resume.pdf" class="btn btn--stroke">
+                        Resume
+                    </a>
+                    <a href="index.html#about" class="btn btn--stroke">
+                        Another Link
+                    </a>
+                </div>
+
+                <div class="home-content__scroll">
+                    <a href="#styles" class="smoothscroll scroll-link">
+                        <span>More about me</span>
+                    </a>
+                </div>
+
+            </div>
+
+        </div> <!-- end home-content -->
+
+        <ul class="home-social">
+            <li>
+                <a href="https://www.facebook.com/rohanvar"><i class="im im-facebook" aria-hidden="true"></i><span>Facebook</span></a>
+            </li>
+            <li>
+                <a href="https://twitter.com/Robartney"><i class="im im-twitter" aria-hidden="true"></i><span>Twiiter</span></a>
+            </li>
+            <li>
+                <a href="https://www.instagram.com/rohanvar/"><i class="im im-instagram" aria-hidden="true"></i><span>Instagram</span></a>
+            </li>
+        </ul> 
+        <!-- end home-social -->
+
+    </section> <!-- end s-home -->
+
+
+    <!-- styles
+    ================================================== -->
+    <section id="styles" class="s-styles">
+    
+        <div class="row narrow section-intro add-bottom text-center">
+
+            <div class="col-twelve tab-full">
+
+                <h1>Glad you made it!</h1>
+
+                <p class="lead">Lorem ipsum Officia elit ad tempor dolore est ex incididunt incididunt occaecat culpa deserunt sunt labore in cillum ullamco magna in Excepteur consequat in reprehenderit proident mollit incididunt officia commodo.
+                Duis ea officia sed dolor pariatur enim dolore dolore quis incididunt nulla exercitation commodo veniam et ea incididunt.</p>
+
+            </div>
+
+        </div>
+
+
+        <div class="row">
+
+
+            <div class="col-six tab-full">
+
+                <h3>Favorite Quotes</h3>
+
+                <blockquote cite="http://where-i-got-my-info-from.com">
+                <p>Your work is going to fill a large part of your life, and the only way to be truly satisfied is
+                to do what you believe is great work. And the only way to do great work is to love what you do.
+                If you haven't found it yet, keep looking. Don't settle. As with all matters of the heart, you'll know when you find it.
+                </p>
+                <cite>
+                   <a href="#">Steve Jobs</a>
+                </cite>
+                </blockquote>
+
+                <blockquote>
+                <p>Good design is as little design as possible.</p>
+                <cite>Dieter Rams</cite>
+                </blockquote>
+
+            </div>
+
+        </div> <!-- end row -->
+
+
+        <div class="row half-bottom">
+
+
+            <div class="col-six tab-full">
+
+
+                <h3>Skill Bars</h3>
+                
+                <ul class="skill-bars">
+                    <li>
+                    <div class="progress percent90"><span>90%</span></div>
+                    <strong>HTML5</strong>
+                    </li>
+                    <li>
+                    <div class="progress percent85"><span>85%</span></div>
+                    <strong>CSS3</strong>
+                    </li>
+                    <li>
+                    <div class="progress percent40"><span>40%</span></div>
+                    <strong>JQuery</strong>
+                    </li>
+                    <li>
+                    <div class="progress percent95"><span>95%</span></div>
+                    <strong>PHP</strong>
+                    </li>
+                    <li>
+                    <div class="progress percent75"><span>75%</span></div>
+                    <strong>Wordpress</strong>
+                    </li>
+                    <li>
+                    <div class="progress percent90"><span>90%</span></div>
+                    <strong>Angular JS</strong>
+                    </li>
+                </ul>
+
+            </div>
+
+        </div> <!-- end row -->
 
 
 
 
+    
+
+
+    </section> <!-- end styles -->
+
+
+    <!-- s-contact
+    ================================================== -->
+    <section id="contact" class="s-contact target-section">
+
+        <div class="overlay"></div>
+
+        <div class="row narrow section-intro">
+            <div class="col-full">
+                <h3>Contact</h3>
+                <h1>Say Hello.</h1>
+                
+                <p class="lead">Lorem ipsum Dolor adipisicing nostrud et aute Excepteur amet commodo ea dolore irure esse Duis nulla sint fugiat cillum ullamco proident aliquip quis qui voluptate dolore veniam Ut laborum non est in officia.</p>
+            </div>
+        </div>
+
+        <div class="row contact__main">
+            <div class="col-eight tab-full contact__form">
+
+                        
+            </div>
+            <div class="col-four tab-full contact__infos">
+                <h4 class="h06">Phone</h4>
+                <p>
+                Mobile: (904) 610 0910<br>
+                Home: (904) 288 9896
+                </p>
+
+                <h4 class="h06">Email</h4>
+                <p>rohanvar@gmail.com<br>
+                rohanvarshney@gatech.edu
+                </p>
+
+                <h4 class="h06">Address</h4>
+                <p>
+                5335 Summit Lake Drive<br>
+                Jacksonville, FL<br>
+                32258
+                </p>
+            </div>
+
+        </div>
+
+    </section> <!-- end s-contact -->
+
+
+    <!-- footer
+    ================================================== -->
+    <footer>
+            <div class="row">
+                <div class="col-full">
+    
+                    <div class="footer-logo">
+                        <a class="footer-site-logo" href="#0"><img src="images/count-bg.jpg" alt="Homepage"></a>
+                    </div>
+    
+                    <ul class="footer-social">
+                        <li><a href="https://www.facebook.com/rohanvar">
+                            <i class="im im-facebook" aria-hidden="true"></i>
+                            <span>Facebook</span>
+                        </a></li>
+                        <li><a href="https://twitter.com/Robartney">
+                            <i class="im im-twitter" aria-hidden="true"></i>
+                            <span>Twitter</span>
+                        </a></li>
+                        <li><a href="https://www.instagram.com/rohanvar/">
+                            <i class="im im-instagram" aria-hidden="true"></i>
+                            <span>Instagram</span>
+                        </a></li>
+                    </ul>
+                        
+                </div>
+            </div>
+    
+            <div class="row footer-bottom">
+    
+                <div class="col-twelve">
+                    <div class="copyright">
+                        <span>© Copyright Hola 2017</span> 
+                        <span>Design by <a href="https://www.styleshout.com/">styleshout</a></span>	
+                    </div>
+    
+                    <div class="go-top">
+                    <a class="smoothscroll" title="Back to Top" href="#top"><i class="im im-arrow-up" aria-hidden="true"></i></a>
+                    </div>
+                </div>
+    
+            </div> <!-- end footer-bottom -->
+    
+        </footer> <!-- end footer -->
+    
+    
+        <div id="preloader"> 
+            <div id="loader"></div>
+        </div>
+     
+    
+        <!-- Java Script
+        ================================================== -->
+        <script src="js/jquery-3.2.1.min.js"></script>
+        <script src="js/plugins.js"></script>
+        <script src="js/main.js"></script>
 
 </body>
+
 </html>
