@@ -3052,9 +3052,9 @@ html.no-csstransitions .home-content__main {
     position: relative;
 }
 
-@media only screen and (max-width: 800px) {
+@media only screen and (max-width: 600px) {
     .s-contact {
-        background-size: 300%3;
+        background-size: 300%;
     }
 }
 
