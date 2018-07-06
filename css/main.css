@@ -3045,10 +3045,17 @@ html.no-csstransitions .home-content__main {
     background-repeat: no-repeat;
     background-position: left, center;
     background-size: 160%;
+
     padding-top: 13.2rem;
     padding-bottom: 12rem;
     color: rgba(255, 255, 255, 0.5);
     position: relative;
+}
+
+@media only screen and (max-width: 800px) {
+    .s-contact {
+        background-size: 300%3;
+    }
 }
 
 .s-contact .overlay {
