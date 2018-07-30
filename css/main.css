@@ -97,14 +97,14 @@ body {
  * ## links - (_document-setup.scss) 
  * ------------------------------------------------------------------- */
 
-a {/*All links*/
+a, a:visited {/*All links*/
     color: #91eae4;
     -webkit-transition: all 0.3s ease-in-out;
     transition: all 0.3s ease-in-out;
 }
 
 a:hover, a:focus, a:active {
-    color: #191A3F;
+    color: #191A3F;/*original: 191A3F;*/
 }
 
 a:focus {
