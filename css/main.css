@@ -543,7 +543,7 @@ form,
     left: 0;
     right: 0;
     bottom: 0;
-    background: #0F1215;
+    background: #0b3757;/*0F1215 original color*/
     z-index: 800;
     height: 100%;
     width: 100%;
@@ -562,10 +562,10 @@ form,
     margin-left: -30px;
     margin-top: -30px;
     padding: 0;
-    background-color: #862121;
+    background-color: #91eae4; /*LOADING CIRCLE(862121)*/
     border-radius: 100%;
-    -webkit-animation: sk-scaleout 1.0s infinite ease-in-out;
-    animation: sk-scaleout 1.0s infinite ease-in-out;
+    -webkit-animation: sk-scaleout 0.75s infinite-ease-in-out;
+    animation: sk-scaleout 0.75s infinite ease-in-out;
 }
 
 @-webkit-keyframes sk-scaleout {
@@ -3044,7 +3044,7 @@ html.no-csstransitions .home-content__main {
     background-image: url("../images/atldt.jpg");
     background-repeat: no-repeat;
     background-position: left, center;
-    background-size: 160%;
+    background-size: 170%;
 
     padding-top: 13.2rem;
     padding-bottom: 12rem;
@@ -3054,7 +3054,7 @@ html.no-csstransitions .home-content__main {
 
 @media only screen and (max-width: 600px) {
     .s-contact {
-        background-size: 300%;
+        background-size: 310%;
     }
 }
 
