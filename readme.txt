@@ -1,10 +1,13 @@
-==================================================================================================
-This is the repository for my GitHub hosted static website. It was created using a template that is 
-described below (including all the JS scripts and CSS) that was extensively modified to suit my
-desire. The pictures used were found on Pixabay & Pexels. 
+
 ==================================================================================================
 
 DESCRIPTION:
+
+
+This is the repository for my GitHub hosted static website. It was created using a template that is 
+described below (including all the JS scripts and CSS) that was extensively modified to suit my
+desire. The pictures used were found on Pixabay & Pexels. 
+
 
 HOLA is a modern and stylish vCard website template. Designed to be a resume, vCard, portfolio 
 template, it's the perfect template for creative designers, developers, freelancers, photographer 
