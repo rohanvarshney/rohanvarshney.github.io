@@ -1,0 +1,206 @@
+/* Custom improvements to reduce white-space dependency and improve formatting */
+
+/* Improved container spacing and layout */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Better profile page layout with reduced white-space dependency */
+.profile-page .page-header {
+  height: 300px; /* Reduced from 380px */
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-page .profile {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.profile-page .profile img {
+  max-width: 140px; /* Reduced from 160px */
+  width: 100%;
+  margin: 0 auto 1rem;
+  transform: none; /* Remove transform dependency */
+  border-radius: 50%;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.profile-page .profile .name {
+  margin-top: 0; /* Remove negative margin dependency */
+  margin-bottom: 1rem;
+}
+
+.profile-page .description {
+  margin: 2rem auto;
+  max-width: 700px; /* Increased from 600px */
+  line-height: 1.6;
+  padding: 0 1rem;
+}
+
+/* Improved navigation spacing */
+.navbar-nav .nav-item {
+  margin: 0 0.5rem;
+}
+
+.navbar-nav .nav-link {
+  padding: 0.5rem 0.75rem;
+  transition: all 0.3s ease;
+}
+
+/* Better content spacing */
+.main-raised {
+  margin-top: 0; /* Remove margin dependency */
+  padding: 2rem 0;
+}
+
+.profile-content {
+  padding: 2rem 0;
+}
+
+/* Improved text formatting */
+.description p {
+  margin-bottom: 1.5rem;
+  text-align: justify;
+  hyphens: auto;
+}
+
+/* Better responsive layout */
+@media (max-width: 768px) {
+  .profile-page .page-header {
+    height: 250px;
+  }
+  
+  .profile-page .profile img {
+    max-width: 120px;
+  }
+  
+  .container {
+    padding: 0 15px;
+  }
+  
+  .description {
+    padding: 0 0.5rem;
+  }
+}
+
+/* Improved footer spacing */
+.footer {
+  margin-top: 2rem;
+  padding: 1.5rem 0;
+}
+
+/* Better button spacing */
+.btn {
+  margin: 0.25rem;
+  transition: all 0.3s ease;
+}
+
+/* Improved card layouts */
+.card {
+  margin-bottom: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Better form spacing */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+/* Improved list spacing */
+.list-unstyled li {
+  margin-bottom: 0.5rem;
+}
+
+/* Better section spacing */
+.section {
+  padding: 3rem 0;
+}
+
+/* Improved grid system */
+.row {
+  margin: 0 -0.75rem;
+}
+
+.col-md-6 {
+  padding: 0 0.75rem;
+}
+
+/* Better typography spacing */
+h1, h2, h3, h4, h5, h6 {
+  margin-bottom: 1rem;
+  line-height: 1.3;
+}
+
+p {
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+/* Improved social links spacing */
+.profile .btn-link {
+  margin: 0 0.5rem;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+/* Better responsive text sizing */
+@media (max-width: 576px) {
+  .profile-page .description {
+    font-size: 0.95rem;
+  }
+  
+  .navbar-brand {
+    font-size: 1.1rem;
+  }
+}
+
+/* Improved spacing utilities */
+.mb-0 { margin-bottom: 0 !important; }
+.mb-1 { margin-bottom: 0.25rem !important; }
+.mb-2 { margin-bottom: 0.5rem !important; }
+.mb-3 { margin-bottom: 1rem !important; }
+.mb-4 { margin-bottom: 1.5rem !important; }
+.mb-5 { margin-bottom: 3rem !important; }
+
+.mt-0 { margin-top: 0 !important; }
+.mt-1 { margin-top: 0.25rem !important; }
+.mt-2 { margin-top: 0.5rem !important; }
+.mt-3 { margin-top: 1rem !important; }
+.mt-4 { margin-top: 1.5rem !important; }
+.mt-5 { margin-top: 3rem !important; }
+
+.p-0 { padding: 0 !important; }
+.p-1 { padding: 0.25rem !important; }
+.p-2 { padding: 0.5rem !important; }
+.p-3 { padding: 1rem !important; }
+.p-4 { padding: 1.5rem !important; }
+.p-5 { padding: 3rem !important; }
+
+/* Improved flexbox utilities */
+.d-flex { display: flex !important; }
+.flex-column { flex-direction: column !important; }
+.justify-content-center { justify-content: center !important; }
+.align-items-center { align-items: center !important; }
+.flex-wrap { flex-wrap: wrap !important; }
+
+/* Better spacing for mobile */
+@media (max-width: 768px) {
+  .main-raised {
+    padding: 1rem 0;
+  }
+  
+  .profile-content {
+    padding: 1rem 0;
+  }
+  
+  .section {
+    padding: 2rem 0;
+  }
+} 
