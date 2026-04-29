@@ -26,6 +26,7 @@ $(document).ready(function() {
   window_width = $(window).width();
 
   $navbar = $('.navbar[color-on-scroll]');
+  $navbar_color_on_scroll = $('.navbar-color-on-scroll');
   scroll_distance = $navbar.attr('color-on-scroll') || 500;
 
   $navbar_collapse = $('.navbar').find('.navbar-collapse');
@@ -159,12 +160,12 @@ materialKit = {
     if ($(document).scrollTop() > scroll_distance) {
       if (materialKit.misc.transparent) {
         materialKit.misc.transparent = false;
-        $('.navbar-color-on-scroll').removeClass('navbar-transparent');
+        $navbar_color_on_scroll.removeClass('navbar-transparent');
       }
     } else {
       if (!materialKit.misc.transparent) {
         materialKit.misc.transparent = true;
-        $('.navbar-color-on-scroll').addClass('navbar-transparent');
+        $navbar_color_on_scroll.addClass('navbar-transparent');
       }
     }
   }, 17)
