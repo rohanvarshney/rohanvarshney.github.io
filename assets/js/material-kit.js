@@ -28,7 +28,7 @@ $(document).ready(function() {
   $navbar = $('.navbar[color-on-scroll]');
   scroll_distance = $navbar.attr('color-on-scroll') || 500;
 
-  $navbar_collapse = $('.navbar').find('.navbar-collapse');
+  var $navbar_collapse = $('.navbar').find('.navbar-collapse');
 
   //  Activate the Tooltips
   $('[data-toggle="tooltip"], [rel="tooltip"]').tooltip();
