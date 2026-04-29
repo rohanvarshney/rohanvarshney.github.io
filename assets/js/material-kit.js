@@ -59,7 +59,7 @@ $(document).ready(function() {
 
 $(document).on('click', '.navbar-toggler', function() {
   var $html = $("html");
-  $toggle = $(this);
+  var $toggle = $(this);
 
   if (materialKit.misc.navbar_menu_visible == 1) {
     $html.removeClass('nav-open');
