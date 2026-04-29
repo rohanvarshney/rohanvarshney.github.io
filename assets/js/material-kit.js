@@ -17,6 +17,7 @@ var navigator = typeof global !== "undefined" && global.navigator ? global.navig
  */
 
 var big_image;
+var $nav;
 
 if (typeof $ !== 'undefined') {
 $(document).ready(function() {
@@ -25,9 +26,12 @@ $(document).ready(function() {
   // Init Material scripts for buttons ripples, inputs animations etc, more info on the next link https://github.com/FezVrasta/bootstrap-material-design#materialjs
   $('body').bootstrapMaterialDesign();
 
-  window_width = $(window).width();
+  var window_width = $(window).width();
+
+  $nav = $('nav');
 
   $navbar = $('.navbar[color-on-scroll]');
+  $navbar_color_on_scroll = $('.navbar-color-on-scroll');
   scroll_distance = $navbar.attr('color-on-scroll') || 500;
 
   $navbar_collapse = $('.navbar').find('.navbar-collapse');
@@ -59,7 +63,7 @@ $(document).ready(function() {
 if (typeof $ !== 'undefined') {
 $(document).on('click', '.navbar-toggler', function() {
   var $html = $("html");
-  $toggle = $(this);
+  var $toggle = $(this);
 
   if (materialKit.misc.navbar_menu_visible == 1) {
     $html.removeClass('nav-open');
@@ -80,7 +84,7 @@ $(document).on('click', '.navbar-toggler', function() {
     $(div).appendTo("body").click(function() {
       $html.removeClass('nav-open');
 
-      if ($('nav').hasClass('navbar-absolute')) {
+      if ($nav.hasClass('navbar-absolute')) {
         $html.removeClass('nav-open-absolute');
       }
       materialKit.misc.navbar_menu_visible = 0;
@@ -90,7 +94,7 @@ $(document).on('click', '.navbar-toggler', function() {
       }, 550);
     });
 
-    if ($('nav').hasClass('navbar-absolute')) {
+    if ($nav.hasClass('navbar-absolute')) {
       $html.addClass('nav-open-absolute');
     }
 
@@ -107,7 +111,8 @@ materialKit = {
     transparent: true,
     fixedTop: false,
     navbar_initialized: false,
-    isWindow: (typeof document !== 'undefined' ? document.documentMode : false) || (typeof navigator !== 'undefined' && navigator.userAgent ? /Edge/.test(navigator.userAgent) : false)
+    isWindow: (typeof document !== 'undefined' ? document.documentMode : false) || (typeof navigator !== 'undefined' && navigator.userAgent ? /Edge/.test(navigator.userAgent) : false),
+    isAnimating: false
   },
 
   initFormExtendedDatetimepickers: function() {
@@ -152,25 +157,31 @@ materialKit = {
   },
 
   checkScrollForParallax: function() {
-    oVal = ($(window).scrollTop() / 3);
-    big_image.css({
-      'transform': 'translate3d(0,' + oVal + 'px,0)',
-      '-webkit-transform': 'translate3d(0,' + oVal + 'px,0)',
-      '-ms-transform': 'translate3d(0,' + oVal + 'px,0)',
-      '-o-transform': 'translate3d(0,' + oVal + 'px,0)'
-    });
+    if (!materialKit.misc.isAnimating) {
+      materialKit.misc.isAnimating = true;
+      window.requestAnimationFrame(function() {
+        var oVal = ($(window).scrollTop() / 3);
+        big_image.css({
+          'transform': 'translate3d(0,' + oVal + 'px,0)',
+          '-webkit-transform': 'translate3d(0,' + oVal + 'px,0)',
+          '-ms-transform': 'translate3d(0,' + oVal + 'px,0)',
+          '-o-transform': 'translate3d(0,' + oVal + 'px,0)'
+        });
+        materialKit.misc.isAnimating = false;
+      });
+    }
   },
 
   checkScrollForTransparentNavbar: debounce(function() {
     if ($(document).scrollTop() > scroll_distance) {
       if (materialKit.misc.transparent) {
         materialKit.misc.transparent = false;
-        $('.navbar-color-on-scroll').removeClass('navbar-transparent');
+        $navbar_color_on_scroll.removeClass('navbar-transparent');
       }
     } else {
       if (!materialKit.misc.transparent) {
         materialKit.misc.transparent = true;
-        $('.navbar-color-on-scroll').addClass('navbar-transparent');
+        $navbar_color_on_scroll.addClass('navbar-transparent');
       }
     }
   }, 17)
@@ -259,7 +270,6 @@ var BrowserDetect = {
 };
 
 var better_browser = '<div class="container"><div class="better-browser row"><div class="col-md-2"></div><div class="col-md-8"><h3>We are sorry but it looks like your Browser doesn\'t support our website Features. In order to get the full experience please download a new version of your favourite browser.</h3></div><div class="col-md-2"></div><br><div class="col-md-4"><a href="https://www.mozilla.org/ro/firefox/new/" class="btn btn-warning">Mozilla</a><br></div><div class="col-md-4"><a href="https://www.google.com/chrome/browser/desktop/index.html" class="btn ">Chrome</a><br></div><div class="col-md-4"><a href="http://windows.microsoft.com/en-us/internet-explorer/ie-11-worldwide-languages" class="btn">Internet Explorer</a><br></div><br><br><h4>Thank you!</h4></div></div>';
-
-if (typeof module !== "undefined" && module.exports) {
-  module.exports = { BrowserDetect };
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { materialKit, BrowserDetect };
 }
