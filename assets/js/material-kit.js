@@ -17,83 +17,85 @@
 
 var big_image;
 
-$(document).ready(function() {
-  BrowserDetect.init();
+if (typeof $ !== 'undefined') {
+  $(document).ready(function() {
+    BrowserDetect.init();
 
-  // Init Material scripts for buttons ripples, inputs animations etc, more info on the next link https://github.com/FezVrasta/bootstrap-material-design#materialjs
-  $('body').bootstrapMaterialDesign();
+    // Init Material scripts for buttons ripples, inputs animations etc, more info on the next link https://github.com/FezVrasta/bootstrap-material-design#materialjs
+    $('body').bootstrapMaterialDesign();
 
-  window_width = $(window).width();
+    window_width = $(window).width();
 
-  $navbar = $('.navbar[color-on-scroll]');
-  scroll_distance = $navbar.attr('color-on-scroll') || 500;
+    $navbar = $('.navbar[color-on-scroll]');
+    scroll_distance = $navbar.attr('color-on-scroll') || 500;
 
-  $navbar_collapse = $('.navbar').find('.navbar-collapse');
+    $navbar_collapse = $('.navbar').find('.navbar-collapse');
 
-  //  Activate the Tooltips
-  $('[data-toggle="tooltip"], [rel="tooltip"]').tooltip();
+    //  Activate the Tooltips
+    $('[data-toggle="tooltip"], [rel="tooltip"]').tooltip();
 
-  // Activate Popovers
-  $('[data-toggle="popover"]').popover();
+    // Activate Popovers
+    $('[data-toggle="popover"]').popover();
 
-  if ($('.navbar-color-on-scroll').length != 0) {
-    $(window).on('scroll', materialKit.checkScrollForTransparentNavbar);
-  }
-
-  materialKit.checkScrollForTransparentNavbar();
-
-  if (window_width >= 768) {
-    big_image = $('.page-header[data-parallax="true"]');
-    if (big_image.length != 0) {
-      $(window).on('scroll', materialKit.checkScrollForParallax);
+    if ($('.navbar-color-on-scroll').length != 0) {
+      $(window).on('scroll', materialKit.checkScrollForTransparentNavbar);
     }
 
-  }
+    materialKit.checkScrollForTransparentNavbar();
 
-
-});
-
-$(document).on('click', '.navbar-toggler', function() {
-  var $html = $("html");
-  $toggle = $(this);
-
-  if (materialKit.misc.navbar_menu_visible == 1) {
-    $html.removeClass('nav-open');
-    materialKit.misc.navbar_menu_visible = 0;
-    $('#bodyClick').remove();
-    setTimeout(function() {
-      $toggle.removeClass('toggled');
-    }, 550);
-
-    $html.removeClass('nav-open-absolute');
-  } else {
-    setTimeout(function() {
-      $toggle.addClass('toggled');
-    }, 580);
-
-
-    div = '<div id="bodyClick"></div>';
-    $(div).appendTo("body").click(function() {
-      $html.removeClass('nav-open');
-
-      if ($('nav').hasClass('navbar-absolute')) {
-        $html.removeClass('nav-open-absolute');
+    if (window_width >= 768) {
+      big_image = $('.page-header[data-parallax="true"]');
+      if (big_image.length != 0) {
+        $(window).on('scroll', materialKit.checkScrollForParallax);
       }
+
+    }
+
+
+  });
+
+  $(document).on('click', '.navbar-toggler', function() {
+    var $html = $("html");
+    $toggle = $(this);
+
+    if (materialKit.misc.navbar_menu_visible == 1) {
+      $html.removeClass('nav-open');
       materialKit.misc.navbar_menu_visible = 0;
       $('#bodyClick').remove();
       setTimeout(function() {
         $toggle.removeClass('toggled');
       }, 550);
-    });
 
-    if ($('nav').hasClass('navbar-absolute')) {
-      $html.addClass('nav-open-absolute');
+      $html.removeClass('nav-open-absolute');
+    } else {
+      setTimeout(function() {
+        $toggle.addClass('toggled');
+      }, 580);
+
+
+      div = '<div id="bodyClick"></div>';
+      $(div).appendTo("body").click(function() {
+        $html.removeClass('nav-open');
+
+        if ($('nav').hasClass('navbar-absolute')) {
+          $html.removeClass('nav-open-absolute');
+        }
+        materialKit.misc.navbar_menu_visible = 0;
+        $('#bodyClick').remove();
+        setTimeout(function() {
+          $toggle.removeClass('toggled');
+        }, 550);
+      });
+
+      if ($('nav').hasClass('navbar-absolute')) {
+        $html.addClass('nav-open-absolute');
+      }
+
+      $html.addClass('nav-open');
+      materialKit.misc.navbar_menu_visible = 1;
     }
-
-    $html.addClass('nav-open');
-    materialKit.misc.navbar_menu_visible = 1;
-  }
-});
+  });
+}
 
 materialKit = {
   misc: {
@@ -102,7 +104,7 @@ materialKit = {
     transparent: true,
     fixedTop: false,
     navbar_initialized: false,
-    isWindow: document.documentMode || /Edge/.test(navigator.userAgent)
+    isWindow: (typeof document !== 'undefined' && document.documentMode) || (typeof navigator !== 'undefined' && /Edge/.test(navigator.userAgent))
   },
 
   initFormExtendedDatetimepickers: function() {
@@ -193,7 +195,9 @@ function debounce(func, wait, immediate) {
 var BrowserDetect = {
   init: function() {
     this.browser = this.searchString(this.dataBrowser) || "Other";
-    this.version = this.searchVersion(navigator.userAgent) || this.searchVersion(navigator.appVersion) || "Unknown";
+    var userAgent = (typeof navigator !== 'undefined') ? navigator.userAgent : "";
+    var appVersion = (typeof navigator !== 'undefined') ? navigator.appVersion : "";
+    this.version = this.searchVersion(userAgent) || this.searchVersion(appVersion) || "Unknown";
   },
   searchString: function(data) {
     for (var i = 0; i < data.length; i++) {
@@ -220,37 +224,44 @@ var BrowserDetect = {
   },
 
   dataBrowser: [{
-      string: navigator.userAgent,
+      string: (typeof navigator !== 'undefined') ? navigator.userAgent : "",
       subString: "Chrome",
       identity: "Chrome"
     },
     {
-      string: navigator.userAgent,
+      string: (typeof navigator !== 'undefined') ? navigator.userAgent : "",
       subString: "MSIE",
       identity: "Explorer"
     },
     {
-      string: navigator.userAgent,
+      string: (typeof navigator !== 'undefined') ? navigator.userAgent : "",
       subString: "Trident",
       identity: "Explorer"
     },
     {
-      string: navigator.userAgent,
+      string: (typeof navigator !== 'undefined') ? navigator.userAgent : "",
       subString: "Firefox",
       identity: "Firefox"
     },
     {
-      string: navigator.userAgent,
+      string: (typeof navigator !== 'undefined') ? navigator.userAgent : "",
       subString: "Safari",
       identity: "Safari"
     },
     {
-      string: navigator.userAgent,
+      string: (typeof navigator !== 'undefined') ? navigator.userAgent : "",
       subString: "Opera",
       identity: "Opera"
     }
   ]
 
 };
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    BrowserDetect: BrowserDetect,
+    materialKit: materialKit
+  };
+}
 
 var better_browser = '<div class="container"><div class="better-browser row"><div class="col-md-2"></div><div class="col-md-8"><h3>We are sorry but it looks like your Browser doesn\'t support our website Features. In order to get the full experience please download a new version of your favourite browser.</h3></div><div class="col-md-2"></div><br><div class="col-md-4"><a href="https://www.mozilla.org/ro/firefox/new/" class="btn btn-warning">Mozilla</a><br></div><div class="col-md-4"><a href="https://www.google.com/chrome/browser/desktop/index.html" class="btn ">Chrome</a><br></div><div class="col-md-4"><a href="http://windows.microsoft.com/en-us/internet-explorer/ie-11-worldwide-languages" class="btn">Internet Explorer</a><br></div><br><br><h4>Thank you!</h4></div></div>';
