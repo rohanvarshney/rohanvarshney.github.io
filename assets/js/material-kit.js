@@ -16,6 +16,7 @@
  */
 
 var big_image;
+var scroll_distance;
 
 $(document).ready(function() {
   BrowserDetect.init();
@@ -23,12 +24,12 @@ $(document).ready(function() {
   // Init Material scripts for buttons ripples, inputs animations etc, more info on the next link https://github.com/FezVrasta/bootstrap-material-design#materialjs
   $('body').bootstrapMaterialDesign();
 
-  window_width = $(window).width();
+  var window_width = $(window).width();
 
-  $navbar = $('.navbar[color-on-scroll]');
+  var $navbar = $('.navbar[color-on-scroll]');
   scroll_distance = $navbar.attr('color-on-scroll') || 500;
 
-  $navbar_collapse = $('.navbar').find('.navbar-collapse');
+  var $navbar_collapse = $('.navbar').find('.navbar-collapse');
 
   //  Activate the Tooltips
   $('[data-toggle="tooltip"], [rel="tooltip"]').tooltip();
@@ -55,7 +56,7 @@ $(document).ready(function() {
 
 $(document).on('click', '.navbar-toggler', function() {
   var $html = $("html");
-  $toggle = $(this);
+  var $toggle = $(this);
 
   if (materialKit.misc.navbar_menu_visible == 1) {
     $html.removeClass('nav-open');
@@ -72,7 +73,7 @@ $(document).on('click', '.navbar-toggler', function() {
     }, 580);
 
 
-    div = '<div id="bodyClick"></div>';
+    var div = '<div id="bodyClick"></div>';
     $(div).appendTo("body").click(function() {
       $html.removeClass('nav-open');
 
@@ -95,7 +96,7 @@ $(document).on('click', '.navbar-toggler', function() {
   }
 });
 
-materialKit = {
+var materialKit = {
   misc: {
     navbar_menu_visible: 0,
     window_width: 0,
@@ -147,7 +148,7 @@ materialKit = {
   },
 
   checkScrollForParallax: function() {
-    oVal = ($(window).scrollTop() / 3);
+    var oVal = ($(window).scrollTop() / 3);
     big_image.css({
       'transform': 'translate3d(0,' + oVal + 'px,0)',
       '-webkit-transform': 'translate3d(0,' + oVal + 'px,0)',
