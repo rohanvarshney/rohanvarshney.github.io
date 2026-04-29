@@ -102,7 +102,8 @@ materialKit = {
     transparent: true,
     fixedTop: false,
     navbar_initialized: false,
-    isWindow: document.documentMode || /Edge/.test(navigator.userAgent)
+    isWindow: document.documentMode || /Edge/.test(navigator.userAgent),
+    isAnimating: false
   },
 
   initFormExtendedDatetimepickers: function() {
@@ -147,13 +148,19 @@ materialKit = {
   },
 
   checkScrollForParallax: function() {
-    oVal = ($(window).scrollTop() / 3);
-    big_image.css({
-      'transform': 'translate3d(0,' + oVal + 'px,0)',
-      '-webkit-transform': 'translate3d(0,' + oVal + 'px,0)',
-      '-ms-transform': 'translate3d(0,' + oVal + 'px,0)',
-      '-o-transform': 'translate3d(0,' + oVal + 'px,0)'
-    });
+    if (!materialKit.misc.isAnimating) {
+      materialKit.misc.isAnimating = true;
+      window.requestAnimationFrame(function() {
+        var oVal = ($(window).scrollTop() / 3);
+        big_image.css({
+          'transform': 'translate3d(0,' + oVal + 'px,0)',
+          '-webkit-transform': 'translate3d(0,' + oVal + 'px,0)',
+          '-ms-transform': 'translate3d(0,' + oVal + 'px,0)',
+          '-o-transform': 'translate3d(0,' + oVal + 'px,0)'
+        });
+        materialKit.misc.isAnimating = false;
+      });
+    }
   },
 
   checkScrollForTransparentNavbar: debounce(function() {
