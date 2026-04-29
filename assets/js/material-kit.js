@@ -1,3 +1,4 @@
+var navigator = typeof global !== "undefined" && global.navigator ? global.navigator : typeof window !== "undefined" && window.navigator ? window.navigator : {};
 /*!
 
  =========================================================
@@ -18,6 +19,7 @@
 var big_image;
 var $nav;
 
+if (typeof $ !== 'undefined') {
 $(document).ready(function() {
   BrowserDetect.init();
 
@@ -56,7 +58,9 @@ $(document).ready(function() {
 
 
 });
+}
 
+if (typeof $ !== 'undefined') {
 $(document).on('click', '.navbar-toggler', function() {
   var $html = $("html");
   $toggle = $(this);
@@ -98,6 +102,7 @@ $(document).on('click', '.navbar-toggler', function() {
     materialKit.misc.navbar_menu_visible = 1;
   }
 });
+}
 
 materialKit = {
   misc: {
@@ -106,7 +111,7 @@ materialKit = {
     transparent: true,
     fixedTop: false,
     navbar_initialized: false,
-    isWindow: document.documentMode || /Edge/.test(navigator.userAgent)
+    isWindow: (typeof document !== 'undefined' ? document.documentMode : false) || (typeof navigator !== 'undefined' && navigator.userAgent ? /Edge/.test(navigator.userAgent) : false)
   },
 
   initFormExtendedDatetimepickers: function() {
@@ -258,3 +263,7 @@ var BrowserDetect = {
 };
 
 var better_browser = '<div class="container"><div class="better-browser row"><div class="col-md-2"></div><div class="col-md-8"><h3>We are sorry but it looks like your Browser doesn\'t support our website Features. In order to get the full experience please download a new version of your favourite browser.</h3></div><div class="col-md-2"></div><br><div class="col-md-4"><a href="https://www.mozilla.org/ro/firefox/new/" class="btn btn-warning">Mozilla</a><br></div><div class="col-md-4"><a href="https://www.google.com/chrome/browser/desktop/index.html" class="btn ">Chrome</a><br></div><div class="col-md-4"><a href="http://windows.microsoft.com/en-us/internet-explorer/ie-11-worldwide-languages" class="btn">Internet Explorer</a><br></div><br><br><h4>Thank you!</h4></div></div>';
+
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = { BrowserDetect };
+}
