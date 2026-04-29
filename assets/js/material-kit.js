@@ -147,7 +147,7 @@ materialKit = {
   },
 
   checkScrollForParallax: function() {
-    oVal = ($(window).scrollTop() / 3);
+    var oVal = ($(window).scrollTop() / 3);
     big_image.css({
       'transform': 'translate3d(0,' + oVal + 'px,0)',
       '-webkit-transform': 'translate3d(0,' + oVal + 'px,0)',
