@@ -17,6 +17,7 @@
 
 var big_image;
 
+if (typeof $ !== "undefined") {
 $(document).ready(function() {
   BrowserDetect.init();
 
@@ -52,7 +53,9 @@ $(document).ready(function() {
 
 
 });
+}
 
+if (typeof $ !== "undefined") {
 $(document).on('click', '.navbar-toggler', function() {
   var $html = $("html");
   $toggle = $(this);
@@ -94,6 +97,7 @@ $(document).on('click', '.navbar-toggler', function() {
     materialKit.misc.navbar_menu_visible = 1;
   }
 });
+}
 
 materialKit = {
   misc: {
@@ -102,7 +106,7 @@ materialKit = {
     transparent: true,
     fixedTop: false,
     navbar_initialized: false,
-    isWindow: document.documentMode || /Edge/.test(navigator.userAgent)
+    isWindow: (typeof document !== "undefined" ? document.documentMode : false) || /Edge/.test(typeof navigator !== "undefined" ? navigator.userAgent : "")
   },
 
   initFormExtendedDatetimepickers: function() {
@@ -123,6 +127,7 @@ materialKit = {
 
   initSliders: function() {
     // Sliders for demo purpose
+    if (typeof document !== "undefined" && document.getElementById) {
     var slider = document.getElementById('sliderRegular');
 
     noUiSlider.create(slider, {
@@ -144,6 +149,7 @@ materialKit = {
         max: 100
       }
     });
+    }
   },
 
   checkScrollForParallax: function() {
@@ -200,12 +206,13 @@ var BrowserDetect = {
       var dataString = data[i].string;
       this.versionSearchString = data[i].subString;
 
-      if (dataString.indexOf(data[i].subString) !== -1) {
+      if (dataString && dataString.indexOf(data[i].subString) !== -1) {
         return data[i].identity;
       }
     }
   },
   searchVersion: function(dataString) {
+    if (!dataString) return;
     var index = dataString.indexOf(this.versionSearchString);
     if (index === -1) {
       return;
@@ -220,32 +227,32 @@ var BrowserDetect = {
   },
 
   dataBrowser: [{
-      string: navigator.userAgent,
+      get string() { return typeof navigator !== "undefined" ? navigator.userAgent : ""; },
       subString: "Chrome",
       identity: "Chrome"
     },
     {
-      string: navigator.userAgent,
+      get string() { return typeof navigator !== "undefined" ? navigator.userAgent : ""; },
       subString: "MSIE",
       identity: "Explorer"
     },
     {
-      string: navigator.userAgent,
+      get string() { return typeof navigator !== "undefined" ? navigator.userAgent : ""; },
       subString: "Trident",
       identity: "Explorer"
     },
     {
-      string: navigator.userAgent,
+      get string() { return typeof navigator !== "undefined" ? navigator.userAgent : ""; },
       subString: "Firefox",
       identity: "Firefox"
     },
     {
-      string: navigator.userAgent,
+      get string() { return typeof navigator !== "undefined" ? navigator.userAgent : ""; },
       subString: "Safari",
       identity: "Safari"
     },
     {
-      string: navigator.userAgent,
+      get string() { return typeof navigator !== "undefined" ? navigator.userAgent : ""; },
       subString: "Opera",
       identity: "Opera"
     }
@@ -254,3 +261,7 @@ var BrowserDetect = {
 };
 
 var better_browser = '<div class="container"><div class="better-browser row"><div class="col-md-2"></div><div class="col-md-8"><h3>We are sorry but it looks like your Browser doesn\'t support our website Features. In order to get the full experience please download a new version of your favourite browser.</h3></div><div class="col-md-2"></div><br><div class="col-md-4"><a href="https://www.mozilla.org/ro/firefox/new/" class="btn btn-warning">Mozilla</a><br></div><div class="col-md-4"><a href="https://www.google.com/chrome/browser/desktop/index.html" class="btn ">Chrome</a><br></div><div class="col-md-4"><a href="http://windows.microsoft.com/en-us/internet-explorer/ie-11-worldwide-languages" class="btn">Internet Explorer</a><br></div><br><br><h4>Thank you!</h4></div></div>';
+
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = { BrowserDetect };
+}
