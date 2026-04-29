@@ -16,6 +16,7 @@
  */
 
 var big_image;
+var $nav;
 
 $(document).ready(function() {
   BrowserDetect.init();
@@ -24,6 +25,8 @@ $(document).ready(function() {
   $('body').bootstrapMaterialDesign();
 
   window_width = $(window).width();
+
+  $nav = $('nav');
 
   $navbar = $('.navbar[color-on-scroll]');
   scroll_distance = $navbar.attr('color-on-scroll') || 500;
@@ -76,7 +79,7 @@ $(document).on('click', '.navbar-toggler', function() {
     $(div).appendTo("body").click(function() {
       $html.removeClass('nav-open');
 
-      if ($('nav').hasClass('navbar-absolute')) {
+      if ($nav.hasClass('navbar-absolute')) {
         $html.removeClass('nav-open-absolute');
       }
       materialKit.misc.navbar_menu_visible = 0;
@@ -86,7 +89,7 @@ $(document).on('click', '.navbar-toggler', function() {
       }, 550);
     });
 
-    if ($('nav').hasClass('navbar-absolute')) {
+    if ($nav.hasClass('navbar-absolute')) {
       $html.addClass('nav-open-absolute');
     }
 
