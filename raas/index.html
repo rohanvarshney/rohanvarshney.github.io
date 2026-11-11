@@ -9,6 +9,7 @@
   <title>Raas / Garba Resources | Rohan Varshney</title>
   <meta content='width=device-width, initial-scale=1.0, shrink-to-fit=no' name='viewport' />
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+  <script src="../assets/js/analytics.js"></script>
   <style>
     * {
       margin: 0;
@@ -260,8 +261,10 @@
     </div>
 
     <div class="resources">
-      <!-- TODO: Replace href with your Project Files Google Drive link and remove onclick -->
-      <a href="#" onclick="showComingSoon(event, 'Project Files')" class="resource-card">
+      <!-- TODO: Replace href with your Project Files Google Drive link, remove onclick, and change data-analytics-status to "live" -->
+      <a href="#" onclick="showComingSoon(event, 'Project Files')" class="resource-card"
+        data-analytics-event="raas_resource_click" data-analytics-category="raas"
+        data-analytics-label="Project Files" data-analytics-status="coming_soon">
         <div class="resource-icon">
           <i class="fa fa-sliders"></i>
         </div>
@@ -276,8 +279,10 @@
         </div>
       </a>
 
-      <!-- TODO: Replace href with your How to Mix Google Docs link and remove onclick -->
-      <a href="#" onclick="showComingSoon(event, 'How to Mix')" class="resource-card">
+      <!-- TODO: Replace href with your How to Mix Google Docs link, remove onclick, and change data-analytics-status to "live" -->
+      <a href="#" onclick="showComingSoon(event, 'How to Mix')" class="resource-card"
+        data-analytics-event="raas_resource_click" data-analytics-category="raas"
+        data-analytics-label="How to Mix" data-analytics-status="coming_soon">
         <div class="resource-icon">
           <i class="fa fa-book"></i>
         </div>
@@ -292,7 +297,9 @@
         </div>
       </a>
 
-      <a href="https://drive.google.com/drive/folders/1tneKiwTXmKsR8wzAICItM6zUChy3d5NX?usp=sharing" target="_blank" rel="noopener noreferrer" class="resource-card">
+      <a href="https://drive.google.com/drive/folders/1tneKiwTXmKsR8wzAICItM6zUChy3d5NX?usp=sharing" target="_blank" rel="noopener noreferrer" class="resource-card"
+        data-analytics-event="raas_resource_click" data-analytics-category="raas"
+        data-analytics-label="Sound FX" data-analytics-status="live">
         <div class="resource-icon">
           <i class="fa fa-volume-up"></i>
         </div>
@@ -309,7 +316,7 @@
     </div>
 
     <div class="footer">
-      <a href="../">&larr; rohanvarshney.github.io</a>
+      <a href="../" data-analytics-event="navigation_click" data-analytics-category="navigation" data-analytics-label="Home">&larr; rohanvarshney.github.io</a>
     </div>
   </div>
 

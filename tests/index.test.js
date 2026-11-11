@@ -36,6 +36,8 @@ test('index.html structure and content', () => {
     // Footer/Status
     assert.ok(htmlContent.includes('Making data move faster to the right places.'), 'Has status text');
     assert.ok(!htmlContent.includes('/raas'), 'Home page does not link directly to /raas');
+    assert.ok(htmlContent.includes('src="./assets/js/analytics.js"'), 'Includes shared analytics script');
+    assert.ok(htmlContent.includes('data-analytics-event="resume_download"'), 'Tracks resume downloads');
 });
 
 test('raas/index.html structure and content', () => {
@@ -51,4 +53,37 @@ test('raas/index.html structure and content', () => {
     assert.ok(raasContent.includes('coming-soon-banner'), 'Has coming soon banner for unavailable links');
     assert.ok(raasContent.includes('src="../assets/logo.png"'), 'Has main logo');
     assert.ok(raasContent.includes('src="../assets/freehand-signature-3.png"'), 'Has freehand signature logo');
+    assert.ok(raasContent.includes('src="../assets/js/analytics.js"'), 'Includes shared analytics script');
+    assert.ok(raasContent.includes('data-analytics-event="raas_resource_click"'), 'Tracks Raas resource clicks');
+});
+
+test('assets/js/analytics.js configuration and 100% link coverage', () => {
+    const analyticsPath = path.join(__dirname, '..', 'assets', 'js', 'analytics.js');
+    const analyticsContent = fs.readFileSync(analyticsPath, 'utf8');
+
+    assert.ok(analyticsContent.includes('GA_MEASUREMENT_ID'), 'Defines GA_MEASUREMENT_ID');
+    assert.ok(analyticsContent.includes('window.trackAnalyticsEvent'), 'Exposes trackAnalyticsEvent helper');
+    assert.ok(analyticsContent.includes("querySelectorAll('a[href]')"), 'Automatically binds to all a[href] elements');
+
+    const filesToCheck = [
+        path.join(__dirname, '..', 'index.html'),
+        path.join(__dirname, '..', 'raas', 'index.html'),
+    ];
+
+    for (const filePath of filesToCheck) {
+        const content = fs.readFileSync(filePath, 'utf8');
+        const anchorTags = content.match(/<a\b[^>]*>/gi) || [];
+        assert.ok(anchorTags.length > 0, `${path.basename(filePath)} has anchor tags`);
+
+        for (const tag of anchorTags) {
+            assert.ok(
+                tag.includes('data-analytics-event='),
+                `Every <a> tag in ${filePath} has data-analytics-event: ${tag}`
+            );
+            assert.ok(
+                tag.includes('data-analytics-label='),
+                `Every <a> tag in ${filePath} has data-analytics-label: ${tag}`
+            );
+        }
+    }
 });
