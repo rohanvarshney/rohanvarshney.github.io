@@ -35,4 +35,20 @@ test('index.html structure and content', () => {
     
     // Footer/Status
     assert.ok(htmlContent.includes('Making data move faster to the right places.'), 'Has status text');
+    assert.ok(!htmlContent.includes('/raas'), 'Home page does not link directly to /raas');
+});
+
+test('raas/index.html structure and content', () => {
+    const raasPath = path.join(__dirname, '..', 'raas', 'index.html');
+    const raasContent = fs.readFileSync(raasPath, 'utf8');
+
+    assert.ok(raasContent.includes('<!DOCTYPE html>'), 'Has doctype declaration');
+    assert.ok(raasContent.includes('<title>Raas / Garba Resources | Rohan Varshney</title>'), 'Has correct title');
+    assert.ok(raasContent.includes('Project Files'), 'Has Project Files section');
+    assert.ok(raasContent.includes('How to Mix'), 'Has How to Mix section');
+    assert.ok(raasContent.includes('Sound FX'), 'Has Sound FX section');
+    assert.ok(raasContent.includes('href="https://drive.google.com/drive/folders/1tneKiwTXmKsR8wzAICItM6zUChy3d5NX?usp=sharing"'), 'Has Sound FX Google Drive link');
+    assert.ok(raasContent.includes('coming-soon-banner'), 'Has coming soon banner for unavailable links');
+    assert.ok(raasContent.includes('src="../assets/logo.png"'), 'Has main logo');
+    assert.ok(raasContent.includes('src="../assets/freehand-signature-3.png"'), 'Has freehand signature logo');
 });
