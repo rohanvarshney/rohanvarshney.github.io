@@ -61,7 +61,7 @@ test('assets/js/analytics.js configuration and 100% link coverage', () => {
     const analyticsPath = path.join(__dirname, '..', 'assets', 'js', 'analytics.js');
     const analyticsContent = fs.readFileSync(analyticsPath, 'utf8');
 
-    assert.ok(analyticsContent.includes('GA_MEASUREMENT_ID'), 'Defines GA_MEASUREMENT_ID');
+    assert.ok(analyticsContent.includes("var GA_MEASUREMENT_ID = 'G-8RL9F3RF9E';"), 'Configures live GA_MEASUREMENT_ID');
     assert.ok(analyticsContent.includes('window.trackAnalyticsEvent'), 'Exposes trackAnalyticsEvent helper');
     assert.ok(analyticsContent.includes("querySelectorAll('a[href]')"), 'Automatically binds to all a[href] elements');
 

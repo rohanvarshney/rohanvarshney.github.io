@@ -1,10 +1,8 @@
 /**
  * Google Analytics 4 (GA4) Configuration & Custom Event Tracking
- *
- * TODO: Replace 'G-XXXXXXXXXX' below with your actual GA4 Measurement ID.
  */
 (function () {
-  var GA_MEASUREMENT_ID = 'G-XXXXXXXXXX';
+  var GA_MEASUREMENT_ID = 'G-8RL9F3RF9E';
 
   window.dataLayer = window.dataLayer || [];
   function gtag() {
@@ -18,12 +16,17 @@
     GA_MEASUREMENT_ID.indexOf('G-') === 0;
 
   if (isConfigured) {
-    var script = document.createElement('script');
-    script.async = true;
-    script.src =
-      'https://www.googletagmanager.com/gtag/js?id=' +
-      encodeURIComponent(GA_MEASUREMENT_ID);
-    document.head.appendChild(script);
+    var existingScript = document.querySelector(
+      'script[src*="googletagmanager.com/gtag/js"]'
+    );
+    if (!existingScript) {
+      var script = document.createElement('script');
+      script.async = true;
+      script.src =
+        'https://www.googletagmanager.com/gtag/js?id=' +
+        encodeURIComponent(GA_MEASUREMENT_ID);
+      document.head.appendChild(script);
+    }
 
     gtag('js', new Date());
     gtag('config', GA_MEASUREMENT_ID, {
