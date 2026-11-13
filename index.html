@@ -139,19 +139,33 @@
       margin-bottom: 30px;
     }
 
+    .social-section:last-child {
+      margin-bottom: 0;
+    }
+
     .social-section-title {
       font-size: 0.9rem;
       color: #666;
-      margin-bottom: 12px;
+      margin-bottom: 4px;
       text-transform: uppercase;
       letter-spacing: 0.1em;
       font-weight: normal;
+    }
+
+    .social-section-tagline {
+      font-size: 0.9rem;
+      color: #000;
+      margin-bottom: 12px;
     }
 
     .social-icons {
       display: flex;
       flex-wrap: wrap;
       gap: 20px;
+    }
+
+    .social-icons:empty {
+      display: none;
     }
 
     .social-icons a {
@@ -165,11 +179,40 @@
       opacity: 0.7;
     }
 
-    .job-status {
-      font-size: 0.9rem;
-      color: #000;
-      margin-top: auto;
-      padding-top: 20px;
+    .social-icons a svg {
+      width: 1em;
+      height: 1em;
+      fill: currentColor;
+      vertical-align: -0.125em;
+    }
+
+    .banner {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      margin-top: 16px;
+      border: 1px solid #dc143c;
+      border-radius: 8px;
+      background-color: #fff5f7;
+      color: #dc143c;
+      font-size: 0.85rem;
+      letter-spacing: 0.03em;
+    }
+
+    .banner.visible {
+      display: flex;
+    }
+
+    .banner-close {
+      background: none;
+      border: none;
+      color: #dc143c;
+      font-family: inherit;
+      font-size: 1rem;
+      cursor: pointer;
+      padding: 0 4px;
+      line-height: 1;
     }
 
     @media (max-width: 768px) {
@@ -216,6 +259,7 @@
 
       <div class="social-section">
         <div class="social-section-title">Professional</div>
+        <div class="social-section-tagline">Making data move faster to the right places.</div>
         <div class="social-icons">
           <a href="resume.pdf" target="_blank" rel="noopener noreferrer" title="Resumé"
             data-analytics-event="resume_download" data-analytics-category="professional" data-analytics-label="Resume PDF">
@@ -234,6 +278,7 @@
 
       <div class="social-section">
         <div class="social-section-title">Personal</div>
+        <div class="social-section-tagline">Always moving, always eating, always listening.</div>
         <div class="social-icons">
           <a href="https://www.instagram.com/rohanvar" target="_blank" rel="noopener noreferrer" title="Instagram"
             data-analytics-event="social_link_click" data-analytics-category="personal" data-analytics-label="Instagram">
@@ -250,11 +295,64 @@
         </div>
       </div>
 
-      <div class="job-status">
-        Making data move faster to the right places.
+      <div class="social-section">
+        <div class="social-section-title">Portfolio</div>
+        <div class="social-section-tagline">Making crowds move to the right frequencies.</div>
+        <div class="social-icons">
+          <a href="#" onclick="showComingSoon(event, 'Raas / Garba')" title="Raas / Garba"
+            data-analytics-event="portfolio_link_click" data-analytics-category="portfolio"
+            data-analytics-label="Raas / Garba" data-analytics-status="coming_soon">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4.2 20.4a1.1 1.1 0 0 1-.2-1.5L15.6 2.7a1.4 1.4 0 0 1 2.2 1.7L5.7 20.3a1.1 1.1 0 0 1-1.5.1zm15.6 0a1.1 1.1 0 0 1-1.5-.1L6.2 4.4a1.4 1.4 0 0 1 2.2-1.7l11.6 16.2a1.1 1.1 0 0 1-.2 1.5z" />
+            </svg>
+          </a>
+          <a href="#" onclick="showComingSoon(event, 'SpotKit')" title="SpotKit"
+            data-analytics-event="portfolio_link_click" data-analytics-category="portfolio"
+            data-analytics-label="SpotKit" data-analytics-status="coming_soon">
+            <i class="fa fa-music"></i>
+          </a>
+          <a href="#" onclick="showComingSoon(event, 'DJing')" title="DJing"
+            data-analytics-event="portfolio_link_click" data-analytics-category="portfolio"
+            data-analytics-label="DJing" data-analytics-status="coming_soon">
+            <i class="fa fa-headphones"></i>
+          </a>
+          <a href="#" onclick="showComingSoon(event, 'Production')" title="Production"
+            data-analytics-event="portfolio_link_click" data-analytics-category="portfolio"
+            data-analytics-label="Production" data-analytics-status="coming_soon">
+            <i class="fa fa-microphone"></i>
+          </a>
+        </div>
+        <div id="coming-soon-banner" class="banner" role="status" aria-live="polite">
+          <span id="coming-soon-text">Coming soon!</span>
+          <button type="button" class="banner-close" aria-label="Close banner" onclick="hideComingSoon()">&times;</button>
+        </div>
       </div>
     </div>
   </div>
+
+  <script>
+    var bannerTimeout;
+
+    function showComingSoon(event, label) {
+      event.preventDefault();
+      var banner = document.getElementById('coming-soon-banner');
+      var text = document.getElementById('coming-soon-text');
+      text.textContent = label + ' — coming soon!';
+      banner.classList.add('visible');
+
+      if (bannerTimeout) {
+        clearTimeout(bannerTimeout);
+      }
+      bannerTimeout = setTimeout(function () {
+        banner.classList.remove('visible');
+      }, 4000);
+    }
+
+    function hideComingSoon() {
+      var banner = document.getElementById('coming-soon-banner');
+      banner.classList.remove('visible');
+    }
+  </script>
 </body>
 
 </html>

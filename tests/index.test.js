@@ -29,12 +29,23 @@ test('index.html structure and content', () => {
     
     // Personal Links
     assert.ok(htmlContent.includes('href="https://www.instagram.com/rohanvar"'), 'Has Instagram link');
-    assert.ok(htmlContent.includes('href="https://soundcloud.com/rohanvarshney"'), 'Has Soundcloud link');
     assert.ok(htmlContent.includes('href="https://open.spotify.com/user/rohanvar'), 'Has Spotify link');
     assert.ok(htmlContent.includes('href="https://beliapp.co/app/rohanvar"'), 'Has Beli app link');
     
-    // Footer/Status
-    assert.ok(htmlContent.includes('Making data move faster to the right places.'), 'Has status text');
+    // Sections and Taglines
+    assert.ok(htmlContent.includes('Professional'), 'Has Professional section');
+    assert.ok(htmlContent.includes('Making data move faster to the right places.'), 'Has Professional tagline');
+    assert.ok(htmlContent.includes('Personal'), 'Has Personal section');
+    assert.ok(htmlContent.includes('Always moving, always eating, always listening.'), 'Has Personal tagline');
+    assert.ok(htmlContent.includes('Portfolio'), 'Has Portfolio section');
+    assert.ok(htmlContent.includes('Making crowds move to the right frequencies.'), 'Has Portfolio tagline');
+
+    // Portfolio Links and Coming Soon Banner
+    assert.ok(htmlContent.includes('data-analytics-label="Raas / Garba"'), 'Has Raas / Garba portfolio item');
+    assert.ok(htmlContent.includes('data-analytics-label="SpotKit"'), 'Has SpotKit portfolio item');
+    assert.ok(htmlContent.includes('data-analytics-label="DJing"'), 'Has DJing portfolio item');
+    assert.ok(htmlContent.includes('data-analytics-label="Production"'), 'Has Production portfolio item');
+    assert.ok(htmlContent.includes('coming-soon-banner'), 'Has coming soon banner for portfolio links');
     assert.ok(!htmlContent.includes('/raas'), 'Home page does not link directly to /raas');
     assert.ok(htmlContent.includes('src="./assets/js/analytics.js"'), 'Includes shared analytics script');
     assert.ok(htmlContent.includes('data-analytics-event="resume_download"'), 'Tracks resume downloads');
