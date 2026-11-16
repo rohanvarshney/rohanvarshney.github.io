@@ -5,10 +5,11 @@
   var GA_MEASUREMENT_ID = 'G-8RL9F3RF9E';
 
   window.dataLayer = window.dataLayer || [];
-  function gtag() {
-    window.dataLayer.push(arguments);
+  if (typeof window.gtag !== 'function') {
+    window.gtag = function gtag() {
+      window.dataLayer.push(arguments);
+    };
   }
-  window.gtag = gtag;
 
   var isConfigured =
     GA_MEASUREMENT_ID &&
@@ -17,22 +18,18 @@
 
   if (isConfigured) {
     var existingScript = document.querySelector(
-      'script[src*="googletagmanager.com/gtag/js"]'
+      'script[src*="googletagmanager.com/gtm.js"], script[src*="googletagmanager.com/gtag/js"]'
     );
     if (!existingScript) {
       var script = document.createElement('script');
       script.async = true;
       script.src =
-        'https://www.googletagmanager.com/gtag/js?id=' +
+        'https://www.googletagmanager.com/gtm.js?id=' +
         encodeURIComponent(GA_MEASUREMENT_ID);
       document.head.appendChild(script);
-    }
 
-    gtag('js', new Date());
-    gtag('config', GA_MEASUREMENT_ID, {
-      page_path: window.location.pathname,
-      page_title: document.title,
-    });
+      window.gtag('js', new Date());
+    }
   }
 
   /**

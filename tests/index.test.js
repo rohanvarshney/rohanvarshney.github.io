@@ -73,6 +73,7 @@ test('assets/js/analytics.js configuration and 100% link coverage', () => {
     const analyticsContent = fs.readFileSync(analyticsPath, 'utf8');
 
     assert.ok(analyticsContent.includes("var GA_MEASUREMENT_ID = 'G-8RL9F3RF9E';"), 'Configures live GA_MEASUREMENT_ID');
+    assert.ok(analyticsContent.includes('googletagmanager.com/gtm.js'), 'Checks for gtm.js Google tag loader');
     assert.ok(analyticsContent.includes('window.trackAnalyticsEvent'), 'Exposes trackAnalyticsEvent helper');
     assert.ok(analyticsContent.includes("querySelectorAll('a[href]')"), 'Automatically binds to all a[href] elements');
 
@@ -83,6 +84,17 @@ test('assets/js/analytics.js configuration and 100% link coverage', () => {
 
     for (const filePath of filesToCheck) {
         const content = fs.readFileSync(filePath, 'utf8');
+        assert.match(
+            content,
+            /<head>\s*<script async src="https:\/\/www\.googletagmanager\.com\/gtm\.js\?id=G-8RL9F3RF9E"><\/script>\s*<script>\s*window\.dataLayer = window\.dataLayer \|\| \[\];\s*function gtag\(\)\{dataLayer\.push\(arguments\);\}\s*gtag\('js', new Date\(\)\);\s*<\/script>/,
+            `${filePath} includes Google tag snippet immediately after <head>`
+        );
+        assert.strictEqual(
+            (content.match(/googletagmanager\.com\//g) || []).length,
+            1,
+            `${filePath} includes exactly one Google tag`
+        );
+
         const anchorTags = content.match(/<a\b[^>]*>/gi) || [];
         assert.ok(anchorTags.length > 0, `${path.basename(filePath)} has anchor tags`);
 
