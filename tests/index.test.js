@@ -59,15 +59,16 @@ test('raas/index.html structure and content', () => {
     assert.ok(raasContent.includes('<title>Raas / Garba Resources | Rohan Varshney</title>'), 'Has correct title');
     assert.ok(raasContent.includes('id="statistics"'), 'Has Statistics section');
     assert.ok(raasContent.includes('Statistics'), 'Has Statistics heading');
-    assert.ok(raasContent.includes('<div class="stat-value">23</div>'), 'Has 23 Team Mixes stat');
+    assert.ok(raasContent.includes('<div class="stat-value">22</div>'), 'Has 22 Team Mixes stat');
     assert.ok(raasContent.includes('<div class="stat-value">14</div>'), 'Has 14 Colleges & Teams stat');
     assert.ok(raasContent.includes('<div class="stat-value">87</div>'), 'Has 87 Bid Points Earned stat');
     assert.ok(raasContent.includes('National Champion Mixes'), 'Has National Champion Mixes card');
     assert.ok(raasContent.includes('aria-label="2 National Champion Mixes"'), 'Has 2 National Champion Mixes card label');
     assert.ok(raasContent.includes('<div class="stat-value">11</div>'), 'Has 11 Circuit Mixtapes stat');
     assert.ok(raasContent.includes('<div class="stat-label">Circuit Mixtapes</div>'), 'Has Circuit Mixtapes label without Ladders');
-    assert.ok(raasContent.includes('<div class="stat-value">1,792</div>'), 'Has 1,792 Audio Bounces Exported stat');
+    assert.ok(raasContent.includes('<div class="stat-value">1,788</div>'), 'Has 1,788 Audio Bounces Exported stat');
     assert.ok(raasContent.includes('<div class="stat-label">RAS Mixes</div>'), 'Has RAS Mixes card');
+    assert.ok(raasContent.includes('<div class="stat-value">6</div>'), 'Has 6 Years Mixing stat');
     assert.ok(raasContent.includes('<div class="stat-label">Years Mixing</div>'), 'Has Years Mixing card');
     assert.strictEqual(
         (raasContent.match(/class="stat-info-btn"/g) || []).length,
@@ -81,8 +82,8 @@ test('raas/index.html structure and content', () => {
     );
     assert.strictEqual(
         (raasContent.match(/class="map-pin-star"/g) || []).length,
-        2,
-        'Has star pinpoints for GT and DSD'
+        3,
+        'Has star pinpoints for GT, UCF, and DSD'
     );
     assert.ok(raasContent.includes('us-map-svg'), 'Has US heatmap SVG');
     assert.ok(raasContent.includes('map-tooltip'), 'Has map hover tooltip');
@@ -112,10 +113,15 @@ test('raas/index.html structure and content', () => {
 
     assert.ok(raasContent.includes('Fun Facts'), 'Has Fun Facts subsection');
     assert.ok(!raasContent.includes('Discarded Segments'), 'Fun Facts does not mention Discarded Segments');
+    assert.ok(!raasContent.includes('Qurbani'), 'GT Qurbani is removed from statistics and map');
     assert.ok(raasContent.includes('id="hall-of-fame"'), 'Has Hall Of Fame section');
     assert.ok(raasContent.includes('Hall Of Fame'), 'Has Hall Of Fame heading');
     assert.ok(raasContent.includes('DSD Mix 2021'), 'Has DSD Mix 2021 Hall Of Fame item');
     assert.ok(raasContent.includes('GT Mix 2022'), 'Has GT Mix 2022 Hall Of Fame item');
+    assert.ok(raasContent.includes('Raas Chaos Mixtape'), 'Has Raas Chaos Mixtape Hall Of Fame item');
+    assert.ok(raasContent.includes('Chunalida'), 'Raas Chaos Mixtape mentions Chunalida');
+    assert.ok(raasContent.includes('Feel So Raas'), 'Raas Chaos Mixtape mentions Feel So Raas');
+    assert.ok(raasContent.includes('GT 19-20'), 'Has GT 19-20 Hall Of Fame item');
     assert.ok(raasContent.includes('data-analytics-event="raas_hof_click"'), 'Tracks Hall Of Fame clicks');
     assert.ok(raasContent.includes('id="resources"'), 'Has Resources section');
     assert.ok(raasContent.includes('Resources'), 'Has Resources heading');
