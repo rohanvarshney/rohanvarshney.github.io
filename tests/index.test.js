@@ -46,7 +46,7 @@ test('index.html structure and content', () => {
     assert.ok(htmlContent.includes('data-analytics-label="DJing"'), 'Has DJing portfolio item');
     assert.ok(htmlContent.includes('data-analytics-label="Production"'), 'Has Production portfolio item');
     assert.ok(htmlContent.includes('coming-soon-banner'), 'Has coming soon banner for portfolio links');
-    assert.ok(!htmlContent.includes('/raas'), 'Home page does not link directly to /raas');
+    assert.ok(htmlContent.includes('href="/raas"'), 'Home page links directly to /raas');
     assert.ok(htmlContent.includes('src="./assets/js/analytics.js"'), 'Includes shared analytics script');
     assert.ok(htmlContent.includes('data-analytics-event="resume_download"'), 'Tracks resume downloads');
 });
@@ -59,13 +59,23 @@ test('raas/index.html structure and content', () => {
     assert.ok(raasContent.includes('<title>Raas / Garba Resources | Rohan Varshney</title>'), 'Has correct title');
     assert.ok(raasContent.includes('id="statistics"'), 'Has Statistics section');
     assert.ok(raasContent.includes('Statistics'), 'Has Statistics heading');
-    assert.ok(raasContent.includes('<div class="stat-value">24</div>'), 'Has 24 Team Mixes stat');
+    assert.ok(raasContent.includes('<div class="stat-value">23</div>'), 'Has 23 Team Mixes stat');
     assert.ok(raasContent.includes('<div class="stat-value">14</div>'), 'Has 14 Colleges & Teams stat');
     assert.ok(raasContent.includes('<div class="stat-value">87</div>'), 'Has 87 Bid Points Earned stat');
     assert.ok(raasContent.includes('National Champion Mixes'), 'Has National Champion Mixes card');
     assert.ok(raasContent.includes('aria-label="2 National Champion Mixes"'), 'Has 2 National Champion Mixes card label');
     assert.ok(raasContent.includes('<div class="stat-value">12</div>'), 'Has 12 Circuit Mixtapes & Ladders stat');
-    assert.ok(raasContent.includes('<div class="stat-value">1,261</div>'), 'Has 1,261 Audio Bounces Exported stat');
+    assert.ok(raasContent.includes('<div class="stat-value">1,792</div>'), 'Has 1,792 Audio Bounces Exported stat');
+    assert.strictEqual(
+        (raasContent.match(/class="stat-info-btn"/g) || []).length,
+        6,
+        'Has info button on all 6 stat cards'
+    );
+    assert.strictEqual(
+        (raasContent.match(/class="stat-info-popover"/g) || []).length,
+        6,
+        'Has info elaboration popover on all 6 stat cards'
+    );
     assert.ok(raasContent.includes('us-map-svg'), 'Has US heatmap SVG');
     assert.ok(raasContent.includes('map-tooltip'), 'Has map hover tooltip');
 
@@ -73,7 +83,7 @@ test('raas/index.html structure and content', () => {
         ['GT Ramblin\' Raas', '2018, 2019, 2021, 2022'],
         ['UCF Knightraas', '2019, 2021, 2022'],
         ['Dirty South Dandiya', '2021, 2022'],
-        ['Cornell Big Red Raas', '2021, 2022'],
+        ['Cornell Big Red Raas', '2021'],
         ['Columbia Raas', '2019, 2021'],
         ['UVA Hooraas', '2021'],
         ['VCU Ricochet Raas', '2021'],
@@ -93,6 +103,7 @@ test('raas/index.html structure and content', () => {
     }
 
     assert.ok(raasContent.includes('Fun Facts'), 'Has Fun Facts subsection');
+    assert.ok(!raasContent.includes('Discarded Segments'), 'Fun Facts does not mention Discarded Segments');
     assert.ok(raasContent.includes('id="hall-of-fame"'), 'Has Hall Of Fame section');
     assert.ok(raasContent.includes('Hall Of Fame'), 'Has Hall Of Fame heading');
     assert.ok(raasContent.includes('DSD Mix 2021'), 'Has DSD Mix 2021 Hall Of Fame item');

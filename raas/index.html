@@ -136,11 +136,73 @@
     }
 
     .stat-card {
+      position: relative;
       padding: 20px 14px;
       border: 1px solid #d0d0d0;
       border-radius: 12px;
       background-color: #fafafa;
       text-align: center;
+    }
+
+    .stat-info-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 1px solid #bbb;
+      background-color: #fff;
+      color: #666;
+      font-family: Georgia, serif;
+      font-style: italic;
+      font-weight: 700;
+      font-size: 0.72rem;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 0;
+      transition: border-color 0.2s, color 0.2s, background-color 0.2s;
+    }
+
+    .stat-info-btn:hover,
+    .stat-info-btn:focus,
+    .stat-card.info-open .stat-info-btn {
+      border-color: #dc143c;
+      background-color: #dc143c;
+      color: #fff;
+      outline: none;
+    }
+
+    .stat-info-popover {
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      width: 240px;
+      background-color: #111;
+      color: #fff;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid #dc143c;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
+      font-size: 0.75rem;
+      line-height: 1.45;
+      text-align: left;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.15s ease, visibility 0.15s ease;
+      z-index: 20;
+    }
+
+    .stat-info-btn:hover + .stat-info-popover,
+    .stat-info-btn:focus + .stat-info-popover,
+    .stat-card.info-open .stat-info-popover {
+      opacity: 1;
+      visibility: visible;
     }
 
     .stat-value {
@@ -537,6 +599,22 @@
         grid-template-columns: repeat(2, 1fr);
       }
 
+      .stat-info-popover {
+        width: 200px;
+        font-size: 0.7rem;
+      }
+
+      .stat-card:nth-child(odd) .stat-info-popover {
+        left: 0;
+        transform: none;
+      }
+
+      .stat-card:nth-child(even) .stat-info-popover {
+        left: auto;
+        right: 0;
+        transform: none;
+      }
+
       .map-card {
         padding: 16px;
       }
@@ -588,27 +666,51 @@
       <h2 class="section-title">Statistics</h2>
       <div class="stats-grid">
         <div class="stat-card">
-          <div class="stat-value">24</div>
+          <button type="button" class="stat-info-btn" aria-label="Info about Team Mixes" aria-expanded="false">i</button>
+          <div class="stat-info-popover" role="tooltip">
+            21 collegiate Raas routines (2018&ndash;2023) &mdash; 1 in 2018&ndash;19, 5 in 2019&ndash;20, 12 in 2021&ndash;22, and 3 in 2022&ndash;23 &mdash; plus 2 Georgia Tech fusion routines (GT Nazaaqat &amp; GT Qurbani in 2019&ndash;20).
+          </div>
+          <div class="stat-value">23</div>
           <div class="stat-label">Team Mixes</div>
         </div>
         <div class="stat-card">
+          <button type="button" class="stat-info-btn" aria-label="Info about Colleges &amp; Teams" aria-expanded="false">i</button>
+          <div class="stat-info-popover" role="tooltip">
+            14 universities mixed for across 9 states (GT, UCF, UT Austin, Cornell, Columbia, CMU, UNC, UVA, VCU, Pitt, UMiami, UF, SLU, UC Riverside), including 3 teams at Georgia Tech (Ramblin' Raas, Nazaaqat, Qurbani).
+          </div>
           <div class="stat-value">14</div>
           <div class="stat-label">Colleges &amp; Teams</div>
         </div>
         <div class="stat-card">
+          <button type="button" class="stat-info-btn" aria-label="Info about Bid Points Earned" aria-expanded="false">i</button>
+          <div class="stat-info-popover" role="tooltip">
+            Official Raas All-Stars (RAS) bid points earned with RovA mixes: 11 pts in 2019&ndash;20 (GT 8, UCF 3), 41 pts in 2021&ndash;22 (Cornell 10, DSD 10, UVA 10, GT 7, UCF 3, VCU 1), and 35 pts in 2022&ndash;23 (GT 16, DSD 14, UCF 5).
+          </div>
           <div class="stat-value">87</div>
           <div class="stat-label">Bid Points Earned</div>
         </div>
         <div class="stat-card stat-card-featured" aria-label="2 National Champion Mixes">
+          <button type="button" class="stat-info-btn" aria-label="Info about National Champion Mixes" aria-expanded="false">i</button>
+          <div class="stat-info-popover" role="tooltip">
+            Back-to-back Raas All-Stars (RAS) National Championship-winning mixes: Dirty South Dandiya (RAS XIII, 2021) and GT Ramblin' Raas (RAS XIV, 2022).
+          </div>
           <div class="stat-value">2</div>
           <div class="stat-label">National Champion Mixes</div>
         </div>
         <div class="stat-card">
+          <button type="button" class="stat-info-btn" aria-label="Info about Circuit Mixtapes &amp; Ladders" aria-expanded="false">i</button>
+          <div class="stat-info-popover" role="tooltip">
+            Official circuit mixtapes, intros &amp; ladder runs: A-Town Showdown (19&ndash;20 &amp; 20&ndash;21), RAS (XII, XIII &amp; XV Album), DDN Ladder 2021, DTX Dandiya, Raas Rampage (21&ndash;22 &amp; 22&ndash;23), Rangeelo Raas, Raas Chaos, and Raas Collab.
+          </div>
           <div class="stat-value">12</div>
           <div class="stat-label">Circuit Mixtapes &amp; Ladders</div>
         </div>
         <div class="stat-card">
-          <div class="stat-value">1,261</div>
+          <button type="button" class="stat-info-btn" aria-label="Info about Audio Bounces Exported" aria-expanded="false">i</button>
+          <div class="stat-info-popover" role="tooltip">
+            Inferred from the highest version number (vN) reached in each segment/mix folder (2018&ndash;2025): 1,261 bounce files (.mp3/.wav) saved on disk plus 531 earlier v1&ndash;v(N-1) drafts.
+          </div>
+          <div class="stat-value">1,792</div>
           <div class="stat-label">Audio Bounces Exported</div>
         </div>
       </div>
@@ -664,12 +766,12 @@
                 <circle class="map-pin-core" cx="453.6" cy="492.4" r="5.5" />
                 <circle cx="453.6" cy="492.4" r="10" fill="transparent" />
               </g>
-              <g class="map-pin" tabindex="0" role="button" aria-label="Cornell Big Red Raas — 2021, 2022"
-                data-team="Cornell Big Red Raas" data-school="Cornell University • Ithaca, NY" data-years="2021, 2022" data-points="10">
-                <circle cx="810.0" cy="181.3" r="28" fill="url(#heat-glow)" style="pointer-events: none;" />
-                <circle class="map-pin-halo" cx="810.0" cy="181.3" r="16" />
-                <circle class="map-pin-core" cx="810.0" cy="181.3" r="5.5" />
-                <circle cx="810.0" cy="181.3" r="10" fill="transparent" />
+              <g class="map-pin" tabindex="0" role="button" aria-label="Cornell Big Red Raas — 2021"
+                data-team="Cornell Big Red Raas" data-school="Cornell University • Ithaca, NY" data-years="2021" data-points="10">
+                <circle cx="810.0" cy="181.3" r="22" fill="url(#heat-glow)" style="pointer-events: none;" />
+                <circle class="map-pin-halo" cx="810.0" cy="181.3" r="12" />
+                <circle class="map-pin-core" cx="810.0" cy="181.3" r="4.5" />
+                <circle cx="810.0" cy="181.3" r="9" fill="transparent" />
               </g>
               <g class="map-pin" tabindex="0" role="button" aria-label="Columbia Raas — 2019, 2021"
                 data-team="Columbia Raas" data-school="Columbia University • New York, NY" data-years="2019, 2021" data-points="0">
@@ -754,8 +856,8 @@
       <div class="fun-facts">
         <div class="fun-facts-title">Fun Facts</div>
         <ul class="fun-facts-list">
-          <li><strong>7-year mixing career (2018&ndash;2025)</strong> spanning <strong>1,261 exported audio bounces</strong> and <strong>1,095 stems &amp; samples</strong> across team routines, circuit mixtapes, DDN Ladder rounds, and standalone mashups.</li>
-          <li>Mixed for <strong>12 collegiate Raas teams in the 2021&ndash;22 comeback season alone</strong> (CMU, Columbia, Cornell, DSD, GT, SLU, UCF, UCR, UF, UNC, UVA, VCU), plus <strong>17 unreleased &amp; meme cuts</strong> in the <code>Discarded Segments</code> vault.</li>
+          <li><strong>7-year mixing career (2018&ndash;2025)</strong> spanning <strong>1,792 exported audio bounces</strong> and <strong>1,095 stems &amp; samples</strong> across team routines, circuit mixtapes, DDN Ladder rounds, and standalone mashups.</li>
+          <li>Mixed for <strong>12 collegiate Raas teams in the 2021&ndash;22 comeback season alone</strong> (CMU, Columbia, Cornell, DSD, GT, SLU, UCF, UCR, UF, UNC, UVA, and VCU) after 2020 competitions were canceled.</li>
           <li>Deepest revision history in the archive: <strong>44 full-mix bounces</strong> for UCF 2022&ndash;23 (<code>UCF2022Full v44</code>), <strong>26 versions</strong> of a single segment (<code>Shankar v26</code> for DSD 21&ndash;22), and <strong>24 full-mix iterations</strong> for GT Ramblin' Raas 19&ndash;20.</li>
           <li>Produced <strong>12 official competition mixtapes &amp; ladder runs</strong> (RAS XII/XIII/XV, ATS, Raas Rampage, Raas Chaos, DTX Dandiya, Rangeelo Raas, DDN Ladder, Raas Collab) plus <strong>20+ standalone singles &amp; remixes</strong> through 2025 (<code>Dankonteroopty</code>, <code>VariD(o)NA</code>, <code>BollyChemical</code>, <code>Airplanes at 945AM</code>, <code>Greedy Asvaar</code>).</li>
         </ul>
@@ -987,7 +1089,7 @@
       var STATE_HEAT_DATA = {
         '13': { color: '#dc143c', mixes: 6 },
         '12': { color: '#dc143c', mixes: 5 },
-        '36': { color: '#e44967', mixes: 4 },
+        '36': { color: '#e44967', mixes: 3 },
         '42': { color: '#ee859a', mixes: 2 },
         '48': { color: '#ee859a', mixes: 2 },
         '51': { color: '#ee859a', mixes: 2 },
@@ -1106,6 +1208,45 @@
             // Keep the embedded US silhouette fallback when offline.
           });
       }
+    })();
+
+    (function initStatInfoPopovers() {
+      var infoBtns = document.querySelectorAll('.stat-info-btn');
+
+      function closeAllInfoPopovers(exceptCard) {
+        document.querySelectorAll('.stat-card.info-open').forEach(function (card) {
+          if (card !== exceptCard) {
+            card.classList.remove('info-open');
+            var btn = card.querySelector('.stat-info-btn');
+            if (btn) {
+              btn.setAttribute('aria-expanded', 'false');
+            }
+          }
+        });
+      }
+
+      infoBtns.forEach(function (btn) {
+        btn.addEventListener('click', function (event) {
+          event.stopPropagation();
+          var card = btn.closest('.stat-card');
+          if (!card) {
+            return;
+          }
+          var isOpen = card.classList.contains('info-open');
+          closeAllInfoPopovers(card);
+          if (isOpen) {
+            card.classList.remove('info-open');
+            btn.setAttribute('aria-expanded', 'false');
+          } else {
+            card.classList.add('info-open');
+            btn.setAttribute('aria-expanded', 'true');
+          }
+        });
+      });
+
+      document.addEventListener('click', function () {
+        closeAllInfoPopovers(null);
+      });
     })();
   </script>
 </body>
