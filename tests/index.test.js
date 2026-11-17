@@ -59,16 +59,18 @@ test('raas/index.html structure and content', () => {
     assert.ok(raasContent.includes('<title>Raas / Garba Resources | Rohan Varshney</title>'), 'Has correct title');
     assert.ok(raasContent.includes('id="statistics"'), 'Has Statistics section');
     assert.ok(raasContent.includes('Statistics'), 'Has Statistics heading');
-    assert.ok(raasContent.includes('<div class="stat-value">19</div>'), 'Has 19 Team Mixes stat');
-    assert.ok(raasContent.includes('<div class="stat-value">12</div>'), 'Has 12 Colleges Mixed For stat');
+    assert.ok(raasContent.includes('<div class="stat-value">24</div>'), 'Has 24 Team Mixes stat');
+    assert.ok(raasContent.includes('<div class="stat-value">14</div>'), 'Has 14 Colleges & Teams stat');
     assert.ok(raasContent.includes('<div class="stat-value">87</div>'), 'Has 87 Bid Points Earned stat');
     assert.ok(raasContent.includes('National Champion Mixes'), 'Has National Champion Mixes card');
     assert.ok(raasContent.includes('aria-label="2 National Champion Mixes"'), 'Has 2 National Champion Mixes card label');
+    assert.ok(raasContent.includes('<div class="stat-value">12</div>'), 'Has 12 Circuit Mixtapes & Ladders stat');
+    assert.ok(raasContent.includes('<div class="stat-value">1,261</div>'), 'Has 1,261 Audio Bounces Exported stat');
     assert.ok(raasContent.includes('us-map-svg'), 'Has US heatmap SVG');
     assert.ok(raasContent.includes('map-tooltip'), 'Has map hover tooltip');
 
     const expectedPins = [
-        ['GT Ramblin\' Raas', '2019, 2021, 2022'],
+        ['GT Ramblin\' Raas', '2018, 2019, 2021, 2022'],
         ['UCF Knightraas', '2019, 2021, 2022'],
         ['Dirty South Dandiya', '2021, 2022'],
         ['Cornell Big Red Raas', '2021, 2022'],
@@ -76,6 +78,8 @@ test('raas/index.html structure and content', () => {
         ['UVA Hooraas', '2021'],
         ['VCU Ricochet Raas', '2021'],
         ['Pitt PantheRaas', '2019'],
+        ['CMU Raasta', '2021'],
+        ['UNC Tar Heel Raas', '2021'],
         ['UM SwaggeRaas', '2019'],
         ['UF Gatoraas', '2021'],
         ['SLU Raas', '2021'],

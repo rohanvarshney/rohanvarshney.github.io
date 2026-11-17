@@ -130,7 +130,7 @@
 
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 16px;
       margin-bottom: 16px;
     }
@@ -588,12 +588,12 @@
       <h2 class="section-title">Statistics</h2>
       <div class="stats-grid">
         <div class="stat-card">
-          <div class="stat-value">19</div>
+          <div class="stat-value">24</div>
           <div class="stat-label">Team Mixes</div>
         </div>
         <div class="stat-card">
-          <div class="stat-value">12</div>
-          <div class="stat-label">Colleges Mixed For</div>
+          <div class="stat-value">14</div>
+          <div class="stat-label">Colleges &amp; Teams</div>
         </div>
         <div class="stat-card">
           <div class="stat-value">87</div>
@@ -602,6 +602,14 @@
         <div class="stat-card stat-card-featured" aria-label="2 National Champion Mixes">
           <div class="stat-value">2</div>
           <div class="stat-label">National Champion Mixes</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">12</div>
+          <div class="stat-label">Circuit Mixtapes &amp; Ladders</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">1,261</div>
+          <div class="stat-label">Audio Bounces Exported</div>
         </div>
       </div>
 
@@ -616,9 +624,9 @@
             <span class="legend-swatch" style="background-color: #ebebeb;" title="0 mixes"></span>
             <span class="legend-swatch" style="background-color: #f7c6d0;" title="1 mix"></span>
             <span class="legend-swatch" style="background-color: #ee859a;" title="2 mixes"></span>
-            <span class="legend-swatch" style="background-color: #e44967;" title="3 mixes"></span>
-            <span class="legend-swatch" style="background-color: #dc143c;" title="4-5 mixes"></span>
-            <span>5 Mixes</span>
+            <span class="legend-swatch" style="background-color: #e44967;" title="3-4 mixes"></span>
+            <span class="legend-swatch" style="background-color: #dc143c;" title="5-6 mixes"></span>
+            <span>6 Mixes</span>
           </div>
         </div>
         <div class="map-wrapper" id="map-wrapper">
@@ -635,8 +643,8 @@
                 d="M 57.5,14.2 L 86.0,8.8 L 501.1,66.1 L 501.0,59.4 L 586.9,85.3 L 667.2,111.6 L 700.5,123.2 L 711.2,186.0 L 703.5,203.2 L 766.9,179.3 L 802.4,146.8 L 824.4,118.8 L 875.7,106.2 L 916.8,38.0 L 945.0,86.2 L 908.1,132.8 L 919.2,172.3 L 860.4,215.8 L 852.3,257.7 L 844.7,306.2 L 861.4,340.1 L 813.2,382.5 L 773.4,442.6 L 812.6,546.5 L 812.1,580.7 L 782.0,590.0 L 752.7,530.6 L 718.5,484.9 L 653.5,485.0 L 622.3,514.8 L 530.8,505.5 L 463.3,548.9 L 464.8,591.8 L 416.7,554.5 L 379.3,500.6 L 338.7,516.0 L 286.3,447.1 L 198.9,446.8 L 134.8,402.9 L 89.3,397.9 L 36.3,337.9 L 23.1,255.9 L 8.3,189.4 L 24.2,132.1 L 53.2,64.9 Z" />
             </g>
             <g id="us-pins-layer">
-              <g class="map-pin" tabindex="0" role="button" aria-label="GT Ramblin' Raas — 2019, 2021, 2022"
-                data-team="GT Ramblin' Raas" data-school="Georgia Tech • Atlanta, GA" data-years="2019, 2021, 2022" data-points="31">
+              <g class="map-pin" tabindex="0" role="button" aria-label="GT Ramblin' Raas — 2018, 2019, 2021, 2022"
+                data-team="GT Ramblin' Raas" data-school="Georgia Tech (+ Nazaaqat &amp; Qurbani) • Atlanta, GA" data-years="2018, 2019, 2021, 2022" data-points="31">
                 <circle cx="704.2" cy="399.9" r="34" fill="url(#heat-glow)" style="pointer-events: none;" />
                 <circle class="map-pin-halo" cx="704.2" cy="399.9" r="20" />
                 <circle class="map-pin-core" cx="704.2" cy="399.9" r="6.5" />
@@ -686,10 +694,24 @@
               </g>
               <g class="map-pin" tabindex="0" role="button" aria-label="Pitt PantheRaas — 2019"
                 data-team="Pitt PantheRaas" data-school="University of Pittsburgh • Pittsburgh, PA" data-years="2019" data-points="0">
-                <circle cx="760.7" cy="237.4" r="22" fill="url(#heat-glow)" style="pointer-events: none;" />
-                <circle class="map-pin-halo" cx="760.7" cy="237.4" r="12" />
-                <circle class="map-pin-core" cx="760.7" cy="237.4" r="4.5" />
-                <circle cx="760.7" cy="237.4" r="9" fill="transparent" />
+                <circle cx="754.0" cy="238.5" r="22" fill="url(#heat-glow)" style="pointer-events: none;" />
+                <circle class="map-pin-halo" cx="754.0" cy="238.5" r="12" />
+                <circle class="map-pin-core" cx="754.0" cy="238.5" r="4.5" />
+                <circle cx="754.0" cy="238.5" r="9" fill="transparent" />
+              </g>
+              <g class="map-pin" tabindex="0" role="button" aria-label="CMU Raasta — 2021"
+                data-team="CMU Raasta" data-school="Carnegie Mellon University • Pittsburgh, PA" data-years="2021" data-points="0">
+                <circle cx="768.0" cy="236.0" r="22" fill="url(#heat-glow)" style="pointer-events: none;" />
+                <circle class="map-pin-halo" cx="768.0" cy="236.0" r="12" />
+                <circle class="map-pin-core" cx="768.0" cy="236.0" r="4.5" />
+                <circle cx="768.0" cy="236.0" r="9" fill="transparent" />
+              </g>
+              <g class="map-pin" tabindex="0" role="button" aria-label="UNC Tar Heel Raas — 2021"
+                data-team="UNC Tar Heel Raas" data-school="UNC Chapel Hill • Chapel Hill, NC" data-years="2021" data-points="0">
+                <circle cx="794.6" cy="337.0" r="22" fill="url(#heat-glow)" style="pointer-events: none;" />
+                <circle class="map-pin-halo" cx="794.6" cy="337.0" r="12" />
+                <circle class="map-pin-core" cx="794.6" cy="337.0" r="4.5" />
+                <circle cx="794.6" cy="337.0" r="9" fill="transparent" />
               </g>
               <g class="map-pin" tabindex="0" role="button" aria-label="UM SwaggeRaas — 2019"
                 data-team="UM SwaggeRaas" data-school="University of Miami • Coral Gables, FL" data-years="2019" data-points="0">
@@ -732,10 +754,10 @@
       <div class="fun-facts">
         <div class="fun-facts-title">Fun Facts</div>
         <ul class="fun-facts-list">
-          <li>Mixed for <strong>10 teams</strong> in the 2021 comeback season alone after 2020 competitions were canceled.</li>
-          <li>Earned <strong>35 bid points</strong> across just 4 mixes in 2022, peaking at 8.75 points per mix.</li>
-          <li>Multi-year collaborator for <strong>GT Ramblin' Raas</strong> (31 pts), <strong>Dirty South Dandiya</strong> (24 pts), and <strong>UCF Knightraas</strong> (11 pts).</li>
-          <li>Reached <strong>8 states</strong> coast to coast &mdash; from UC Riverside in California to Columbia and Cornell in New York.</li>
+          <li><strong>7-year mixing career (2018&ndash;2025)</strong> spanning <strong>1,261 exported audio bounces</strong> and <strong>1,095 stems &amp; samples</strong> across team routines, circuit mixtapes, DDN Ladder rounds, and standalone mashups.</li>
+          <li>Mixed for <strong>12 collegiate Raas teams in the 2021&ndash;22 comeback season alone</strong> (CMU, Columbia, Cornell, DSD, GT, SLU, UCF, UCR, UF, UNC, UVA, VCU), plus <strong>17 unreleased &amp; meme cuts</strong> in the <code>Discarded Segments</code> vault.</li>
+          <li>Deepest revision history in the archive: <strong>44 full-mix bounces</strong> for UCF 2022&ndash;23 (<code>UCF2022Full v44</code>), <strong>26 versions</strong> of a single segment (<code>Shankar v26</code> for DSD 21&ndash;22), and <strong>24 full-mix iterations</strong> for GT Ramblin' Raas 19&ndash;20.</li>
+          <li>Produced <strong>12 official competition mixtapes &amp; ladder runs</strong> (RAS XII/XIII/XV, ATS, Raas Rampage, Raas Chaos, DTX Dandiya, Rangeelo Raas, DDN Ladder, Raas Collab) plus <strong>20+ standalone singles &amp; remixes</strong> through 2025 (<code>Dankonteroopty</code>, <code>VariD(o)NA</code>, <code>BollyChemical</code>, <code>Airplanes at 945AM</code>, <code>Greedy Asvaar</code>).</li>
         </ul>
       </div>
     </section>
@@ -963,14 +985,15 @@
       document.addEventListener('click', hidePinTooltip);
 
       var STATE_HEAT_DATA = {
+        '13': { color: '#dc143c', mixes: 6 },
         '12': { color: '#dc143c', mixes: 5 },
-        '36': { color: '#dc143c', mixes: 4 },
-        '13': { color: '#e44967', mixes: 3 },
+        '36': { color: '#e44967', mixes: 4 },
+        '42': { color: '#ee859a', mixes: 2 },
         '48': { color: '#ee859a', mixes: 2 },
         '51': { color: '#ee859a', mixes: 2 },
         '06': { color: '#f7c6d0', mixes: 1 },
         '29': { color: '#f7c6d0', mixes: 1 },
-        '42': { color: '#f7c6d0', mixes: 1 }
+        '37': { color: '#f7c6d0', mixes: 1 }
       };
 
       function decodeTopologyArcs(topology) {
