@@ -70,6 +70,8 @@ test('index.html structure and content', () => {
     assert.ok(htmlContent.includes('data-analytics-label="Production"'), 'Has Production portfolio item');
     assert.ok(htmlContent.includes('coming-soon-banner'), 'Has coming soon banner for unavailable links');
     assert.ok(htmlContent.includes('href="/raas"'), 'Home page links directly to /raas');
+    assert.ok(htmlContent.includes('href="/dj"'), 'Home page links directly to /dj');
+    assert.ok(htmlContent.includes('href="/production"'), 'Home page links directly to /production');
     assert.ok(htmlContent.includes('href="/SpotKit"'), 'Home page links directly to /SpotKit');
     assert.ok(htmlContent.includes('src="./assets/js/analytics.js"'), 'Includes shared analytics script');
     assert.ok(htmlContent.includes('data-analytics-event="resume_download"'), 'Tracks resume downloads');
@@ -170,6 +172,52 @@ test('raas/index.html structure and content', () => {
     assert.ok(raasContent.includes('data-analytics-event="raas_resource_click"'), 'Tracks Raas resource clicks');
 });
 
+test('dj/index.html structure and content', () => {
+    const djPath = path.join(__dirname, '..', 'dj', 'index.html');
+    const djContent = fs.readFileSync(djPath, 'utf8');
+
+    assert.ok(djContent.includes('<!DOCTYPE html>'), 'Has doctype declaration');
+    assert.ok(djContent.includes('<title>DJ ROVA — Bookings | Rohan Varshney</title>'), 'Has correct title');
+    assert.ok(djContent.includes('data-contact-email='), 'Has data-contact-email attribute');
+    assert.ok(djContent.includes('id="listen"'), 'Has Listen section');
+    assert.ok(djContent.includes('id="events"'), 'Has Events section');
+    assert.ok(djContent.includes('id="gigs"'), 'Has Gigs section');
+    assert.ok(djContent.includes('id="press"'), 'Has Press Kit section');
+    assert.ok(djContent.includes('id="faq"'), 'Has FAQ section');
+    assert.ok(djContent.includes('id="book"'), 'Has Booking section');
+    assert.ok(djContent.includes('data-mailto-form'), 'Has mailto inquiry form');
+    assert.ok(djContent.includes('data-share'), 'Has share button');
+    assert.ok(djContent.includes('data-waveform'), 'Has waveform visual');
+    assert.ok(djContent.includes('data-bio-tab="short"'), 'Has short bio tab');
+    assert.ok(djContent.includes('data-bio-tab="long"'), 'Has long bio tab');
+    assert.ok(djContent.includes('href="../production/"'), 'Cross-links to Production');
+    assert.ok(djContent.includes('href="../raas/"'), 'Cross-links to Raas / Garba');
+    assert.ok(djContent.includes('src="../assets/js/analytics.js"'), 'Includes analytics script');
+    assert.ok(djContent.includes('src="../assets/js/portfolio.js"'), 'Includes portfolio script');
+});
+
+test('production/index.html structure and content', () => {
+    const prodPath = path.join(__dirname, '..', 'production', 'index.html');
+    const prodContent = fs.readFileSync(prodPath, 'utf8');
+
+    assert.ok(prodContent.includes('<!DOCTYPE html>'), 'Has doctype declaration');
+    assert.ok(prodContent.includes('<title>ROVA Production — Collabs, Remixes &amp; Custom Mixes | Rohan Varshney</title>'), 'Has correct title');
+    assert.ok(prodContent.includes('data-contact-email='), 'Has data-contact-email attribute');
+    assert.ok(prodContent.includes('id="releases"'), 'Has Releases section');
+    assert.ok(prodContent.includes('id="services"'), 'Has Services section');
+    assert.ok(prodContent.includes('id="process"'), 'Has Process section');
+    assert.ok(prodContent.includes('id="credits"'), 'Has Credits section');
+    assert.ok(prodContent.includes('id="faq"'), 'Has FAQ section');
+    assert.ok(prodContent.includes('id="collab"'), 'Has Collab section');
+    assert.ok(prodContent.includes('data-mailto-form'), 'Has mailto collab form');
+    assert.ok(prodContent.includes('data-filter-group'), 'Has release filter buttons');
+    assert.ok(prodContent.includes('class="arrangement"'), 'Has studio arrangement DAW visual');
+    assert.ok(prodContent.includes('href="../dj/"'), 'Cross-links to DJing');
+    assert.ok(prodContent.includes('href="../raas/"'), 'Cross-links to Raas / Garba');
+    assert.ok(prodContent.includes('src="../assets/js/analytics.js"'), 'Includes analytics script');
+    assert.ok(prodContent.includes('src="../assets/js/portfolio.js"'), 'Includes portfolio script');
+});
+
 test('assets/js/analytics.js configuration and 100% link coverage', () => {
     const analyticsPath = path.join(__dirname, '..', 'assets', 'js', 'analytics.js');
     const analyticsContent = fs.readFileSync(analyticsPath, 'utf8');
@@ -182,6 +230,8 @@ test('assets/js/analytics.js configuration and 100% link coverage', () => {
     const filesToCheck = [
         path.join(__dirname, '..', 'index.html'),
         path.join(__dirname, '..', 'raas', 'index.html'),
+        path.join(__dirname, '..', 'dj', 'index.html'),
+        path.join(__dirname, '..', 'production', 'index.html'),
     ];
 
     for (const filePath of filesToCheck) {
