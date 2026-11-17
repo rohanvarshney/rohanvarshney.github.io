@@ -57,6 +57,55 @@ test('raas/index.html structure and content', () => {
 
     assert.ok(raasContent.includes('<!DOCTYPE html>'), 'Has doctype declaration');
     assert.ok(raasContent.includes('<title>Raas / Garba Resources | Rohan Varshney</title>'), 'Has correct title');
+    assert.ok(raasContent.includes('id="statistics"'), 'Has Statistics section');
+    assert.ok(raasContent.includes('Statistics'), 'Has Statistics heading');
+    assert.ok(raasContent.includes('<div class="stat-value">19</div>'), 'Has 19 Team Mixes stat');
+    assert.ok(raasContent.includes('<div class="stat-value">12</div>'), 'Has 12 Colleges Mixed For stat');
+    assert.ok(raasContent.includes('<div class="stat-value">87</div>'), 'Has 87 Bid Points Earned stat');
+    assert.ok(raasContent.includes('National Champion Mixes'), 'Has National Champion Mixes card');
+    assert.ok(raasContent.includes('aria-label="2 National Champion Mixes"'), 'Has 2 National Champion Mixes card label');
+    assert.ok(raasContent.includes('us-map-svg'), 'Has US heatmap SVG');
+    assert.ok(raasContent.includes('map-tooltip'), 'Has map hover tooltip');
+
+    const expectedPins = [
+        ['GT Ramblin\' Raas', '2019, 2021, 2022'],
+        ['UCF Knightraas', '2019, 2021, 2022'],
+        ['Dirty South Dandiya', '2021, 2022'],
+        ['Cornell Big Red Raas', '2021, 2022'],
+        ['Columbia Raas', '2019, 2021'],
+        ['UVA Hooraas', '2021'],
+        ['VCU Ricochet Raas', '2021'],
+        ['Pitt PantheRaas', '2019'],
+        ['UM SwaggeRaas', '2019'],
+        ['UF Gatoraas', '2021'],
+        ['SLU Raas', '2021'],
+        ['UCRaas', '2021'],
+    ];
+    for (const [team, years] of expectedPins) {
+        assert.ok(
+            raasContent.includes(`data-team="${team}"`) && raasContent.includes(`data-years="${years}"`),
+            `Has map pinpoint for ${team} (${years})`
+        );
+    }
+
+    assert.ok(raasContent.includes('Fun Facts'), 'Has Fun Facts subsection');
+    assert.ok(raasContent.includes('id="hall-of-fame"'), 'Has Hall Of Fame section');
+    assert.ok(raasContent.includes('Hall Of Fame'), 'Has Hall Of Fame heading');
+    assert.ok(raasContent.includes('DSD Mix 2021'), 'Has DSD Mix 2021 Hall Of Fame item');
+    assert.ok(raasContent.includes('GT Mix 2022'), 'Has GT Mix 2022 Hall Of Fame item');
+    assert.ok(raasContent.includes('data-analytics-event="raas_hof_click"'), 'Tracks Hall Of Fame clicks');
+    assert.ok(raasContent.includes('id="resources"'), 'Has Resources section');
+    assert.ok(raasContent.includes('Resources'), 'Has Resources heading');
+
+    const statsIndex = raasContent.indexOf('id="statistics"');
+    const hofIndex = raasContent.indexOf('id="hall-of-fame"');
+    const resourcesIndex = raasContent.indexOf('id="resources"');
+    assert.ok(
+        statsIndex !== -1 && hofIndex !== -1 && resourcesIndex !== -1 &&
+        statsIndex < hofIndex && hofIndex < resourcesIndex,
+        'Sections appear in order: Statistics -> Hall Of Fame -> Resources'
+    );
+
     assert.ok(raasContent.includes('Project Files'), 'Has Project Files section');
     assert.ok(raasContent.includes('How to Mix'), 'Has How to Mix section');
     assert.ok(raasContent.includes('Sound FX'), 'Has Sound FX section');

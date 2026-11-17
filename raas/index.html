@@ -110,6 +110,307 @@
       margin: 32px 0;
     }
 
+    .section {
+      margin-bottom: 36px;
+    }
+
+    .section:last-of-type {
+      margin-bottom: 0;
+    }
+
+    .section-title {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #dc143c;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 16px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .stat-card {
+      padding: 20px 14px;
+      border: 1px solid #d0d0d0;
+      border-radius: 12px;
+      background-color: #fafafa;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      font-size: 1.9rem;
+      font-weight: 700;
+      color: #dc143c;
+      line-height: 1.2;
+      margin-bottom: 6px;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      line-height: 1.3;
+    }
+
+    .stat-card-featured {
+      border-color: rgba(220, 20, 60, 0.45);
+      background-color: #fff8f9;
+    }
+
+    .map-card {
+      padding: 20px 24px;
+      border: 1px solid #d0d0d0;
+      border-radius: 12px;
+      background-color: #fafafa;
+      margin-bottom: 16px;
+    }
+
+    .map-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .map-title {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #000;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .map-subtitle {
+      font-size: 0.78rem;
+      color: #666;
+      margin-top: 2px;
+    }
+
+    .map-legend {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.72rem;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .legend-swatch {
+      width: 14px;
+      height: 10px;
+      border-radius: 2px;
+      display: inline-block;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+    }
+
+    .map-wrapper {
+      position: relative;
+      width: 100%;
+    }
+
+    .us-map-svg {
+      width: 100%;
+      height: auto;
+      display: block;
+      overflow: visible;
+    }
+
+    .state-path {
+      stroke: #ffffff;
+      stroke-width: 1;
+      transition: opacity 0.2s;
+    }
+
+    .state-path:hover {
+      opacity: 0.88;
+    }
+
+    .map-pin {
+      cursor: pointer;
+      outline: none;
+    }
+
+    .map-pin-halo {
+      fill: rgba(220, 20, 60, 0.22);
+      pointer-events: none;
+      transition: fill 0.2s;
+    }
+
+    .map-pin-core {
+      fill: #dc143c;
+      stroke: #ffffff;
+      stroke-width: 2;
+      transition: fill 0.2s, stroke-width 0.2s;
+    }
+
+    .map-pin:hover .map-pin-halo,
+    .map-pin:focus .map-pin-halo {
+      fill: rgba(220, 20, 60, 0.38);
+    }
+
+    .map-pin:hover .map-pin-core,
+    .map-pin:focus .map-pin-core {
+      fill: #a50e2d;
+      stroke-width: 2.5;
+    }
+
+    .map-tooltip {
+      position: absolute;
+      pointer-events: none;
+      background-color: #111;
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      line-height: 1.4;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+      opacity: 0;
+      transform: translate(-50%, -115%);
+      transition: opacity 0.15s ease;
+      z-index: 10;
+      white-space: nowrap;
+      border: 1px solid #dc143c;
+    }
+
+    .map-tooltip.visible {
+      opacity: 1;
+    }
+
+    .map-tooltip-team {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: #ff4d6d;
+      margin-bottom: 2px;
+    }
+
+    .map-tooltip-school {
+      color: #ccc;
+      font-size: 0.75rem;
+      margin-bottom: 4px;
+    }
+
+    .map-tooltip-years {
+      color: #fff;
+      font-weight: 600;
+      font-size: 0.78rem;
+    }
+
+    .fun-facts {
+      padding: 20px 24px;
+      border: 1px solid #d0d0d0;
+      border-radius: 12px;
+      background-color: #fafafa;
+    }
+
+    .fun-facts-title {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #000;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 12px;
+    }
+
+    .fun-facts-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .fun-facts-list li {
+      position: relative;
+      padding-left: 18px;
+      font-size: 0.9rem;
+      color: #444;
+      line-height: 1.5;
+    }
+
+    .fun-facts-list li::before {
+      content: '›';
+      position: absolute;
+      left: 0;
+      color: #dc143c;
+      font-weight: bold;
+    }
+
+    .hof-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .hof-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px;
+      border: 1px solid #d0d0d0;
+      border-radius: 12px;
+      background-color: #fafafa;
+      text-decoration: none;
+      color: inherit;
+      transition: border-color 0.2s, transform 0.2s, background-color 0.2s;
+    }
+
+    .hof-card:hover {
+      border-color: #dc143c;
+      background-color: #fff;
+      transform: translateY(-2px);
+    }
+
+    .hof-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+
+    .hof-title {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #000;
+    }
+
+    .hof-badge {
+      font-size: 0.72rem;
+      color: #dc143c;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+      padding-top: 3px;
+    }
+
+    .hof-meta {
+      font-size: 0.78rem;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 8px;
+    }
+
+    .hof-description {
+      font-size: 0.9rem;
+      color: #444;
+      line-height: 1.5;
+    }
+
     .resources {
       display: flex;
       flex-direction: column;
@@ -232,6 +533,23 @@
         font-size: 1.8rem;
       }
 
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .map-card {
+        padding: 16px;
+      }
+
+      .map-tooltip {
+        font-size: 0.72rem;
+        padding: 8px 10px;
+      }
+
+      .hof-grid {
+        grid-template-columns: 1fr;
+      }
+
       .resource-card {
         padding: 18px;
         gap: 16px;
@@ -266,60 +584,288 @@
       <button type="button" class="banner-close" aria-label="Close banner" onclick="hideComingSoon()">&times;</button>
     </div>
 
-    <div class="resources">
-      <!-- TODO: Replace href with your Project Files Google Drive link, remove onclick, and change data-analytics-status to "live" -->
-      <a href="#" onclick="showComingSoon(event, 'Project Files')" class="resource-card"
-        data-analytics-event="raas_resource_click" data-analytics-category="raas"
-        data-analytics-label="Project Files" data-analytics-status="coming_soon">
-        <div class="resource-icon">
-          <i class="fa fa-sliders"></i>
+    <section class="section" id="statistics">
+      <h2 class="section-title">Statistics</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value">19</div>
+          <div class="stat-label">Team Mixes</div>
         </div>
-        <div class="resource-content">
-          <div class="resource-header">
-            <span class="resource-title">Project Files</span>
-            <span class="resource-badge">Google Drive &nearr;</span>
-          </div>
-          <p class="resource-description">
-            Logic Pro X project files for the mashups and compilations I made during my time as a mixer.
-          </p>
+        <div class="stat-card">
+          <div class="stat-value">12</div>
+          <div class="stat-label">Colleges Mixed For</div>
         </div>
-      </a>
+        <div class="stat-card">
+          <div class="stat-value">87</div>
+          <div class="stat-label">Bid Points Earned</div>
+        </div>
+        <div class="stat-card stat-card-featured" aria-label="2 National Champion Mixes">
+          <div class="stat-value">2</div>
+          <div class="stat-label">National Champion Mixes</div>
+        </div>
+      </div>
 
-      <!-- TODO: Replace href with your How to Mix Google Docs link, remove onclick, and change data-analytics-status to "live" -->
-      <a href="#" onclick="showComingSoon(event, 'How to Mix')" class="resource-card"
-        data-analytics-event="raas_resource_click" data-analytics-category="raas"
-        data-analytics-label="How to Mix" data-analytics-status="coming_soon">
-        <div class="resource-icon">
-          <i class="fa fa-book"></i>
-        </div>
-        <div class="resource-content">
-          <div class="resource-header">
-            <span class="resource-title">How to Mix</span>
-            <span class="resource-badge">Google Docs &nearr;</span>
+      <div class="map-card">
+        <div class="map-header">
+          <div>
+            <div class="map-title">Collegiate Mixing Heatmap</div>
+            <div class="map-subtitle">Hover or tap a pinpoint to see the team &amp; years mixed for</div>
           </div>
-          <p class="resource-description">
-            Instructions and tips to kickstart your learning process for creating Raas/Garba mixes.
-          </p>
+          <div class="map-legend" aria-label="Mixes per state scale">
+            <span>0</span>
+            <span class="legend-swatch" style="background-color: #ebebeb;" title="0 mixes"></span>
+            <span class="legend-swatch" style="background-color: #f7c6d0;" title="1 mix"></span>
+            <span class="legend-swatch" style="background-color: #ee859a;" title="2 mixes"></span>
+            <span class="legend-swatch" style="background-color: #e44967;" title="3 mixes"></span>
+            <span class="legend-swatch" style="background-color: #dc143c;" title="4-5 mixes"></span>
+            <span>5 Mixes</span>
+          </div>
         </div>
-      </a>
+        <div class="map-wrapper" id="map-wrapper">
+          <svg class="us-map-svg" viewBox="0 0 975 610" role="img" aria-label="United States heatmap of colleges mixed for">
+            <defs>
+              <radialGradient id="heat-glow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#dc143c" stop-opacity="0.45" />
+                <stop offset="55%" stop-color="#dc143c" stop-opacity="0.16" />
+                <stop offset="100%" stop-color="#dc143c" stop-opacity="0" />
+              </radialGradient>
+            </defs>
+            <g id="us-states-layer">
+              <path id="us-fallback-outline" fill="#ebebeb" stroke="#d0d0d0" stroke-width="1.5"
+                d="M 57.5,14.2 L 86.0,8.8 L 501.1,66.1 L 501.0,59.4 L 586.9,85.3 L 667.2,111.6 L 700.5,123.2 L 711.2,186.0 L 703.5,203.2 L 766.9,179.3 L 802.4,146.8 L 824.4,118.8 L 875.7,106.2 L 916.8,38.0 L 945.0,86.2 L 908.1,132.8 L 919.2,172.3 L 860.4,215.8 L 852.3,257.7 L 844.7,306.2 L 861.4,340.1 L 813.2,382.5 L 773.4,442.6 L 812.6,546.5 L 812.1,580.7 L 782.0,590.0 L 752.7,530.6 L 718.5,484.9 L 653.5,485.0 L 622.3,514.8 L 530.8,505.5 L 463.3,548.9 L 464.8,591.8 L 416.7,554.5 L 379.3,500.6 L 338.7,516.0 L 286.3,447.1 L 198.9,446.8 L 134.8,402.9 L 89.3,397.9 L 36.3,337.9 L 23.1,255.9 L 8.3,189.4 L 24.2,132.1 L 53.2,64.9 Z" />
+            </g>
+            <g id="us-pins-layer">
+              <g class="map-pin" tabindex="0" role="button" aria-label="GT Ramblin' Raas — 2019, 2021, 2022"
+                data-team="GT Ramblin' Raas" data-school="Georgia Tech • Atlanta, GA" data-years="2019, 2021, 2022" data-points="31">
+                <circle cx="704.2" cy="399.9" r="34" fill="url(#heat-glow)" style="pointer-events: none;" />
+                <circle class="map-pin-halo" cx="704.2" cy="399.9" r="20" />
+                <circle class="map-pin-core" cx="704.2" cy="399.9" r="6.5" />
+                <circle cx="704.2" cy="399.9" r="10" fill="transparent" />
+              </g>
+              <g class="map-pin" tabindex="0" role="button" aria-label="UCF Knightraas — 2019, 2021, 2022"
+                data-team="UCF Knightraas" data-school="University of Central Florida • Orlando, FL" data-years="2019, 2021, 2022" data-points="11">
+                <circle cx="781.7" cy="508.0" r="34" fill="url(#heat-glow)" style="pointer-events: none;" />
+                <circle class="map-pin-halo" cx="781.7" cy="508.0" r="20" />
+                <circle class="map-pin-core" cx="781.7" cy="508.0" r="6.5" />
+                <circle cx="781.7" cy="508.0" r="10" fill="transparent" />
+              </g>
+              <g class="map-pin" tabindex="0" role="button" aria-label="Dirty South Dandiya — 2021, 2022"
+                data-team="Dirty South Dandiya" data-school="UT Austin • Austin, TX" data-years="2021, 2022" data-points="24">
+                <circle cx="453.6" cy="492.4" r="28" fill="url(#heat-glow)" style="pointer-events: none;" />
+                <circle class="map-pin-halo" cx="453.6" cy="492.4" r="16" />
+                <circle class="map-pin-core" cx="453.6" cy="492.4" r="5.5" />
+                <circle cx="453.6" cy="492.4" r="10" fill="transparent" />
+              </g>
+              <g class="map-pin" tabindex="0" role="button" aria-label="Cornell Big Red Raas — 2021, 2022"
+                data-team="Cornell Big Red Raas" data-school="Cornell University • Ithaca, NY" data-years="2021, 2022" data-points="10">
+                <circle cx="810.0" cy="181.3" r="28" fill="url(#heat-glow)" style="pointer-events: none;" />
+                <circle class="map-pin-halo" cx="810.0" cy="181.3" r="16" />
+                <circle class="map-pin-core" cx="810.0" cy="181.3" r="5.5" />
+                <circle cx="810.0" cy="181.3" r="10" fill="transparent" />
+              </g>
+              <g class="map-pin" tabindex="0" role="button" aria-label="Columbia Raas — 2019, 2021"
+                data-team="Columbia Raas" data-school="Columbia University • New York, NY" data-years="2019, 2021" data-points="0">
+                <circle cx="859.4" cy="208.8" r="28" fill="url(#heat-glow)" style="pointer-events: none;" />
+                <circle class="map-pin-halo" cx="859.4" cy="208.8" r="16" />
+                <circle class="map-pin-core" cx="859.4" cy="208.8" r="5.5" />
+                <circle cx="859.4" cy="208.8" r="10" fill="transparent" />
+              </g>
+              <g class="map-pin" tabindex="0" role="button" aria-label="UVA Hooraas — 2021"
+                data-team="UVA Hooraas" data-school="University of Virginia • Charlottesville, VA" data-years="2021" data-points="10">
+                <circle cx="795.3" cy="287.3" r="22" fill="url(#heat-glow)" style="pointer-events: none;" />
+                <circle class="map-pin-halo" cx="795.3" cy="287.3" r="12" />
+                <circle class="map-pin-core" cx="795.3" cy="287.3" r="4.5" />
+                <circle cx="795.3" cy="287.3" r="9" fill="transparent" />
+              </g>
+              <g class="map-pin" tabindex="0" role="button" aria-label="VCU Ricochet Raas — 2021"
+                data-team="VCU Ricochet Raas" data-school="Virginia Commonwealth University • Richmond, VA" data-years="2021" data-points="1">
+                <circle cx="815.8" cy="294.7" r="22" fill="url(#heat-glow)" style="pointer-events: none;" />
+                <circle class="map-pin-halo" cx="815.8" cy="294.7" r="12" />
+                <circle class="map-pin-core" cx="815.8" cy="294.7" r="4.5" />
+                <circle cx="815.8" cy="294.7" r="9" fill="transparent" />
+              </g>
+              <g class="map-pin" tabindex="0" role="button" aria-label="Pitt PantheRaas — 2019"
+                data-team="Pitt PantheRaas" data-school="University of Pittsburgh • Pittsburgh, PA" data-years="2019" data-points="0">
+                <circle cx="760.7" cy="237.4" r="22" fill="url(#heat-glow)" style="pointer-events: none;" />
+                <circle class="map-pin-halo" cx="760.7" cy="237.4" r="12" />
+                <circle class="map-pin-core" cx="760.7" cy="237.4" r="4.5" />
+                <circle cx="760.7" cy="237.4" r="9" fill="transparent" />
+              </g>
+              <g class="map-pin" tabindex="0" role="button" aria-label="UM SwaggeRaas — 2019"
+                data-team="UM SwaggeRaas" data-school="University of Miami • Coral Gables, FL" data-years="2019" data-points="0">
+                <circle cx="810.6" cy="569.2" r="22" fill="url(#heat-glow)" style="pointer-events: none;" />
+                <circle class="map-pin-halo" cx="810.6" cy="569.2" r="12" />
+                <circle class="map-pin-core" cx="810.6" cy="569.2" r="4.5" />
+                <circle cx="810.6" cy="569.2" r="9" fill="transparent" />
+              </g>
+              <g class="map-pin" tabindex="0" role="button" aria-label="UF Gatoraas — 2021"
+                data-team="UF Gatoraas" data-school="University of Florida • Gainesville, FL" data-years="2021" data-points="0">
+                <circle cx="755.8" cy="488.0" r="22" fill="url(#heat-glow)" style="pointer-events: none;" />
+                <circle class="map-pin-halo" cx="755.8" cy="488.0" r="12" />
+                <circle class="map-pin-core" cx="755.8" cy="488.0" r="4.5" />
+                <circle cx="755.8" cy="488.0" r="9" fill="transparent" />
+              </g>
+              <g class="map-pin" tabindex="0" role="button" aria-label="SLU Raas — 2021"
+                data-team="SLU Raas" data-school="Saint Louis University • St. Louis, MO" data-years="2021" data-points="0">
+                <circle cx="588.7" cy="298.8" r="22" fill="url(#heat-glow)" style="pointer-events: none;" />
+                <circle class="map-pin-halo" cx="588.7" cy="298.8" r="12" />
+                <circle class="map-pin-core" cx="588.7" cy="298.8" r="4.5" />
+                <circle cx="588.7" cy="298.8" r="9" fill="transparent" />
+              </g>
+              <g class="map-pin" tabindex="0" role="button" aria-label="UCRaas — 2021"
+                data-team="UCRaas" data-school="UC Riverside • Riverside, CA" data-years="2021" data-points="0">
+                <circle cx="92.5" cy="364.1" r="22" fill="url(#heat-glow)" style="pointer-events: none;" />
+                <circle class="map-pin-halo" cx="92.5" cy="364.1" r="12" />
+                <circle class="map-pin-core" cx="92.5" cy="364.1" r="4.5" />
+                <circle cx="92.5" cy="364.1" r="9" fill="transparent" />
+              </g>
+            </g>
+          </svg>
+          <div id="map-tooltip" class="map-tooltip" role="tooltip" aria-hidden="true">
+            <div class="map-tooltip-team" id="tooltip-team"></div>
+            <div class="map-tooltip-school" id="tooltip-school"></div>
+            <div class="map-tooltip-years" id="tooltip-years"></div>
+          </div>
+        </div>
+      </div>
 
-      <a href="https://drive.google.com/drive/folders/1tneKiwTXmKsR8wzAICItM6zUChy3d5NX?usp=sharing" target="_blank" rel="noopener noreferrer" class="resource-card"
-        data-analytics-event="raas_resource_click" data-analytics-category="raas"
-        data-analytics-label="Sound FX" data-analytics-status="live">
-        <div class="resource-icon">
-          <i class="fa fa-volume-up"></i>
-        </div>
-        <div class="resource-content">
-          <div class="resource-header">
-            <span class="resource-title">Sound FX</span>
-            <span class="resource-badge">Google Drive &nearr;</span>
+      <div class="fun-facts">
+        <div class="fun-facts-title">Fun Facts</div>
+        <ul class="fun-facts-list">
+          <li>Mixed for <strong>10 teams</strong> in the 2021 comeback season alone after 2020 competitions were canceled.</li>
+          <li>Earned <strong>35 bid points</strong> across just 4 mixes in 2022, peaking at 8.75 points per mix.</li>
+          <li>Multi-year collaborator for <strong>GT Ramblin' Raas</strong> (31 pts), <strong>Dirty South Dandiya</strong> (24 pts), and <strong>UCF Knightraas</strong> (11 pts).</li>
+          <li>Reached <strong>8 states</strong> coast to coast &mdash; from UC Riverside in California to Columbia and Cornell in New York.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" id="hall-of-fame">
+      <h2 class="section-title">Hall Of Fame</h2>
+      <div class="hof-grid">
+        <!-- TODO: Replace href with your DSD Mix 2021 link, remove onclick, and change data-analytics-status to "live" -->
+        <a href="#" onclick="showComingSoon(event, 'DSD Mix 2021')" class="hof-card"
+          data-analytics-event="raas_hof_click" data-analytics-category="raas"
+          data-analytics-label="DSD Mix 2021" data-analytics-status="coming_soon">
+          <div>
+            <div class="hof-header">
+              <span class="hof-title">DSD Mix 2021</span>
+              <span class="hof-badge">Listen &nearr;</span>
+            </div>
+            <div class="hof-meta">2021 &bull; Competition Mix</div>
+            <p class="hof-description">
+              Full-production competition mix crafted for the 2021 dance season.
+            </p>
           </div>
-          <p class="resource-description">
-            Direct downloads of sound effect files for team or personal mixing usage.
-          </p>
-        </div>
-      </a>
-    </div>
+        </a>
+
+        <!-- TODO: Replace href with your GT Mix 2022 link, remove onclick, and change data-analytics-status to "live" -->
+        <a href="#" onclick="showComingSoon(event, 'GT Mix 2022')" class="hof-card"
+          data-analytics-event="raas_hof_click" data-analytics-category="raas"
+          data-analytics-label="GT Mix 2022" data-analytics-status="coming_soon">
+          <div>
+            <div class="hof-header">
+              <span class="hof-title">GT Mix 2022</span>
+              <span class="hof-badge">Listen &nearr;</span>
+            </div>
+            <div class="hof-meta">2022 &bull; GT Ramblin' Raas</div>
+            <p class="hof-description">
+              High-energy home team competition mix produced for Georgia Tech Ramblin' Raas.
+            </p>
+          </div>
+        </a>
+
+        <!-- TODO: Replace href with your RAS XIII Mixtape link, remove onclick, and change data-analytics-status to "live" -->
+        <a href="#" onclick="showComingSoon(event, 'RAS XIII: Raas Reboot Mixtape')" class="hof-card"
+          data-analytics-event="raas_hof_click" data-analytics-category="raas"
+          data-analytics-label="RAS XIII: Raas Reboot Mixtape" data-analytics-status="coming_soon">
+          <div>
+            <div class="hof-header">
+              <span class="hof-title">RAS XIII: Raas Reboot</span>
+              <span class="hof-badge">Listen &nearr;</span>
+            </div>
+            <div class="hof-meta">2021 &bull; Official Mixtape</div>
+            <p class="hof-description">
+              Official national championship promotional mixtape for Raas All-Stars XIII.
+            </p>
+          </div>
+        </a>
+
+        <!-- TODO: Replace href with your UCF Knightraas Mix link, remove onclick, and change data-analytics-status to "live" -->
+        <a href="#" onclick="showComingSoon(event, 'UCF Knightraas Mix')" class="hof-card"
+          data-analytics-event="raas_hof_click" data-analytics-category="raas"
+          data-analytics-label="UCF Knightraas Mix" data-analytics-status="coming_soon">
+          <div>
+            <div class="hof-header">
+              <span class="hof-title">UCF Knightraas Mix</span>
+              <span class="hof-badge">Listen &nearr;</span>
+            </div>
+            <div class="hof-meta">2020 &bull; Competition Mix</div>
+            <p class="hof-description">
+              Custom competition soundtrack and mashup arrangement for UCF Knightraas.
+            </p>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <section class="section" id="resources">
+      <h2 class="section-title">Resources</h2>
+      <div class="resources">
+        <!-- TODO: Replace href with your Project Files Google Drive link, remove onclick, and change data-analytics-status to "live" -->
+        <a href="#" onclick="showComingSoon(event, 'Project Files')" class="resource-card"
+          data-analytics-event="raas_resource_click" data-analytics-category="raas"
+          data-analytics-label="Project Files" data-analytics-status="coming_soon">
+          <div class="resource-icon">
+            <i class="fa fa-sliders"></i>
+          </div>
+          <div class="resource-content">
+            <div class="resource-header">
+              <span class="resource-title">Project Files</span>
+              <span class="resource-badge">Google Drive &nearr;</span>
+            </div>
+            <p class="resource-description">
+              Logic Pro X project files for the mashups and compilations I made during my time as a mixer.
+            </p>
+          </div>
+        </a>
+
+        <!-- TODO: Replace href with your How to Mix Google Docs link, remove onclick, and change data-analytics-status to "live" -->
+        <a href="#" onclick="showComingSoon(event, 'How to Mix')" class="resource-card"
+          data-analytics-event="raas_resource_click" data-analytics-category="raas"
+          data-analytics-label="How to Mix" data-analytics-status="coming_soon">
+          <div class="resource-icon">
+            <i class="fa fa-book"></i>
+          </div>
+          <div class="resource-content">
+            <div class="resource-header">
+              <span class="resource-title">How to Mix</span>
+              <span class="resource-badge">Google Docs &nearr;</span>
+            </div>
+            <p class="resource-description">
+              Instructions and tips to kickstart your learning process for creating Raas/Garba mixes.
+            </p>
+          </div>
+        </a>
+
+        <a href="https://drive.google.com/drive/folders/1tneKiwTXmKsR8wzAICItM6zUChy3d5NX?usp=sharing" target="_blank" rel="noopener noreferrer" class="resource-card"
+          data-analytics-event="raas_resource_click" data-analytics-category="raas"
+          data-analytics-label="Sound FX" data-analytics-status="live">
+          <div class="resource-icon">
+            <i class="fa fa-volume-up"></i>
+          </div>
+          <div class="resource-content">
+            <div class="resource-header">
+              <span class="resource-title">Sound FX</span>
+              <span class="resource-badge">Google Drive &nearr;</span>
+            </div>
+            <p class="resource-description">
+              Direct downloads of sound effect files for team or personal mixing usage.
+            </p>
+          </div>
+        </a>
+      </div>
+    </section>
 
     <div class="footer">
       <a href="../" data-analytics-event="navigation_click" data-analytics-category="navigation" data-analytics-label="Home">&larr; rohanvarshney.github.io</a>
@@ -335,6 +881,9 @@
       var text = document.getElementById('coming-soon-text');
       text.textContent = label + ' — link coming soon!';
       banner.classList.add('visible');
+      if (typeof banner.scrollIntoView === 'function') {
+        banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
 
       if (bannerTimeout) {
         clearTimeout(bannerTimeout);
@@ -348,6 +897,193 @@
       var banner = document.getElementById('coming-soon-banner');
       banner.classList.remove('visible');
     }
+
+    (function initRaasMap() {
+      var tooltip = document.getElementById('map-tooltip');
+      var tooltipTeam = document.getElementById('tooltip-team');
+      var tooltipSchool = document.getElementById('tooltip-school');
+      var tooltipYears = document.getElementById('tooltip-years');
+      var pins = document.querySelectorAll('.map-pin');
+
+      function showPinTooltip(pin) {
+        if (!tooltip || !pin) {
+          return;
+        }
+        var team = pin.getAttribute('data-team') || '';
+        var school = pin.getAttribute('data-school') || '';
+        var years = pin.getAttribute('data-years') || '';
+        var points = parseInt(pin.getAttribute('data-points') || '0', 10);
+
+        tooltipTeam.textContent = team;
+        tooltipSchool.textContent = school;
+        tooltipYears.textContent =
+          'Years: ' + years + (points > 0 ? ' • ' + points + ' Bid Pts' : '');
+
+        var core = pin.querySelector('.map-pin-core');
+        if (core) {
+          var cx = parseFloat(core.getAttribute('cx'));
+          var cy = parseFloat(core.getAttribute('cy'));
+          var leftPct = (cx / 975) * 100;
+          var topPct = (cy / 610) * 100;
+          var txPct = leftPct < 20 ? -15 : (leftPct > 80 ? -85 : -50);
+          var tyPct = topPct < 26 ? 24 : -118;
+
+          tooltip.style.left = leftPct + '%';
+          tooltip.style.top = topPct + '%';
+          tooltip.style.transform = 'translate(' + txPct + '%, ' + tyPct + '%)';
+        }
+
+        tooltip.classList.add('visible');
+        tooltip.setAttribute('aria-hidden', 'false');
+      }
+
+      function hidePinTooltip() {
+        if (!tooltip) {
+          return;
+        }
+        tooltip.classList.remove('visible');
+        tooltip.setAttribute('aria-hidden', 'true');
+      }
+
+      pins.forEach(function (pin) {
+        pin.addEventListener('mouseenter', function () {
+          showPinTooltip(pin);
+        });
+        pin.addEventListener('mouseleave', hidePinTooltip);
+        pin.addEventListener('focus', function () {
+          showPinTooltip(pin);
+        });
+        pin.addEventListener('blur', hidePinTooltip);
+        pin.addEventListener('click', function (event) {
+          event.stopPropagation();
+          showPinTooltip(pin);
+        });
+      });
+
+      document.addEventListener('click', hidePinTooltip);
+
+      var STATE_HEAT_DATA = {
+        '12': { color: '#dc143c', mixes: 5 },
+        '36': { color: '#dc143c', mixes: 4 },
+        '13': { color: '#e44967', mixes: 3 },
+        '48': { color: '#ee859a', mixes: 2 },
+        '51': { color: '#ee859a', mixes: 2 },
+        '06': { color: '#f7c6d0', mixes: 1 },
+        '29': { color: '#f7c6d0', mixes: 1 },
+        '42': { color: '#f7c6d0', mixes: 1 }
+      };
+
+      function decodeTopologyArcs(topology) {
+        var transform = topology.transform;
+        return topology.arcs.map(function (arc) {
+          var x = 0;
+          var y = 0;
+          return arc.map(function (point) {
+            if (transform) {
+              x += point[0];
+              y += point[1];
+              return [
+                x * transform.scale[0] + transform.translate[0],
+                y * transform.scale[1] + transform.translate[1]
+              ];
+            }
+            return [point[0], point[1]];
+          });
+        });
+      }
+
+      function ringToSvgPath(ring, decodedArcs) {
+        var coords = [];
+        for (var i = 0; i < ring.length; i++) {
+          var arcIndex = ring[i];
+          var arc = arcIndex < 0
+            ? decodedArcs[~arcIndex].slice().reverse()
+            : decodedArcs[arcIndex];
+          for (var j = i === 0 ? 0 : 1; j < arc.length; j++) {
+            coords.push(arc[j]);
+          }
+        }
+        if (coords.length === 0) {
+          return '';
+        }
+        var parts = ['M' + coords[0][0].toFixed(1) + ',' + coords[0][1].toFixed(1)];
+        for (var k = 1; k < coords.length; k++) {
+          parts.push('L' + coords[k][0].toFixed(1) + ',' + coords[k][1].toFixed(1));
+        }
+        parts.push('Z');
+        return parts.join('');
+      }
+
+      function geometryToSvgPath(geom, decodedArcs) {
+        if (geom.type === 'Polygon') {
+          return geom.arcs.map(function (ring) {
+            return ringToSvgPath(ring, decodedArcs);
+          }).join(' ');
+        }
+        if (geom.type === 'MultiPolygon') {
+          return geom.arcs.map(function (polygon) {
+            return polygon.map(function (ring) {
+              return ringToSvgPath(ring, decodedArcs);
+            }).join(' ');
+          }).join(' ');
+        }
+        return '';
+      }
+
+      var statesLayer = document.getElementById('us-states-layer');
+      if (statesLayer && typeof fetch === 'function') {
+        fetch('https://cdn.jsdelivr.net/npm/us-atlas@3/states-albers-10m.json')
+          .then(function (response) {
+            if (!response.ok) {
+              throw new Error('Failed to load US map topology');
+            }
+            return response.json();
+          })
+          .then(function (topology) {
+            if (!topology || !topology.objects || !topology.objects.states) {
+              return;
+            }
+            var svgNs = 'http://www.w3.org/2000/svg';
+            var decodedArcs = decodeTopologyArcs(topology);
+            var fragment = document.createDocumentFragment();
+            var geometries = topology.objects.states.geometries || [];
+
+            geometries.forEach(function (geom) {
+              var d = geometryToSvgPath(geom, decodedArcs);
+              if (!d) {
+                return;
+              }
+              var stateId = String(geom.id || '').padStart(2, '0');
+              var heat = STATE_HEAT_DATA[stateId];
+              var path = document.createElementNS(svgNs, 'path');
+              path.setAttribute('d', d);
+              path.setAttribute('class', 'state-path');
+              path.setAttribute('data-state-fips', stateId);
+              path.setAttribute('fill', heat ? heat.color : '#ebebeb');
+
+              var stateName = geom.properties && geom.properties.name ? geom.properties.name : '';
+              if (stateName) {
+                var titleEl = document.createElementNS(svgNs, 'title');
+                titleEl.textContent = heat
+                  ? stateName + ' (' + heat.mixes + (heat.mixes === 1 ? ' mix)' : ' mixes)')
+                  : stateName;
+                path.appendChild(titleEl);
+              }
+              fragment.appendChild(path);
+            });
+
+            if (fragment.childNodes.length > 0) {
+              while (statesLayer.firstChild) {
+                statesLayer.removeChild(statesLayer.firstChild);
+              }
+              statesLayer.appendChild(fragment);
+            }
+          })
+          .catch(function () {
+            // Keep the embedded US silhouette fallback when offline.
+          });
+      }
+    })();
   </script>
 </body>
 
