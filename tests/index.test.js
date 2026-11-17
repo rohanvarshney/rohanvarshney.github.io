@@ -17,7 +17,8 @@ test('index.html structure and content', () => {
     
     // Main Content
     assert.ok(htmlContent.includes('<h1 class="question">Rohan Varshney'), 'Has main heading');
-    assert.ok(htmlContent.includes('SENIOR SOFTWARE ENGINEER @ LYFT'), 'Has job title description');
+    assert.ok(htmlContent.includes('.lyft-pink'), 'Has Lyft pink CSS class');
+    assert.ok(htmlContent.includes('SENIOR SOFTWARE ENGINEER @ <span class="lyft-pink">LYFT</span>'), 'Has job title description with pink LYFT');
     
     // Profile Image
     assert.ok(htmlContent.includes('src="./assets/img/faces/rohan.jpg"'), 'Has profile picture');
@@ -39,14 +40,37 @@ test('index.html structure and content', () => {
     assert.ok(htmlContent.includes('Always moving, always eating, always listening.'), 'Has Personal tagline');
     assert.ok(htmlContent.includes('Portfolio'), 'Has Portfolio section');
     assert.ok(htmlContent.includes('Making crowds move to the right frequencies.'), 'Has Portfolio tagline');
+    assert.ok(htmlContent.includes('<div class="social-section-title">Projects</div>'), 'Has Projects section');
+    assert.ok(htmlContent.includes('Making ideas move from concept to code.'), 'Has Projects tagline');
 
-    // Portfolio Links and Coming Soon Banner
+    const professionalIndex = htmlContent.indexOf('<div class="social-section-title">Professional</div>');
+    const personalIndex = htmlContent.indexOf('<div class="social-section-title">Personal</div>');
+    const portfolioIndex = htmlContent.indexOf('<div class="social-section-title">Portfolio</div>');
+    const projectsIndex = htmlContent.indexOf('<div class="social-section-title">Projects</div>');
+    const spotkitIndex = htmlContent.indexOf('data-analytics-label="SpotKit"');
+    assert.ok(
+        professionalIndex !== -1 &&
+        personalIndex !== -1 &&
+        portfolioIndex !== -1 &&
+        projectsIndex !== -1 &&
+        professionalIndex < personalIndex &&
+        personalIndex < portfolioIndex &&
+        portfolioIndex < projectsIndex,
+        'Sections appear in order: Professional -> Personal -> Portfolio -> Projects'
+    );
+    assert.ok(spotkitIndex > projectsIndex, 'SpotKit appears under Projects section');
+
+    // Portfolio & Projects Links and Coming Soon Banner
     assert.ok(htmlContent.includes('data-analytics-label="Raas / Garba"'), 'Has Raas / Garba portfolio item');
-    assert.ok(htmlContent.includes('data-analytics-label="SpotKit"'), 'Has SpotKit portfolio item');
+    assert.ok(htmlContent.includes('data-analytics-label="SpotKit"'), 'Has SpotKit project item');
+    assert.ok(htmlContent.includes('data-analytics-event="project_link_click"'), 'Tracks SpotKit as project_link_click');
+    assert.ok(htmlContent.includes('data-analytics-category="projects"'), 'Categorizes SpotKit under projects');
     assert.ok(htmlContent.includes('data-analytics-label="DJing"'), 'Has DJing portfolio item');
+    assert.match(htmlContent, /data-analytics-label="DJing"[\s\S]*?<svg\b[\s\S]*?<\/svg>[\s\S]*?<\/a>/, 'DJing uses an inline SVG DJ controller icon');
     assert.ok(htmlContent.includes('data-analytics-label="Production"'), 'Has Production portfolio item');
-    assert.ok(htmlContent.includes('coming-soon-banner'), 'Has coming soon banner for portfolio links');
+    assert.ok(htmlContent.includes('coming-soon-banner'), 'Has coming soon banner for unavailable links');
     assert.ok(htmlContent.includes('href="/raas"'), 'Home page links directly to /raas');
+    assert.ok(htmlContent.includes('href="/SpotKit"'), 'Home page links directly to /SpotKit');
     assert.ok(htmlContent.includes('src="./assets/js/analytics.js"'), 'Includes shared analytics script');
     assert.ok(htmlContent.includes('data-analytics-event="resume_download"'), 'Tracks resume downloads');
 });
