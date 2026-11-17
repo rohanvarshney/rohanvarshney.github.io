@@ -64,17 +64,25 @@ test('raas/index.html structure and content', () => {
     assert.ok(raasContent.includes('<div class="stat-value">87</div>'), 'Has 87 Bid Points Earned stat');
     assert.ok(raasContent.includes('National Champion Mixes'), 'Has National Champion Mixes card');
     assert.ok(raasContent.includes('aria-label="2 National Champion Mixes"'), 'Has 2 National Champion Mixes card label');
-    assert.ok(raasContent.includes('<div class="stat-value">12</div>'), 'Has 12 Circuit Mixtapes & Ladders stat');
+    assert.ok(raasContent.includes('<div class="stat-value">11</div>'), 'Has 11 Circuit Mixtapes stat');
+    assert.ok(raasContent.includes('<div class="stat-label">Circuit Mixtapes</div>'), 'Has Circuit Mixtapes label without Ladders');
     assert.ok(raasContent.includes('<div class="stat-value">1,792</div>'), 'Has 1,792 Audio Bounces Exported stat');
+    assert.ok(raasContent.includes('<div class="stat-label">RAS Mixes</div>'), 'Has RAS Mixes card');
+    assert.ok(raasContent.includes('<div class="stat-label">Years Mixing</div>'), 'Has Years Mixing card');
     assert.strictEqual(
         (raasContent.match(/class="stat-info-btn"/g) || []).length,
-        6,
-        'Has info button on all 6 stat cards'
+        8,
+        'Has info button on all 8 stat cards'
     );
     assert.strictEqual(
         (raasContent.match(/class="stat-info-popover"/g) || []).length,
-        6,
-        'Has info elaboration popover on all 6 stat cards'
+        8,
+        'Has info elaboration popover on all 8 stat cards'
+    );
+    assert.strictEqual(
+        (raasContent.match(/class="map-pin-star"/g) || []).length,
+        2,
+        'Has star pinpoints for GT and DSD'
     );
     assert.ok(raasContent.includes('us-map-svg'), 'Has US heatmap SVG');
     assert.ok(raasContent.includes('map-tooltip'), 'Has map hover tooltip');
