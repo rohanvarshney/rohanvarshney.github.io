@@ -53,12 +53,15 @@ test('index.html structure and content', () => {
         personalIndex !== -1 &&
         portfolioIndex !== -1 &&
         projectsIndex !== -1 &&
-        professionalIndex < personalIndex &&
-        personalIndex < portfolioIndex &&
-        portfolioIndex < projectsIndex,
-        'Sections appear in order: Professional -> Personal -> Portfolio -> Projects'
+        professionalIndex < portfolioIndex &&
+        portfolioIndex < projectsIndex &&
+        projectsIndex < personalIndex,
+        'Sections appear in order: Professional -> Portfolio -> Projects -> Personal'
     );
-    assert.ok(spotkitIndex > projectsIndex, 'SpotKit appears under Projects section');
+    assert.ok(
+        spotkitIndex > projectsIndex && spotkitIndex < personalIndex,
+        'SpotKit appears under Projects section'
+    );
 
     // Portfolio & Projects Links and Coming Soon Banner
     assert.ok(htmlContent.includes('data-analytics-label="Raas / Garba"'), 'Has Raas / Garba portfolio item');
@@ -75,6 +78,67 @@ test('index.html structure and content', () => {
     assert.ok(htmlContent.includes('href="/SpotKit"'), 'Home page links directly to /SpotKit');
     assert.ok(htmlContent.includes('src="./assets/js/analytics.js"'), 'Includes shared analytics script');
     assert.ok(htmlContent.includes('data-analytics-event="resume_download"'), 'Tracks resume downloads');
+
+    // Desktop-only hover tooltip banner for homepage red icons
+    const desktopMediaQuery = '@media (hover: hover) and (pointer: fine) and (min-width: 769px)';
+    const mediaStart = htmlContent.indexOf(desktopMediaQuery);
+    assert.ok(mediaStart !== -1, 'Has desktop-only hover/pointer/min-width media query');
+    const mediaOpenBrace = htmlContent.indexOf('{', mediaStart);
+    let depth = 0;
+    let mediaEnd = -1;
+    for (let i = mediaOpenBrace; i < htmlContent.length; i++) {
+        if (htmlContent[i] === '{') depth++;
+        else if (htmlContent[i] === '}') {
+            depth--;
+            if (depth === 0) {
+                mediaEnd = i + 1;
+                break;
+            }
+        }
+    }
+    assert.ok(mediaEnd !== -1, 'Desktop-only media query has matching closing brace');
+    const desktopMediaBlock = htmlContent.slice(mediaStart, mediaEnd);
+    const outsideDesktopMedia = htmlContent.slice(0, mediaStart) + htmlContent.slice(mediaEnd);
+
+    assert.ok(
+        desktopMediaBlock.includes('.social-icons a[data-tooltip]::after') &&
+        desktopMediaBlock.includes('content: attr(data-tooltip)'),
+        'Desktop-only media query renders tooltip banner from data-tooltip'
+    );
+    assert.ok(
+        !outsideDesktopMedia.includes('.social-icons a:hover') &&
+        !outsideDesktopMedia.includes('.social-icons a[data-tooltip]'),
+        'No .social-icons a:hover or tooltip rules exist outside desktop-only media query'
+    );
+
+    const expectedIconLabels = [
+        'Resumé',
+        'LinkedIn',
+        'GitHub',
+        'Instagram',
+        'Spotify',
+        'Beli',
+        'Raas / Garba',
+        'DJing',
+        'Production',
+        'SpotKit',
+    ];
+    for (const label of expectedIconLabels) {
+        assert.ok(
+            htmlContent.includes(`aria-label="${label}"`) &&
+            htmlContent.includes(`data-tooltip="${label}"`),
+            `Icon link has matching aria-label and data-tooltip for ${label}`
+        );
+    }
+
+    const indexAnchors = htmlContent.match(/<a\b[^>]*>/gi) || [];
+    assert.strictEqual(indexAnchors.length, 10, 'Homepage has all 10 icon links');
+    for (const tag of indexAnchors) {
+        assert.ok(
+            !/\btitle=/.test(tag),
+            `Homepage anchor tag omits native title attribute to avoid duplicate desktop tooltip: ${tag}`
+        );
+    }
 });
 
 test('raas/index.html structure and content', () => {
