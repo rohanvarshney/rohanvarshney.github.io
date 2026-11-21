@@ -146,7 +146,8 @@ test('raas/index.html structure and content', () => {
     const raasContent = fs.readFileSync(raasPath, 'utf8');
 
     assert.ok(raasContent.includes('<!DOCTYPE html>'), 'Has doctype declaration');
-    assert.ok(raasContent.includes('<title>Raas / Garba Resources | Rohan Varshney</title>'), 'Has correct title');
+    assert.ok(raasContent.includes('<title>RAS XII - XV | Rohan Varshney</title>'), 'Has correct title');
+    assert.ok(raasContent.includes('<h1 class="title">RAS XII - XV<span class="cursor"></span></h1>'), 'Has correct main heading');
     assert.ok(raasContent.includes('id="statistics"'), 'Has Statistics section');
     assert.ok(raasContent.includes('Statistics'), 'Has Statistics heading');
     assert.ok(raasContent.includes('<div class="stat-value">22</div>'), 'Has 22 Team Mixes stat');
@@ -225,10 +226,13 @@ test('raas/index.html structure and content', () => {
         'Sections appear in order: Statistics -> Hall Of Fame -> Resources'
     );
 
-    assert.ok(raasContent.includes('Project Files'), 'Has Project Files section');
-    assert.ok(raasContent.includes('How to Mix'), 'Has How to Mix section');
-    assert.ok(raasContent.includes('Sound FX'), 'Has Sound FX section');
-    assert.ok(raasContent.includes('href="https://drive.google.com/drive/folders/1tneKiwTXmKsR8wzAICItM6zUChy3d5NX?usp=sharing"'), 'Has Sound FX Google Drive link');
+    assert.ok(raasContent.includes('<span class="resource-title">All Project Files</span>'), 'Has All Project Files section');
+    assert.ok(raasContent.includes('<span class="resource-title">How to In-House Mix for Raas</span>'), 'Has How to In-House Mix for Raas section');
+    assert.ok(raasContent.includes('href="https://docs.google.com/document/d/1MljkjOZmstdsRXOnsO0Z_NJqpnJQsBKbyGvo37Y1dNg/edit?usp=sharing"'), 'Has How to In-House Mix for Raas Google Docs link');
+    assert.ok(raasContent.includes('data-analytics-label="How to In-House Mix for Raas" data-analytics-status="live"'), 'Tracks How to In-House Mix for Raas as live');
+    assert.ok(raasContent.includes('<span class="resource-title">ROVA Raas Sounds</span>'), 'Has ROVA Raas Sounds section');
+    assert.ok(raasContent.includes('data-analytics-label="ROVA Raas Sounds" data-analytics-status="live"'), 'Tracks ROVA Raas Sounds as live');
+    assert.ok(raasContent.includes('href="https://drive.google.com/drive/folders/1tneKiwTXmKsR8wzAICItM6zUChy3d5NX?usp=sharing"'), 'Has ROVA Raas Sounds Google Drive link');
     assert.ok(raasContent.includes('coming-soon-banner'), 'Has coming soon banner for unavailable links');
     assert.ok(raasContent.includes('src="../assets/logo.png"'), 'Has main logo');
     assert.ok(raasContent.includes('src="../assets/freehand-signature-3.png"'), 'Has freehand signature logo');
