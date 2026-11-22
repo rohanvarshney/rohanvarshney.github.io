@@ -1,7 +1,8 @@
 const test = require('node:test');
 const assert = require('node:assert');
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
+const vm = require('node:vm');
 
 test('index.html structure and content', () => {
     const htmlPath = path.join(__dirname, '..', 'index.html');
@@ -37,11 +38,11 @@ test('index.html structure and content', () => {
     assert.ok(htmlContent.includes('Professional'), 'Has Professional section');
     assert.ok(htmlContent.includes('Making data move faster to the right places.'), 'Has Professional tagline');
     assert.ok(htmlContent.includes('Personal'), 'Has Personal section');
-    assert.ok(htmlContent.includes('Always moving, always eating, always listening.'), 'Has Personal tagline');
+    assert.ok(htmlContent.includes('Always exploring, always eating, always listening.'), 'Has Personal tagline');
     assert.ok(htmlContent.includes('Portfolio'), 'Has Portfolio section');
-    assert.ok(htmlContent.includes('Making crowds move to the right frequencies.'), 'Has Portfolio tagline');
+    assert.ok(htmlContent.includes('Moving crowds to the right frequencies.'), 'Has Portfolio tagline');
     assert.ok(htmlContent.includes('<div class="social-section-title">Projects</div>'), 'Has Projects section');
-    assert.ok(htmlContent.includes('Making ideas move from concept to code.'), 'Has Projects tagline');
+    assert.ok(htmlContent.includes('Moving ideas from concept to code.'), 'Has Projects tagline');
 
     const professionalIndex = htmlContent.indexOf('<div class="social-section-title">Professional</div>');
     const personalIndex = htmlContent.indexOf('<div class="social-section-title">Personal</div>');
@@ -265,6 +266,8 @@ test('dj/index.html structure and content', () => {
     assert.ok(djContent.includes('id="book"'), 'Has Booking section');
     assert.ok(djContent.includes('data-mailto-form'), 'Has mailto inquiry form');
     assert.ok(djContent.includes('data-share'), 'Has share button');
+    assert.ok(djContent.includes('title="Copy page URL"'), 'DJ share button advertises copying the page URL');
+    assert.ok(djContent.includes('id="coming-soon-banner"'), 'DJ page has toast banner element');
     assert.ok(djContent.includes('data-waveform'), 'Has waveform visual');
     assert.ok(djContent.includes('data-bio-tab="short"'), 'Has short bio tab');
     assert.ok(djContent.includes('data-bio-tab="long"'), 'Has long bio tab');
@@ -292,6 +295,9 @@ test('production/index.html structure and content', () => {
     assert.ok(prodContent.includes('id="faq"'), 'Has FAQ section');
     assert.ok(prodContent.includes('id="collab"'), 'Has Collab section');
     assert.ok(prodContent.includes('data-mailto-form'), 'Has mailto collab form');
+    assert.ok(prodContent.includes('data-share'), 'Has share button');
+    assert.ok(prodContent.includes('title="Copy page URL"'), 'Production share button advertises copying the page URL');
+    assert.ok(prodContent.includes('id="coming-soon-banner"'), 'Production page has toast banner element');
     assert.ok(prodContent.includes('data-filter-group'), 'Has release filter buttons');
     assert.ok(prodContent.includes('class="arrangement"'), 'Has studio arrangement DAW visual');
     assert.ok(prodContent.includes('src="../assets/logo.png"'), 'Has main logo in header');
@@ -345,4 +351,201 @@ test('assets/js/analytics.js configuration and 100% link coverage', () => {
             );
         }
     }
+});
+
+test('assets/js/portfolio.js share button copies URL and shows banner', async () => {
+    const portfolioPath = path.join(__dirname, '..', 'assets', 'js', 'portfolio.js');
+    const portfolioJs = fs.readFileSync(portfolioPath, 'utf8');
+
+    assert.ok(!portfolioJs.includes('navigator.share'), 'portfolio.js does not use native navigator.share');
+
+    function runShareScenario({ href, clipboardWriteText, execCommand }) {
+        let domReadyHandler = null;
+        let shareClickHandler = null;
+        let lastTextarea = null;
+        let shareSheetCalls = 0;
+        const copiedByClipboard = [];
+        const trackedEvents = [];
+        const bannerClasses = new Set();
+        const bannerText = { textContent: 'Coming soon!' };
+        const timers = [];
+        let nextTimerId = 1;
+
+        const shareButton = {
+            addEventListener(type, fn) {
+                if (type === 'click') {
+                    shareClickHandler = fn;
+                }
+            },
+        };
+
+        const banner = {
+            classList: {
+                add(cls) { bannerClasses.add(cls); },
+                remove(cls) { bannerClasses.delete(cls); },
+                contains(cls) { return bannerClasses.has(cls); },
+            },
+        };
+
+        const sandbox = {
+            location: { href },
+            isSecureContext: true,
+            trackAnalyticsEvent(name, params) {
+                trackedEvents.push({ name, params });
+            },
+            navigator: {
+                share() {
+                    shareSheetCalls++;
+                    return Promise.resolve();
+                },
+                clipboard: {
+                    writeText(text) {
+                        copiedByClipboard.push(text);
+                        return clipboardWriteText(text);
+                    },
+                },
+            },
+            document: {
+                title: 'DJ ROVA — Bookings | Rohan Varshney',
+                body: {
+                    getAttribute() { return ''; },
+                    appendChild() {},
+                    removeChild() {},
+                },
+                addEventListener(type, fn) {
+                    if (type === 'DOMContentLoaded') {
+                        domReadyHandler = fn;
+                    }
+                },
+                querySelector() { return null; },
+                querySelectorAll(selector) {
+                    return selector === '[data-share]' ? [shareButton] : [];
+                },
+                getElementById(id) {
+                    if (id === 'coming-soon-banner') return banner;
+                    if (id === 'coming-soon-text') return bannerText;
+                    return null;
+                },
+                createElement(tag) {
+                    assert.strictEqual(tag, 'textarea');
+                    lastTextarea = {
+                        value: '',
+                        style: {},
+                        setAttribute() {},
+                        select() {},
+                        setSelectionRange() {},
+                    };
+                    return lastTextarea;
+                },
+                execCommand(cmd) {
+                    return execCommand ? execCommand(cmd, lastTextarea ? lastTextarea.value : '') : false;
+                },
+            },
+            setTimeout(fn, delay) {
+                const entry = { id: nextTimerId++, fn, delay, cleared: false };
+                timers.push(entry);
+                return entry.id;
+            },
+            clearTimeout(id) {
+                const entry = timers.find((t) => t.id === id);
+                if (entry) entry.cleared = true;
+            },
+        };
+        sandbox.window = sandbox;
+
+        vm.createContext(sandbox);
+        vm.runInContext(portfolioJs, sandbox);
+        assert.strictEqual(typeof domReadyHandler, 'function', 'Registers DOMContentLoaded handler');
+        domReadyHandler();
+        assert.strictEqual(typeof shareClickHandler, 'function', 'Binds click handler to [data-share]');
+
+        let prevented = false;
+        shareClickHandler({
+            preventDefault() {
+                prevented = true;
+            },
+        });
+
+        return {
+            get prevented() { return prevented; },
+            get shareSheetCalls() { return shareSheetCalls; },
+            copiedByClipboard,
+            trackedEvents,
+            bannerClasses,
+            bannerText,
+            timers,
+            get lastTextareaValue() { return lastTextarea ? lastTextarea.value : null; },
+        };
+    }
+
+    // 1. Copies hash-stripped URL via navigator.clipboard even when navigator.share exists
+    const clipboardSuccess = runShareScenario({
+        href: 'https://rohanvarshney.github.io/dj/#book',
+        clipboardWriteText: () => Promise.resolve(),
+    });
+    await new Promise((resolve) => setImmediate(resolve));
+
+    assert.strictEqual(clipboardSuccess.prevented, true, 'Prevents default button behavior');
+    assert.strictEqual(clipboardSuccess.shareSheetCalls, 0, 'Never invokes navigator.share');
+    assert.deepStrictEqual(
+        clipboardSuccess.copiedByClipboard,
+        ['https://rohanvarshney.github.io/dj/'],
+        'Copies current URL without hash fragment'
+    );
+    assert.strictEqual(clipboardSuccess.bannerClasses.has('visible'), true, 'Shows toast banner');
+    assert.strictEqual(
+        clipboardSuccess.bannerText.textContent,
+        'Page URL copied to clipboard.',
+        'Displays clipboard confirmation message in banner'
+    );
+    assert.deepStrictEqual(
+        JSON.parse(JSON.stringify(clipboardSuccess.trackedEvents)),
+        [{ name: 'portfolio_share', params: { event_category: 'share', event_label: 'DJ ROVA — Bookings | Rohan Varshney' } }],
+        'Tracks portfolio_share analytics event'
+    );
+    assert.strictEqual(clipboardSuccess.timers.length, 1, 'Schedules auto-hide timeout');
+    assert.strictEqual(clipboardSuccess.timers[0].delay, 3800, 'Auto-hides banner after 3800ms');
+    clipboardSuccess.timers[0].fn();
+    assert.strictEqual(clipboardSuccess.bannerClasses.has('visible'), false, 'Hides banner when timeout fires');
+
+    // 2. Falls back to execCommand('copy') when clipboard.writeText rejects and succeeds
+    let fallbackCopiedText = null;
+    const fallbackSuccess = runShareScenario({
+        href: 'https://rohanvarshney.github.io/production/#collab',
+        clipboardWriteText: () => Promise.reject(new Error('Permission denied')),
+        execCommand(cmd, value) {
+            assert.strictEqual(cmd, 'copy');
+            fallbackCopiedText = value;
+            return true;
+        },
+    });
+    await new Promise((resolve) => setImmediate(resolve));
+
+    assert.strictEqual(fallbackSuccess.shareSheetCalls, 0, 'Never invokes navigator.share on fallback');
+    assert.strictEqual(
+        fallbackCopiedText,
+        'https://rohanvarshney.github.io/production/',
+        'Fallback copies URL without hash fragment via execCommand'
+    );
+    assert.strictEqual(fallbackSuccess.bannerClasses.has('visible'), true, 'Shows banner on fallback success');
+    assert.strictEqual(
+        fallbackSuccess.bannerText.textContent,
+        'Page URL copied to clipboard.',
+        'Displays clipboard confirmation message on fallback success'
+    );
+
+    // 3. Displays manual link fallback banner if both clipboard API and execCommand fail
+    const fallbackFailure = runShareScenario({
+        href: 'https://rohanvarshney.github.io/production/',
+        clipboardWriteText: () => Promise.reject(new Error('Permission denied')),
+        execCommand: () => false,
+    });
+    await new Promise((resolve) => setImmediate(resolve));
+
+    assert.strictEqual(fallbackFailure.bannerClasses.has('visible'), true, 'Shows banner when copy fails');
+    assert.strictEqual(
+        fallbackFailure.bannerText.textContent,
+        'Copy this link: https://rohanvarshney.github.io/production/',
+        'Displays fallback URL banner message when copy fails'
+    );
 });

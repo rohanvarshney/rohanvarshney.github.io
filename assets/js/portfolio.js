@@ -5,7 +5,7 @@
  *   body[data-contact-email]      single place to set the booking / collab email
  *   [data-email-link]             <a> that becomes a mailto: link + shows the email
  *   [data-coming-soon="Label"]    placeholder link/button -> "coming soon" toast
- *   [data-share]                  native share sheet, falls back to copying the URL
+ *   [data-share]                  copies the page URL to clipboard and shows a banner
  *   [data-copy-email]             copies the contact email
  *   [data-copy-target="#id"]      copies the text of another element
  *   form[data-mailto-form]        inquiry form -> pre-filled email (no backend needed)
@@ -50,6 +50,10 @@
     if (toast) {
       toast.classList.remove('visible');
     }
+    if (toastTimeout) {
+      clearTimeout(toastTimeout);
+      toastTimeout = null;
+    }
   }
 
   window.showToast = showToast;
@@ -63,27 +67,42 @@
 
   /* ---------- Clipboard ---------- */
 
-  function copyText(value) {
-    if (navigator.clipboard && window.isSecureContext) {
-      return navigator.clipboard.writeText(value);
-    }
+  function fallbackCopyText(value) {
     return new Promise(function (resolve, reject) {
       var area = document.createElement('textarea');
       area.value = value;
       area.setAttribute('readonly', '');
       area.style.position = 'fixed';
+      area.style.top = '0';
+      area.style.left = '0';
       area.style.opacity = '0';
       document.body.appendChild(area);
       area.select();
+      if (typeof area.setSelectionRange === 'function') {
+        area.setSelectionRange(0, value.length);
+      }
       try {
-        document.execCommand('copy');
-        resolve();
+        var copied = document.execCommand('copy');
+        if (copied) {
+          resolve();
+        } else {
+          reject(new Error('Copy command was unsuccessful'));
+        }
       } catch (err) {
         reject(err);
       } finally {
         document.body.removeChild(area);
       }
     });
+  }
+
+  function copyText(value) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function' && window.isSecureContext) {
+      return navigator.clipboard.writeText(value).catch(function () {
+        return fallbackCopyText(value);
+      });
+    }
+    return fallbackCopyText(value);
   }
 
   function flashCopied(button, message) {
@@ -135,22 +154,14 @@
     document.querySelectorAll('[data-share]').forEach(function (el) {
       el.addEventListener('click', function (event) {
         event.preventDefault();
-        var shareData = {
-          title: document.title,
-          text: (document.querySelector('meta[name="description"]') || {}).content || document.title,
-          url: window.location.href.split('#')[0],
-        };
+        var url = window.location.href.split('#')[0];
         track('portfolio_share', { event_category: 'share', event_label: document.title });
-        if (navigator.share) {
-          navigator.share(shareData).catch(function () {});
-          return;
-        }
-        copyText(shareData.url).then(
+        copyText(url).then(
           function () {
-            showToast('Link copied \u2014 paste it anywhere.');
+            showToast('Page URL copied to clipboard.');
           },
           function () {
-            showToast(shareData.url);
+            showToast('Copy this link: ' + url);
           }
         );
       });
