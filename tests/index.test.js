@@ -207,13 +207,16 @@ test('raas/index.html structure and content', () => {
     assert.ok(!raasContent.includes('Qurbani'), 'GT Qurbani is removed from statistics and map');
     assert.ok(raasContent.includes('id="hall-of-fame"'), 'Has Hall Of Fame section');
     assert.ok(raasContent.includes('Hall Of Fame'), 'Has Hall Of Fame heading');
-    assert.ok(raasContent.includes('DSD Mix 2021'), 'Has DSD Mix 2021 Hall Of Fame item');
-    assert.ok(raasContent.includes('GT Mix 2022'), 'Has GT Mix 2022 Hall Of Fame item');
-    assert.ok(raasContent.includes('Raas Chaos Mixtape'), 'Has Raas Chaos Mixtape Hall Of Fame item');
+    assert.ok(raasContent.includes('<ul class="hof-list">'), 'Hall Of Fame uses a bulletpoint list');
+    assert.ok(!raasContent.includes('class="hof-card"'), 'Hall Of Fame does not use cards');
+    assert.ok(raasContent.includes('<strong>DSD 2021-2022</strong>'), 'Has DSD 2021-2022 Hall Of Fame item');
+    assert.ok(raasContent.includes('<strong>GT 2022-2023</strong>'), 'Has GT 2022-2023 Hall Of Fame item');
+    assert.ok(raasContent.includes('<strong>RAS XIII: Raas Reboot (2021)</strong>'), 'Has RAS XIII: Raas Reboot (2021) Hall Of Fame item');
+    assert.ok(raasContent.includes('<strong>UCF 2019-2020</strong>'), 'Has UCF 2019-2020 Hall Of Fame item');
+    assert.ok(raasContent.includes('<strong>Raas Chaos Mixtape (2022)</strong>'), 'Has Raas Chaos Mixtape (2022) Hall Of Fame item');
     assert.ok(raasContent.includes('Chunalida'), 'Raas Chaos Mixtape mentions Chunalida');
     assert.ok(raasContent.includes('Feel So Raas'), 'Raas Chaos Mixtape mentions Feel So Raas');
-    assert.ok(raasContent.includes('GT 19-20'), 'Has GT 19-20 Hall Of Fame item');
-    assert.ok(raasContent.includes('data-analytics-event="raas_hof_click"'), 'Tracks Hall Of Fame clicks');
+    assert.ok(raasContent.includes('<strong>GT 2019-2020</strong>'), 'Has GT 2019-2020 Hall Of Fame item');
     assert.ok(raasContent.includes('id="resources"'), 'Has Resources section');
     assert.ok(raasContent.includes('Resources'), 'Has Resources heading');
 
@@ -227,6 +230,9 @@ test('raas/index.html structure and content', () => {
     );
 
     assert.ok(raasContent.includes('<span class="resource-title">All Project Files</span>'), 'Has All Project Files section');
+    assert.ok(raasContent.includes('href="https://drive.google.com/drive/folders/1RIb04DsH7YmGpx7YLLmsJvrYgw7L4jKg?usp=sharing"'), 'Has All Project Files Google Drive link');
+    assert.ok(raasContent.includes('data-analytics-label="All Project Files" data-analytics-status="live"'), 'Tracks All Project Files as live');
+    assert.ok(raasContent.includes('View access by request only') && raasContent.includes('comment in your request'), 'Emphasizes view-access request and recommended comment for All Project Files');
     assert.ok(raasContent.includes('<span class="resource-title">How to In-House Mix for Raas</span>'), 'Has How to In-House Mix for Raas section');
     assert.ok(raasContent.includes('href="https://docs.google.com/document/d/1MljkjOZmstdsRXOnsO0Z_NJqpnJQsBKbyGvo37Y1dNg/edit?usp=sharing"'), 'Has How to In-House Mix for Raas Google Docs link');
     assert.ok(raasContent.includes('data-analytics-label="How to In-House Mix for Raas" data-analytics-status="live"'), 'Tracks How to In-House Mix for Raas as live');
