@@ -264,6 +264,8 @@ test('dj/index.html structure and content', () => {
     assert.ok(djContent.includes('data-waveform'), 'Has waveform visual');
     assert.ok(djContent.includes('data-bio-tab="short"'), 'Has short bio tab');
     assert.ok(djContent.includes('data-bio-tab="long"'), 'Has long bio tab');
+    assert.ok(djContent.includes('class="dj-rig"'), 'Has live DJ rig visual');
+    assert.ok(!djContent.includes('Press photo placeholder'), 'Replaces static press photo placeholder');
     assert.ok(djContent.includes('href="../production/"'), 'Cross-links to Production');
     assert.ok(djContent.includes('href="../raas/"'), 'Cross-links to Raas / Garba');
     assert.ok(djContent.includes('src="../assets/js/analytics.js"'), 'Includes analytics script');
