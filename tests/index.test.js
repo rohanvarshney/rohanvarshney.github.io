@@ -242,6 +242,10 @@ test('raas/index.html structure and content', () => {
     assert.ok(raasContent.includes('coming-soon-banner'), 'Has coming soon banner for unavailable links');
     assert.ok(raasContent.includes('src="../assets/logo.png"'), 'Has main logo');
     assert.ok(raasContent.includes('src="../assets/freehand-signature-3.png"'), 'Has freehand signature logo');
+    assert.ok(raasContent.includes('<nav class="topnav"'), 'Has sticky top navigation header');
+    assert.ok(raasContent.includes('href="#statistics"'), 'Topnav links to Statistics section');
+    assert.ok(raasContent.includes('href="#hall-of-fame"'), 'Topnav links to Hall Of Fame section');
+    assert.ok(raasContent.includes('href="#resources"'), 'Topnav links to Resources section');
     assert.ok(raasContent.includes('src="../assets/js/analytics.js"'), 'Includes shared analytics script');
     assert.ok(raasContent.includes('data-analytics-event="raas_resource_click"'), 'Tracks Raas resource clicks');
 });
@@ -266,6 +270,8 @@ test('dj/index.html structure and content', () => {
     assert.ok(djContent.includes('data-bio-tab="long"'), 'Has long bio tab');
     assert.ok(djContent.includes('class="dj-rig"'), 'Has live DJ rig visual');
     assert.ok(!djContent.includes('Press photo placeholder'), 'Replaces static press photo placeholder');
+    assert.ok(djContent.includes('src="../assets/logo.png"'), 'Has main logo in header');
+    assert.ok(djContent.includes('src="../assets/freehand-signature-3.png"'), 'Has freehand signature logo in header');
     assert.ok(djContent.includes('href="../production/"'), 'Cross-links to Production');
     assert.ok(djContent.includes('href="../raas/"'), 'Cross-links to Raas / Garba');
     assert.ok(djContent.includes('src="../assets/js/analytics.js"'), 'Includes analytics script');
@@ -288,6 +294,8 @@ test('production/index.html structure and content', () => {
     assert.ok(prodContent.includes('data-mailto-form'), 'Has mailto collab form');
     assert.ok(prodContent.includes('data-filter-group'), 'Has release filter buttons');
     assert.ok(prodContent.includes('class="arrangement"'), 'Has studio arrangement DAW visual');
+    assert.ok(prodContent.includes('src="../assets/logo.png"'), 'Has main logo in header');
+    assert.ok(prodContent.includes('src="../assets/freehand-signature-3.png"'), 'Has freehand signature logo in header');
     assert.ok(prodContent.includes('href="../dj/"'), 'Cross-links to DJing');
     assert.ok(prodContent.includes('href="../raas/"'), 'Cross-links to Raas / Garba');
     assert.ok(prodContent.includes('src="../assets/js/analytics.js"'), 'Includes analytics script');

@@ -108,10 +108,23 @@ img {
   gap: 20px;
 }
 
+.topnav-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
 .topnav-brand img {
   height: 30px;
   width: auto;
+  object-fit: contain;
   mix-blend-mode: multiply;
+}
+
+.topnav-brand .topnav-signature {
+  height: 36px;
 }
 
 .topnav-links {
@@ -2247,6 +2260,18 @@ details.faq .faq-body {
 @media (max-width: 560px) {
   .container {
     padding: 24px 16px 96px;
+  }
+
+  .topnav-brand {
+    gap: 8px;
+  }
+
+  .topnav-brand img {
+    height: 26px;
+  }
+
+  .topnav-brand .topnav-signature {
+    height: 31px;
   }
 
   .dj-rig {
