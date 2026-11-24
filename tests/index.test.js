@@ -76,7 +76,9 @@ test('index.html structure and content', () => {
     assert.ok(htmlContent.includes('data-analytics-event="project_link_click"'), 'Tracks SpotKit as project_link_click');
     assert.ok(htmlContent.includes('data-analytics-category="projects"'), 'Categorizes SpotKit under projects');
     assert.ok(htmlContent.includes('data-analytics-label="Beli Ranking Normalization"'), 'Has Beli Ranking Normalization project item');
-    assert.ok(htmlContent.includes("onclick=\"showComingSoon(event, 'Beli Ranking Normalization')\""), 'Beli Ranking Normalization triggers coming soon banner');
+    assert.ok(htmlContent.includes('href="https://rohanvarshney.github.io/beli-ranking-normalization/"'), 'Home page links directly to Beli Ranking Normalization');
+    assert.ok(htmlContent.includes('data-analytics-label="Beli Ranking Normalization" data-analytics-status="live"'), 'Tracks Beli Ranking Normalization as live');
+    assert.ok(!htmlContent.includes("showComingSoon(event, 'Beli Ranking Normalization')"), 'Beli Ranking Normalization no longer triggers coming soon banner');
     assert.match(htmlContent, /data-analytics-label="Beli Ranking Normalization"[\s\S]*?<svg\b[\s\S]*?<\/svg>[\s\S]*?<\/a>/, 'Beli Ranking Normalization uses an inline SVG bell curve icon');
     assert.ok(htmlContent.includes('data-analytics-label="DJing"'), 'Has DJing portfolio item');
     assert.match(htmlContent, /data-analytics-label="DJing"[\s\S]*?<svg\b[\s\S]*?<\/svg>[\s\S]*?<\/a>/, 'DJing uses an inline SVG DJ controller icon');
