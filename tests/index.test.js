@@ -219,14 +219,14 @@ test('raas/index.html structure and content', () => {
     assert.ok(raasContent.includes('Hall Of Fame'), 'Has Hall Of Fame heading');
     assert.ok(raasContent.includes('<ul class="hof-list">'), 'Hall Of Fame uses a bulletpoint list');
     assert.ok(!raasContent.includes('class="hof-card"'), 'Hall Of Fame does not use cards');
-    assert.ok(raasContent.includes('<strong>DSD 2021-2022</strong>'), 'Has DSD 2021-2022 Hall Of Fame item');
-    assert.ok(raasContent.includes('<strong>GT 2022-2023</strong>'), 'Has GT 2022-2023 Hall Of Fame item');
-    assert.ok(raasContent.includes('<strong>RAS XIII: Raas Reboot (2021)</strong>'), 'Has RAS XIII: Raas Reboot (2021) Hall Of Fame item');
-    assert.ok(raasContent.includes('<strong>UCF 2019-2020</strong>'), 'Has UCF 2019-2020 Hall Of Fame item');
-    assert.ok(raasContent.includes('<strong>Raas Chaos Mixtape (2022)</strong>'), 'Has Raas Chaos Mixtape (2022) Hall Of Fame item');
-    assert.ok(raasContent.includes('Chunalida'), 'Raas Chaos Mixtape mentions Chunalida');
-    assert.ok(raasContent.includes('Feel So Raas'), 'Raas Chaos Mixtape mentions Feel So Raas');
-    assert.ok(raasContent.includes('<strong>GT 2019-2020</strong>'), 'Has GT 2019-2020 Hall Of Fame item');
+    assert.ok(raasContent.includes('<li><strong>DSD 2021-2022</strong></li>'), 'Has DSD 2021-2022 Hall Of Fame item without description');
+    assert.ok(raasContent.includes('<li><strong>GT 2022-2023</strong></li>'), 'Has GT 2022-2023 Hall Of Fame item without description');
+    assert.ok(raasContent.includes('<li><strong>RAS XIII: Raas Reboot (2021)</strong></li>'), 'Has RAS XIII: Raas Reboot (2021) Hall Of Fame item without description');
+    assert.ok(raasContent.includes('<li><strong>UCF 2019-2020</strong></li>'), 'Has UCF 2019-2020 Hall Of Fame item without description');
+    assert.ok(raasContent.includes('<li><strong>Raas Chaos Mixtape (2022)</strong></li>'), 'Has Raas Chaos Mixtape (2022) Hall Of Fame item without description');
+    assert.ok(raasContent.includes('<li><strong>GT 2019-2020</strong></li>'), 'Has GT 2019-2020 Hall Of Fame item without description');
+    const hofMatch = raasContent.match(/<ul class="hof-list">([\s\S]*?)<\/ul>/);
+    assert.ok(hofMatch && !hofMatch[1].includes('&mdash;'), 'Hall Of Fame items omit descriptions after em dash');
     assert.ok(raasContent.includes('id="resources"'), 'Has Resources section');
     assert.ok(raasContent.includes('Resources'), 'Has Resources heading');
 
