@@ -42,13 +42,14 @@ test('index.html structure and content', () => {
     assert.ok(htmlContent.includes('Portfolio'), 'Has Portfolio section');
     assert.ok(htmlContent.includes('Moving crowds to the right frequencies.'), 'Has Portfolio tagline');
     assert.ok(htmlContent.includes('<div class="social-section-title">Projects</div>'), 'Has Projects section');
-    assert.ok(htmlContent.includes('Moving ideas from concept to code.'), 'Has Projects tagline');
+    assert.ok(htmlContent.includes('Taking ideas from concept to code.'), 'Has Projects tagline');
 
     const professionalIndex = htmlContent.indexOf('<div class="social-section-title">Professional</div>');
     const personalIndex = htmlContent.indexOf('<div class="social-section-title">Personal</div>');
     const portfolioIndex = htmlContent.indexOf('<div class="social-section-title">Portfolio</div>');
     const projectsIndex = htmlContent.indexOf('<div class="social-section-title">Projects</div>');
     const spotkitIndex = htmlContent.indexOf('data-analytics-label="SpotKit"');
+    const beliNormIndex = htmlContent.indexOf('data-analytics-label="Beli Ranking Normalization"');
     assert.ok(
         professionalIndex !== -1 &&
         personalIndex !== -1 &&
@@ -63,12 +64,19 @@ test('index.html structure and content', () => {
         spotkitIndex > projectsIndex && spotkitIndex < personalIndex,
         'SpotKit appears under Projects section'
     );
+    assert.ok(
+        beliNormIndex > spotkitIndex && beliNormIndex < personalIndex,
+        'Beli Ranking Normalization appears as second item under Projects section'
+    );
 
     // Portfolio & Projects Links and Coming Soon Banner
     assert.ok(htmlContent.includes('data-analytics-label="Raas / Garba"'), 'Has Raas / Garba portfolio item');
     assert.ok(htmlContent.includes('data-analytics-label="SpotKit"'), 'Has SpotKit project item');
     assert.ok(htmlContent.includes('data-analytics-event="project_link_click"'), 'Tracks SpotKit as project_link_click');
     assert.ok(htmlContent.includes('data-analytics-category="projects"'), 'Categorizes SpotKit under projects');
+    assert.ok(htmlContent.includes('data-analytics-label="Beli Ranking Normalization"'), 'Has Beli Ranking Normalization project item');
+    assert.ok(htmlContent.includes("onclick=\"showComingSoon(event, 'Beli Ranking Normalization')\""), 'Beli Ranking Normalization triggers coming soon banner');
+    assert.match(htmlContent, /data-analytics-label="Beli Ranking Normalization"[\s\S]*?<svg\b[\s\S]*?<\/svg>[\s\S]*?<\/a>/, 'Beli Ranking Normalization uses an inline SVG bell curve icon');
     assert.ok(htmlContent.includes('data-analytics-label="DJing"'), 'Has DJing portfolio item');
     assert.match(htmlContent, /data-analytics-label="DJing"[\s\S]*?<svg\b[\s\S]*?<\/svg>[\s\S]*?<\/a>/, 'DJing uses an inline SVG DJ controller icon');
     assert.ok(htmlContent.includes('data-analytics-label="Production"'), 'Has Production portfolio item');
@@ -123,6 +131,7 @@ test('index.html structure and content', () => {
         'DJing',
         'Production',
         'SpotKit',
+        'Beli Ranking Normalization',
     ];
     for (const label of expectedIconLabels) {
         assert.ok(
@@ -133,7 +142,7 @@ test('index.html structure and content', () => {
     }
 
     const indexAnchors = htmlContent.match(/<a\b[^>]*>/gi) || [];
-    assert.strictEqual(indexAnchors.length, 10, 'Homepage has all 10 icon links');
+    assert.strictEqual(indexAnchors.length, 11, 'Homepage has all 11 icon links');
     for (const tag of indexAnchors) {
         assert.ok(
             !/\btitle=/.test(tag),
