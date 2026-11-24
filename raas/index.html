@@ -663,10 +663,14 @@
     }
 
     .footer {
-      margin-top: 40px;
+      margin-top: 64px;
+      padding-top: 20px;
+      border-top: 1px solid #333;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
       font-size: 0.85rem;
       color: #666;
     }
@@ -679,6 +683,18 @@
 
     .footer a:hover {
       opacity: 0.7;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .footer-social {
+      display: flex;
+      gap: 16px;
+      font-size: 1.15rem;
     }
 
     .banner {
@@ -1126,9 +1142,17 @@
       </div>
     </section>
 
-    <div class="footer">
-      <a href="../" data-analytics-event="navigation_click" data-analytics-category="navigation" data-analytics-label="Home">&larr; rohanvarshney.github.io</a>
-    </div>
+    <footer class="footer">
+      <div class="footer-links">
+        <a href="../" data-analytics-event="navigation_click" data-analytics-category="navigation" data-analytics-label="Home">&larr; rohanvarshney.github.io</a>
+        <a href="../dj/" data-analytics-event="portfolio_link_click" data-analytics-category="portfolio" data-analytics-label="Footer DJing">DJing</a>
+        <a href="../production/" data-analytics-event="portfolio_link_click" data-analytics-category="portfolio" data-analytics-label="Footer Production">Production</a>
+      </div>
+      <div class="footer-social">
+        <a href="https://www.instagram.com/rohanvar" target="_blank" rel="noopener noreferrer" title="Instagram"
+          data-analytics-event="social_link_click" data-analytics-category="raas" data-analytics-label="Footer Instagram"><i class="fa fa-instagram" aria-hidden="true"></i></a>
+      </div>
+    </footer>
   </main>
 
   <script>

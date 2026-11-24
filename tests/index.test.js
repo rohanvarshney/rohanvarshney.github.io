@@ -71,6 +71,7 @@ test('index.html structure and content', () => {
 
     // Portfolio & Projects Links and Coming Soon Banner
     assert.ok(htmlContent.includes('data-analytics-label="Raas / Garba"'), 'Has Raas / Garba portfolio item');
+    assert.match(htmlContent, /data-analytics-label="Raas \/ Garba"[\s\S]*?<svg\b[\s\S]*?dandiya-front[\s\S]*?dandiya-back[\s\S]*?<\/svg>[\s\S]*?<\/a>/, 'Raas / Garba uses adorned dandiya inline SVG with spiral stripes, crossover mask, and tassels');
     assert.ok(htmlContent.includes('data-analytics-label="SpotKit"'), 'Has SpotKit project item');
     assert.ok(htmlContent.includes('data-analytics-event="project_link_click"'), 'Tracks SpotKit as project_link_click');
     assert.ok(htmlContent.includes('data-analytics-category="projects"'), 'Categorizes SpotKit under projects');
@@ -258,6 +259,11 @@ test('raas/index.html structure and content', () => {
     assert.ok(raasContent.includes('href="#resources"'), 'Topnav links to Resources section');
     assert.ok(raasContent.includes('src="../assets/js/analytics.js"'), 'Includes shared analytics script');
     assert.ok(raasContent.includes('data-analytics-event="raas_resource_click"'), 'Tracks Raas resource clicks');
+    assert.ok(raasContent.includes('<footer class="footer">'), 'Has semantic footer matching DJ/Production pages');
+    assert.ok(raasContent.includes('class="footer-links"'), 'Footer has footer-links container');
+    assert.ok(raasContent.includes('class="footer-social"'), 'Footer has footer-social container');
+    assert.ok(raasContent.includes('href="../dj/"'), 'Footer cross-links to DJing');
+    assert.ok(raasContent.includes('href="../production/"'), 'Footer cross-links to Production');
 });
 
 test('dj/index.html structure and content', () => {
@@ -288,6 +294,49 @@ test('dj/index.html structure and content', () => {
     assert.ok(djContent.includes('href="../raas/"'), 'Cross-links to Raas / Garba');
     assert.ok(djContent.includes('src="../assets/js/analytics.js"'), 'Includes analytics script');
     assert.ok(djContent.includes('src="../assets/js/portfolio.js"'), 'Includes portfolio script');
+
+    // Updated genres, bio, location, Serato setup, and placeholder removal
+    assert.ok(djContent.includes('house (disco, tech, progressive)'), 'Includes house (disco, tech, progressive)');
+    assert.ok(djContent.includes('throwbacks'), 'Includes throwbacks');
+    assert.ok(!djContent.includes('Desi house') && !djContent.includes('Desi House'), 'Removes Desi house references');
+    assert.ok(!djContent.includes('Afrobeats') && !djContent.includes('Hip-Hop / Afro'), 'Removes Afrobeats references');
+    assert.ok(djContent.includes('years of production and practice'), 'Includes years of production and practice');
+    assert.ok(!djContent.includes('national-champion'), 'Removes national-champion reference');
+    assert.ok(djContent.includes('Based in Brooklyn, NYC'), 'Includes Based in Brooklyn, NYC');
+    assert.ok(!djContent.includes('Travels nationwide'), 'Removes Travels nationwide');
+    assert.ok(djContent.includes('Serato DJ Pro'), 'Includes Serato DJ Pro');
+    assert.ok(!djContent.includes('Rekordbox'), 'Removes Rekordbox reference');
+    assert.ok(djContent.includes('data-contact-email="rohanvar@gmail.com"'), 'Uses rohanvar@gmail.com as booking email');
+    assert.ok(!djContent.includes('bookings@example.com'), 'Removes bookings@example.com placeholder');
+
+    assert.ok(djContent.includes('</span> Now booking</div>'), 'Status chip reads Now booking');
+    assert.ok(!djContent.includes('Now booking 2026'), 'Removes date range from status chip');
+
+    const djWithoutFooter = djContent.replace(/<footer[\s\S]*?<\/footer>/, '');
+    assert.ok(!/raas|garba|navratri|collegiate/i.test(djWithoutFooter), 'DJ page body copy is agnostic of Raas/Garba');
+    assert.ok(!/soundcloud/i.test(djContent), 'Removes all SoundCloud links and references');
+
+    const leftoverPlaceholders = [
+        '[Spring',
+        '[City',
+        '[Featured',
+        '[60]',
+        '[2026]',
+        '[Sangeet',
+        '[Desi',
+        '[Navratri',
+        '[Open',
+        '[Dec',
+        '[Venue',
+        '[Name',
+        '[Update',
+        '[DDJ',
+        '[region]',
+        '[weddings',
+    ];
+    for (const token of leftoverPlaceholders) {
+        assert.ok(!djContent.includes(token), `Removes leftover placeholder token: ${token}`);
+    }
 });
 
 test('production/index.html structure and content', () => {
@@ -315,6 +364,19 @@ test('production/index.html structure and content', () => {
     assert.ok(prodContent.includes('href="../raas/"'), 'Cross-links to Raas / Garba');
     assert.ok(prodContent.includes('src="../assets/js/analytics.js"'), 'Includes analytics script');
     assert.ok(prodContent.includes('src="../assets/js/portfolio.js"'), 'Includes portfolio script');
+    assert.ok(prodContent.includes('years of production and practice'), 'Production page highlights years of production and practice');
+
+    const prodWithoutFooter = prodContent.replace(/<footer[\s\S]*?<\/footer>/, '');
+    assert.ok(
+        !/raas|garba|dandiya|national-champion|collegiate/i.test(prodWithoutFooter),
+        'Production page body copy is agnostic of Raas/Garba'
+    );
+    assert.ok(!/soundcloud/i.test(prodContent), 'Removes all SoundCloud links and references');
+    assert.ok(prodContent.includes('All Genres'), 'Production hero uses All Genres');
+    assert.ok(!prodContent.includes('Desi &times; Electronic &times; Hip-Hop'), 'Removes Desi x Electronic x Hip-Hop');
+    assert.ok(prodContent.includes('Logic Pro X'), 'Production uses Logic Pro X');
+    assert.ok(prodContent.includes('ROVA_session_final_v44.logicx'), 'Arrangement visual uses .logicx project file');
+    assert.ok(!/ableton|fl studio|\.als\b/i.test(prodContent), 'Removes Ableton Live, FL Studio, and .als references');
 });
 
 test('assets/js/analytics.js configuration and 100% link coverage', () => {

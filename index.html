@@ -356,7 +356,29 @@
             data-analytics-event="portfolio_link_click" data-analytics-category="portfolio"
             data-analytics-label="Raas / Garba" data-analytics-status="live">
             <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M4.2 20.4a1.1 1.1 0 0 1-.2-1.5L15.6 2.7a1.4 1.4 0 0 1 2.2 1.7L5.7 20.3a1.1 1.1 0 0 1-1.5.1zm15.6 0a1.1 1.1 0 0 1-1.5-.1L6.2 4.4a1.4 1.4 0 0 1 2.2-1.7l11.6 16.2a1.1 1.1 0 0 1-.2 1.5z" />
+              <defs>
+                <mask id="dandiya-front">
+                  <rect width="24" height="24" fill="white" />
+                  <g transform="rotate(38 12 10.2)" fill="none" stroke="black" stroke-width="1.1">
+                    <path d="M9.8 5.4 L14.2 4.0 M9.8 8.4 L14.2 7.0 M9.8 11.4 L14.2 10.0 M9.8 14.4 L14.2 13.0 M9.8 17.2 L14.2 15.8" />
+                  </g>
+                </mask>
+                <mask id="dandiya-back">
+                  <rect width="24" height="24" fill="white" />
+                  <g transform="rotate(-38 12 10.2)" fill="none" stroke="black" stroke-width="1.1">
+                    <path d="M9.8 5.4 L14.2 4.0 M9.8 8.4 L14.2 7.0 M9.8 11.4 L14.2 10.0 M9.8 14.4 L14.2 13.0 M9.8 17.2 L14.2 15.8" />
+                  </g>
+                  <rect x="9.45" y="1.0" width="5.1" height="18.4" rx="2.0" fill="black" transform="rotate(38 12 10.2)" />
+                </mask>
+              </defs>
+              <rect x="10.35" y="1.7" width="3.3" height="17.0" rx="1.5" transform="rotate(-38 12 10.2)" mask="url(#dandiya-back)" />
+              <rect x="10.35" y="1.7" width="3.3" height="17.0" rx="1.5" transform="rotate(38 12 10.2)" mask="url(#dandiya-front)" />
+              <circle cx="6.4" cy="18.1" r="1.0" />
+              <circle cx="17.6" cy="18.1" r="1.0" />
+              <g fill="none" stroke="currentColor" stroke-width="1.05" stroke-linecap="round">
+                <path d="M5.9 19.2 L4.4 22.7 M6.4 19.3 L6.4 23.0 M6.9 19.2 L8.4 22.7" />
+                <path d="M17.1 19.2 L15.6 22.7 M17.6 19.3 L17.6 23.0 M18.1 19.2 L19.6 22.7" />
+              </g>
             </svg>
           </a>
           <a href="/dj" aria-label="DJing" data-tooltip="DJing"
