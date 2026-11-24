@@ -314,6 +314,32 @@ test('dj/index.html structure and content', () => {
     assert.ok(djContent.includes('</span> Now booking</div>'), 'Status chip reads Now booking');
     assert.ok(!djContent.includes('Now booking 2026'), 'Removes date range from status chip');
 
+    assert.ok(djContent.includes('when to drop the beat.'), 'Hero lead says drop the beat');
+    assert.ok(!djContent.includes('drop the dhol'), 'Removes drop the dhol from hero lead');
+
+    const chipsMatch = djContent.match(/<div class="chips">([\s\S]*?)<\/div>/);
+    assert.ok(chipsMatch, 'Has What you\'ll hear chips');
+    assert.ok(chipsMatch[1].includes('<span class="chip">Pop</span>'), 'Chips include Pop');
+    assert.ok(chipsMatch[1].includes('<span class="chip">Punjabi</span>'), 'Chips include Punjabi');
+    assert.ok(chipsMatch[1].includes('<span class="chip">Electronic</span>'), 'Chips include Electronic');
+    assert.ok(!chipsMatch[1].includes('Bhangra'), 'Chips exclude Bhangra');
+
+    const eventsMatch = djContent.match(/<section[^>]*id="events"[\s\S]*?<\/section>/);
+    assert.ok(eventsMatch, 'Has Events section');
+    assert.ok(eventsMatch[0].includes('class="grid-2"'), 'Events section uses grid-2');
+    assert.strictEqual((eventsMatch[0].match(/class="tile"/g) || []).length, 4, 'Events section has 4 cards');
+    assert.ok(!eventsMatch[0].includes('Weddings &amp; Sangeets'), 'Events section removes Weddings & Sangeets');
+    assert.ok(!eventsMatch[0].includes('College &amp; Showcases'), 'Events section removes College & Showcases');
+
+    const gigsMatch = djContent.match(/<section[^>]*id="gigs"[\s\S]*?<\/section>/);
+    assert.ok(gigsMatch, 'Has Gigs section');
+    assert.strictEqual((gigsMatch[0].match(/<li class="gig/g) || []).length, 2, 'Selected Gigs has 2 items');
+
+    const testimonialsMatch = djContent.match(/<section[^>]*id="testimonials"[\s\S]*?<\/section>/);
+    assert.ok(testimonialsMatch, 'Has Kind Words section');
+    assert.ok(testimonialsMatch[0].includes('class="grid-2"'), 'Kind Words section uses grid-2');
+    assert.strictEqual((testimonialsMatch[0].match(/<figure class="card quote">/g) || []).length, 2, 'Kind Words has 2 quote cards');
+
     const djWithoutFooter = djContent.replace(/<footer[\s\S]*?<\/footer>/, '');
     assert.ok(!/raas|garba|navratri|collegiate/i.test(djWithoutFooter), 'DJ page body copy is agnostic of Raas/Garba');
     assert.ok(!/soundcloud/i.test(djContent), 'Removes all SoundCloud links and references');
@@ -350,8 +376,8 @@ test('production/index.html structure and content', () => {
     assert.ok(prodContent.includes('data-contact-email='), 'Has data-contact-email attribute');
     assert.ok(prodContent.includes('id="releases"'), 'Has Releases section');
     assert.ok(prodContent.includes('id="services"'), 'Has Services section');
-    assert.ok(prodContent.includes('id="process"'), 'Has Process section');
-    assert.ok(prodContent.includes('id="credits"'), 'Has Credits section');
+    assert.ok(!prodContent.includes('id="process"') && !prodContent.includes('How It Works') && !prodContent.includes('href="#process"'), 'Removes How It Works section and nav link');
+    assert.ok(!prodContent.includes('id="credits"') && !prodContent.includes('Experience &amp; Toolkit') && !prodContent.includes('href="#credits"'), 'Removes Experience & Toolkit section and nav link');
     assert.ok(prodContent.includes('id="faq"'), 'Has FAQ section');
     assert.ok(prodContent.includes('id="collab"'), 'Has Collab section');
     assert.ok(prodContent.includes('data-mailto-form'), 'Has mailto collab form');
