@@ -69,6 +69,16 @@ test('index.html structure and content', () => {
         'Beli Ranking Normalization appears as second item under Projects section'
     );
 
+    const djingIndex = htmlContent.indexOf('data-analytics-label="DJing"');
+    const productionIndex = htmlContent.indexOf('data-analytics-label="Production"');
+    const raasIndex = htmlContent.indexOf('data-analytics-label="Raas / Garba"');
+    assert.ok(
+        djingIndex > portfolioIndex &&
+        productionIndex > djingIndex &&
+        raasIndex > productionIndex,
+        'Portfolio items appear in order: DJing -> Production -> Raas / Garba'
+    );
+
     // Portfolio & Projects Links and Coming Soon Banner
     assert.ok(htmlContent.includes('data-analytics-label="Raas / Garba"'), 'Has Raas / Garba portfolio item');
     assert.match(htmlContent, /data-analytics-label="Raas \/ Garba"[\s\S]*?<svg\b[\s\S]*?dandiya-front[\s\S]*?dandiya-back[\s\S]*?<\/svg>[\s\S]*?<\/a>/, 'Raas / Garba uses adorned dandiya inline SVG with spiral stripes, crossover mask, and tassels');
@@ -335,10 +345,9 @@ test('dj/index.html structure and content', () => {
     assert.ok(gigsMatch, 'Has Gigs section');
     assert.strictEqual((gigsMatch[0].match(/<li class="gig/g) || []).length, 2, 'Selected Gigs has 2 items');
 
-    const testimonialsMatch = djContent.match(/<section[^>]*id="testimonials"[\s\S]*?<\/section>/);
-    assert.ok(testimonialsMatch, 'Has Kind Words section');
-    assert.ok(testimonialsMatch[0].includes('class="grid-2"'), 'Kind Words section uses grid-2');
-    assert.strictEqual((testimonialsMatch[0].match(/<figure class="card quote">/g) || []).length, 2, 'Kind Words has 2 quote cards');
+    assert.ok(!djContent.includes('id="testimonials"') && !djContent.includes('Kind Words'), 'Removes Kind Words section');
+    assert.ok(!djContent.includes('ig.me/m/'), 'DJ page does not use broken ig.me/m/ links');
+    assert.ok(djContent.includes('href="https://www.instagram.com/rohanvar"'), 'DJ page links to instagram.com/rohanvar');
 
     const djWithoutFooter = djContent.replace(/<footer[\s\S]*?<\/footer>/, '');
     assert.ok(!/raas|garba|navratri|collegiate/i.test(djWithoutFooter), 'DJ page body copy is agnostic of Raas/Garba');
@@ -378,6 +387,9 @@ test('production/index.html structure and content', () => {
     assert.ok(prodContent.includes('id="services"'), 'Has Services section');
     assert.ok(!prodContent.includes('id="process"') && !prodContent.includes('How It Works') && !prodContent.includes('href="#process"'), 'Removes How It Works section and nav link');
     assert.ok(!prodContent.includes('id="credits"') && !prodContent.includes('Experience &amp; Toolkit') && !prodContent.includes('href="#credits"'), 'Removes Experience & Toolkit section and nav link');
+    assert.ok(!prodContent.includes('id="testimonials"') && !prodContent.includes('Kind Words'), 'Removes Kind Words section');
+    assert.ok(!prodContent.includes('ig.me/m/'), 'Production page does not use broken ig.me/m/ links');
+    assert.ok(prodContent.includes('href="https://www.instagram.com/rohanvar"'), 'Production page links to instagram.com/rohanvar');
     assert.ok(prodContent.includes('id="faq"'), 'Has FAQ section');
     assert.ok(prodContent.includes('id="collab"'), 'Has Collab section');
     assert.ok(prodContent.includes('data-mailto-form'), 'Has mailto collab form');
