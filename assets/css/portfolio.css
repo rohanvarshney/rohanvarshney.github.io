@@ -1764,6 +1764,21 @@ details.faq .faq-body {
   inset: 22%;
 }
 
+.release .cover.has-art {
+  padding: 0;
+}
+
+.release .cover.has-art::after {
+  display: none;
+}
+
+.release .cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 .release:nth-child(6n + 2) .cover {
   background: radial-gradient(circle at 70% 25%, #ffb347, transparent 55%), radial-gradient(circle at 20% 85%, #dc143c, transparent 60%), #7a0a22;
 }

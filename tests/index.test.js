@@ -55,10 +55,10 @@ test('index.html structure and content', () => {
         personalIndex !== -1 &&
         portfolioIndex !== -1 &&
         projectsIndex !== -1 &&
-        professionalIndex < portfolioIndex &&
-        portfolioIndex < projectsIndex &&
-        projectsIndex < personalIndex,
-        'Sections appear in order: Professional -> Portfolio -> Projects -> Personal'
+        professionalIndex < projectsIndex &&
+        projectsIndex < personalIndex &&
+        personalIndex < portfolioIndex,
+        'Sections appear in order: Professional -> Projects -> Personal -> Portfolio'
     );
     assert.ok(
         spotkitIndex > projectsIndex && spotkitIndex < personalIndex,
@@ -405,6 +405,18 @@ test('production/index.html structure and content', () => {
     assert.ok(prodContent.includes('Logic Pro X'), 'Production uses Logic Pro X');
     assert.ok(prodContent.includes('ROVA_session_final_v44.logicx'), 'Arrangement visual uses .logicx project file');
     assert.ok(!/ableton|fl studio|\.als\b/i.test(prodContent), 'Removes Ableton Live, FL Studio, and .als references');
+
+    assert.ok(prodContent.includes('house pool party'), 'Has house pool party release');
+    assert.ok(prodContent.includes('href="https://open.spotify.com/track/6IoqO8jmnH9Ml3BTGxDk1B"'), 'Links to house pool party on Spotify');
+    assert.ok(prodContent.includes('data-analytics-label="house pool party Spotify" data-analytics-status="live"'), 'Tracks house pool party Spotify link as live');
+
+    assert.ok(prodContent.includes('rainy overpass'), 'Has rainy overpass release');
+    assert.ok(prodContent.includes('href="https://open.spotify.com/track/1IG988cgn1YSuc0lhyk1uG"'), 'Links to rainy overpass on Spotify');
+    assert.ok(prodContent.includes('data-analytics-label="rainy overpass Spotify" data-analytics-status="live"'), 'Tracks rainy overpass Spotify link as live');
+
+    assert.ok(prodContent.includes('href="https://open.spotify.com/artist/4rzG9xC24GurQlOwEtqB7x"'), 'Footer links to ROVA Spotify artist profile');
+    assert.ok(prodContent.includes('data-analytics-label="Footer Spotify" data-analytics-status="live"'), 'Tracks Footer Spotify link as live');
+    assert.ok(!prodContent.includes('data-coming-soon="Spotify artist profile"'), 'Removes coming-soon from Footer Spotify link');
 });
 
 test('assets/js/analytics.js configuration and 100% link coverage', () => {
