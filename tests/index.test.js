@@ -426,6 +426,21 @@ test('production/index.html structure and content', () => {
     assert.ok(prodContent.includes('href="https://open.spotify.com/track/1IG988cgn1YSuc0lhyk1uG"'), 'Links to rainy overpass on Spotify');
     assert.ok(prodContent.includes('data-analytics-label="rainy overpass Spotify" data-analytics-status="live"'), 'Tracks rainy overpass Spotify link as live');
 
+    assert.ok(prodContent.includes('DAWN OF THE DATASTREAM'), 'Has DAWN OF THE DATASTREAM release');
+    assert.ok(prodContent.includes('Single &middot; 1:20 &middot; 2025'), 'Marks DAWN OF THE DATASTREAM as a single');
+    assert.ok(prodContent.includes('href="https://open.spotify.com/track/2NtjENcey2LS5lbxTWFeaI"'), 'Links to DAWN OF THE DATASTREAM on Spotify');
+    assert.ok(prodContent.includes('data-analytics-label="DAWN OF THE DATASTREAM Spotify" data-analytics-status="live"'), 'Tracks DAWN OF THE DATASTREAM Spotify link as live');
+
+    assert.ok(prodContent.includes('TO THE SKY'), 'Has TO THE SKY release');
+    assert.ok(prodContent.includes('Single &middot; 3:47 &middot; 2025'), 'Marks TO THE SKY as a single');
+    assert.ok(prodContent.includes('href="https://open.spotify.com/track/5WQWrRPrLNgfz5GdYFEOHl"'), 'Links to TO THE SKY on Spotify');
+    assert.ok(prodContent.includes('data-analytics-label="TO THE SKY Spotify" data-analytics-status="live"'), 'Tracks TO THE SKY Spotify link as live');
+
+    assert.ok(prodContent.includes('rough drafts (2024 - 2025)'), 'Has rough drafts (2024 - 2025) EP release');
+    assert.ok(prodContent.includes('EP &middot; 5 Tracks &middot; 8:45 &middot; 2025'), 'Marks rough drafts (2024 - 2025) as an EP');
+    assert.ok(prodContent.includes('href="https://open.spotify.com/album/2LE5QkOtkIjlmskNcmO7iO"'), 'Links to rough drafts (2024 - 2025) on Spotify');
+    assert.ok(prodContent.includes('data-analytics-label="rough drafts (2024 - 2025) Spotify" data-analytics-status="live"'), 'Tracks rough drafts (2024 - 2025) Spotify link as live');
+
     assert.ok(prodContent.includes('href="https://open.spotify.com/artist/4rzG9xC24GurQlOwEtqB7x"'), 'Footer links to ROVA Spotify artist profile');
     assert.ok(prodContent.includes('data-analytics-label="Footer Spotify" data-analytics-status="live"'), 'Tracks Footer Spotify link as live');
     assert.ok(!prodContent.includes('data-coming-soon="Spotify artist profile"'), 'Removes coming-soon from Footer Spotify link');
