@@ -134,12 +134,12 @@
 
       <!-- Audio files are lazy-loaded on play from ../assets/audio/ (0 bytes downloaded on page load).
            To add a new playable track, drop <filename>.mp3 into assets/audio/ (or a subfolder such as
-           assets/audio/mashups/), set data-audio-file="mashups/pure usa/move-like-i-do.mp3" (or a full data-audio-src), and
+           assets/audio/mashups/), set data-audio-file="<path>.mp3" (or a full data-audio-src), and
            optionally data-peaks="<80 comma-separated values>" on the .release item. -->
       <article class="player"
         data-audio-player
         data-audio-base="../assets/audio/"
-        data-audio-file="mashups/move-like-i-do.mp3"
+        data-audio-file="mashups/pure usa/move-like-i-do.mp3"
         data-track-title="Move Like I Do"
         data-track-duration="2:52"
         data-track-list="#release-list">
@@ -507,8 +507,6 @@
               <i class="fa fa-play" aria-hidden="true"></i>
             </button>
           </div>
-        </li>
-        <!-- AUDIO-RELEASES:END -->  </div>
         </li>
         <!-- AUDIO-RELEASES:END -->
       </ul>

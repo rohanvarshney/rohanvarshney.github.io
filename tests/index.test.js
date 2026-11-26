@@ -258,6 +258,18 @@ test('raas/index.html structure and content', () => {
     assert.ok(raasContent.includes('data-audio-player'), 'Raas page has declarative audio player');
     assert.ok(raasContent.includes('data-audio-base="../assets/audio/"'), 'Raas player points to ../assets/audio/');
     assert.ok(!/<audio\b/i.test(raasContent), 'Raas page omits eager <audio> tags so initial load downloads 0 audio bytes');
+    assert.strictEqual((raasContent.match(/<!-- RAAS-AUDIO:START -->/g) || []).length, 1, 'Has exactly one RAAS-AUDIO:START marker');
+    assert.strictEqual((raasContent.match(/<!-- RAAS-AUDIO:END -->/g) || []).length, 1, 'Has exactly one RAAS-AUDIO:END marker');
+
+    const raasPlayerMatch = raasContent.match(/<article class="player"[\s\S]*?<\/article>/);
+    assert.ok(raasPlayerMatch, 'Raas page has featured player article');
+    assert.ok(raasPlayerMatch[0].includes('data-audio-file="mashups/raas/feel-so-raas.mp3"'), 'Raas featured player wires feel-so-raas.mp3');
+    assert.ok(raasPlayerMatch[0].includes('aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>'), 'Raas featured player waveform div is intact');
+    assert.ok(raasPlayerMatch[0].includes('<span class="player-time" data-player-time aria-live="off">0:00 / 1:46</span>'), 'Raas featured player time span is intact');
+    assert.ok(!raasPlayerMatch[0].includes('<li') && !raasPlayerMatch[0].includes('RAAS-AUDIO:'), 'Raas featured player contains no list items or sync markers');
+
+    const raasListMatch = raasContent.match(/<ul class="release-list" id="raas-release-list">([\s\S]*?)<\/ul>/);
+    assert.ok(raasListMatch, 'Raas page has #raas-release-list container');
 
     const raasAudioDir = path.join(__dirname, '..', 'assets', 'audio', 'mashups', 'raas');
     const raasDiskMp3s = fs.readdirSync(raasAudioDir)
@@ -265,8 +277,8 @@ test('raas/index.html structure and content', () => {
         .map((f) => `mashups/raas/${f}`);
     assert.strictEqual(raasDiskMp3s.length, 10, 'Discovers all 10 Raas MP3 files under assets/audio/mashups/raas/');
 
-    const raasRowMatches = [...raasContent.matchAll(/<li class="release(?:\s+is-active)?"[^>]*data-audio-file="([^"]+)"[^>]*>[\s\S]*?<\/li>/g)];
-    assert.strictEqual(raasRowMatches.length, raasDiskMp3s.length, 'Raas page renders one card per Raas MP3 on disk');
+    const raasRowMatches = [...raasListMatch[1].matchAll(/<li class="release(?:\s+is-active)?"[^>]*data-audio-file="([^"]+)"[^>]*>[\s\S]*?<\/li>/g)];
+    assert.strictEqual(raasRowMatches.length, raasDiskMp3s.length, 'Raas #raas-release-list renders one card per Raas MP3 on disk');
 
     const raasRenderedFiles = new Set();
     for (const [cardHtml, relFile] of raasRowMatches) {
@@ -472,7 +484,13 @@ test('production/index.html structure and content', () => {
     assert.ok(prodContent.includes('<div class="cover" data-player-cover aria-hidden="true">MASHUP</div>'), 'Featured player shows MASHUP cover');
     const featuredPlayerMatch = prodContent.match(/<article class="player"[\s\S]*?<\/article>/);
     assert.ok(featuredPlayerMatch, 'Has featured player article');
+    assert.ok(featuredPlayerMatch[0].includes('data-audio-file="mashups/pure usa/move-like-i-do.mp3"'), 'Featured player article itself wires mashups/pure usa/move-like-i-do.mp3');
+    assert.ok(featuredPlayerMatch[0].includes('aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>'), 'Featured player waveform div is intact');
+    assert.ok(featuredPlayerMatch[0].includes('<span class="player-time" data-player-time aria-live="off">0:00 / 2:52</span>'), 'Featured player time span is intact');
+    assert.ok(!featuredPlayerMatch[0].includes('<li') && !featuredPlayerMatch[0].includes('AUDIO-RELEASES:'), 'Featured player contains no list items or sync markers');
     assert.ok(!featuredPlayerMatch[0].includes('data-category='), 'Featured player has no data-category so category filters never hide it');
+    assert.strictEqual((prodContent.match(/<!-- AUDIO-RELEASES:START -->/g) || []).length, 1, 'Has exactly one AUDIO-RELEASES:START marker');
+    assert.strictEqual((prodContent.match(/<!-- AUDIO-RELEASES:END -->/g) || []).length, 1, 'Has exactly one AUDIO-RELEASES:END marker');
     assert.ok(
         prodContent.indexOf('<article class="player"') < prodContent.indexOf('id="release-list"'),
         'Featured player appears above the filterable release list'
@@ -577,8 +595,12 @@ test('production/index.html structure and content', () => {
         remixes: 'remix',
         performances: 'performance',
     };
-    const rowMatches = [...prodContent.matchAll(/<li class="release(?:\s+is-active)?"[^>]*data-audio-file="([^"]+)"[^>]*>[\s\S]*?<\/li>/g)];
-    assert.strictEqual(rowMatches.length, diskMp3s.length, 'Renders one release card per MP3 on disk');
+    const prodListMatch = prodContent.match(/<ul class="release-list" id="release-list">([\s\S]*?)<\/ul>/);
+    assert.ok(prodListMatch, 'Production page has #release-list container');
+    assert.match(prodListMatch[1], /<!-- AUDIO-RELEASES:END -->\s*$/, 'Nothing except whitespace appears between AUDIO-RELEASES:END and </ul>');
+
+    const rowMatches = [...prodListMatch[1].matchAll(/<li class="release(?:\s+is-active)?"[^>]*data-audio-file="([^"]+)"[^>]*>[\s\S]*?<\/li>/g)];
+    assert.strictEqual(rowMatches.length, diskMp3s.length, 'Renders one release card per MP3 on disk inside #release-list');
 
     const renderedFiles = new Set();
     for (const [cardHtml, relFile] of rowMatches) {

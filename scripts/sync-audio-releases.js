@@ -415,42 +415,52 @@ function renderReleaseItem(track) {
 
 function updateHtmlWithTracks(htmlPath, startMarker, endMarker, tracks) {
   let html = fs.readFileSync(htmlPath, 'utf8');
-  const startIdx = html.indexOf(startMarker);
-  const endIdx = html.indexOf(endMarker);
-  if (startIdx === -1 || endIdx === -1 || endIdx < startIdx) {
-    throw new Error(`Missing ${startMarker} / ${endMarker} markers in ${htmlPath}`);
-  }
 
   const featured = tracks.find((t) => t.featured) || tracks[0];
   if (featured) {
-    html = html
-      .replace(/data-audio-file="[^"]*"/, `data-audio-file="${escapeHtml(featured.relPath)}"`)
-      .replace(/data-track-title="[^"]*"/, `data-track-title="${escapeHtml(featured.title)}"`)
-      .replace(/data-track-duration="[^"]*"/, `data-track-duration="${escapeHtml(featured.duration)}"`)
+    const playerMatch = html.match(/<article class="player"[\s\S]*?<\/article>/);
+    if (!playerMatch) {
+      throw new Error(`Missing <article class="player"> block in ${htmlPath}`);
+    }
+    let updatedPlayerHtml = playerMatch[0]
+      .replace(/data-audio-file="[^"]*"/, () => `data-audio-file="${escapeHtml(featured.relPath)}"`)
+      .replace(/data-track-title="[^"]*"/, () => `data-track-title="${escapeHtml(featured.title)}"`)
+      .replace(/data-track-duration="[^"]*"/, () => `data-track-duration="${escapeHtml(featured.duration)}"`)
+      .replace(/data-seed="[^"]*"/, () => `data-seed="${featured.seed}"`)
       .replace(
         /<div class="cover" data-player-cover aria-hidden="true">[\s\S]*?<\/div>/,
-        `<div class="cover" data-player-cover aria-hidden="true">${escapeHtml(featured.cover)}</div>`
+        () => `<div class="cover" data-player-cover aria-hidden="true">${escapeHtml(featured.cover)}</div>`
       )
       .replace(
         /<h3 class="player-title" data-player-title>[\s\S]*?<\/h3>/,
-        `<h3 class="player-title" data-player-title>${escapeHtml(featured.title)}</h3>`
+        () => `<h3 class="player-title" data-player-title>${escapeHtml(featured.title)}</h3>`
       )
       .replace(
         /<div class="player-meta" data-player-meta>[\s\S]*?<\/div>/,
-        `<div class="player-meta" data-player-meta>${escapeHtml(featured.meta)}</div>`
+        () => `<div class="player-meta" data-player-meta>${escapeHtml(featured.meta)}</div>`
       )
       .replace(
         /(<button[^>]*data-play-toggle[^>]*aria-label=")Play [^"]*(")/,
-        `$1Play ${escapeHtml(featured.title)}$2`
+        (_, prefix, suffix) => `${prefix}Play ${escapeHtml(featured.title)}${suffix}`
       )
-      .replace(
-        /(<article class="player"[\s\S]*?data-peaks=")[^"]*(")/,
-        `$1${featured.peaks}$2`
-      )
+      .replace(/data-peaks="[^"]*"/, () => `data-peaks="${featured.peaks}"`)
       .replace(
         /(<span class="player-time" data-player-time aria-live="off">)0:00 \/ [^<]*(<\/span>)/,
-        `$10:00 / ${escapeHtml(featured.duration)}$2`
+        (_, prefix, suffix) => `${prefix}0:00 / ${escapeHtml(featured.duration)}${suffix}`
       );
+    html = html.replace(/<article class="player"[\s\S]*?<\/article>/, () => updatedPlayerHtml);
+  }
+
+  const startIdx = html.indexOf(startMarker);
+  const endIdx = html.indexOf(endMarker);
+  if (
+    startIdx === -1 ||
+    endIdx === -1 ||
+    endIdx <= startIdx ||
+    startIdx !== html.lastIndexOf(startMarker) ||
+    endIdx !== html.lastIndexOf(endMarker)
+  ) {
+    throw new Error(`Invalid or duplicate ${startMarker} / ${endMarker} markers in ${htmlPath}`);
   }
 
   const renderedBlock = `${startMarker}\n${tracks.map(renderReleaseItem).join('\n')}\n        ${endMarker}`;
