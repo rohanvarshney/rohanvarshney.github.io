@@ -13,7 +13,7 @@ test('index.html structure and content', () => {
     assert.ok(htmlContent.includes('<html lang="en">'), 'Has html tag with language en');
     
     // Head section
-    assert.ok(htmlContent.includes('<title>Rohan Varshney</title>'), 'Has correct title');
+    assert.ok(htmlContent.includes('<title>Rohan Varshney — Senior Software Engineer at Lyft | ROVA</title>'), 'Has correct title');
     assert.ok(htmlContent.includes('href="./assets/img/logo.ico"'), 'Has favicon references');
     
     // Main Content
@@ -94,9 +94,9 @@ test('index.html structure and content', () => {
     assert.match(htmlContent, /data-analytics-label="DJing"[\s\S]*?<svg\b[\s\S]*?<\/svg>[\s\S]*?<\/a>/, 'DJing uses an inline SVG DJ controller icon');
     assert.ok(htmlContent.includes('data-analytics-label="Production"'), 'Has Production portfolio item');
     assert.ok(htmlContent.includes('coming-soon-banner'), 'Has coming soon banner for unavailable links');
-    assert.ok(htmlContent.includes('href="/raas"'), 'Home page links directly to /raas');
-    assert.ok(htmlContent.includes('href="/dj"'), 'Home page links directly to /dj');
-    assert.ok(htmlContent.includes('href="/production"'), 'Home page links directly to /production');
+    assert.ok(htmlContent.includes('href="/raas/"'), 'Home page links directly to /raas/');
+    assert.ok(htmlContent.includes('href="/dj/"'), 'Home page links directly to /dj/');
+    assert.ok(htmlContent.includes('href="/production/"'), 'Home page links directly to /production/');
     assert.ok(htmlContent.includes('href="/SpotKit"'), 'Home page links directly to /SpotKit');
     assert.ok(htmlContent.includes('src="./assets/js/analytics.js"'), 'Includes shared analytics script');
     assert.ok(htmlContent.includes('data-analytics-event="resume_download"'), 'Tracks resume downloads');
@@ -890,4 +890,50 @@ test('assets/js/analytics.js tracks click and middle-click (auxclick) with norma
         ],
         'Normalizes relative directory/file links while preserving anchors and mailto URLs'
     );
+});
+
+test('SEO metadata, JSON-LD schema, sitemap.xml, and robots.txt', () => {
+    const pages = [
+        { file: 'index.html', url: 'https://rohanvarshney.github.io/' },
+        { file: path.join('dj', 'index.html'), url: 'https://rohanvarshney.github.io/dj/' },
+        { file: path.join('production', 'index.html'), url: 'https://rohanvarshney.github.io/production/' },
+        { file: path.join('raas', 'index.html'), url: 'https://rohanvarshney.github.io/raas/' },
+    ];
+
+    for (const page of pages) {
+        const content = fs.readFileSync(path.join(__dirname, '..', page.file), 'utf8');
+        assert.match(content, /<meta name="description" content="[^"]{50,}">/, `${page.file} has meta description`);
+        assert.ok(content.includes(`<link rel="canonical" href="${page.url}">`), `${page.file} has canonical URL`);
+        assert.ok(content.includes('<meta property="og:site_name" content="Rohan Varshney">'), `${page.file} has og:site_name`);
+        assert.ok(content.includes(`<meta property="og:url" content="${page.url}">`), `${page.file} has og:url`);
+        assert.match(content, /<meta property="og:title" content="[^"]+">/, `${page.file} has og:title`);
+        assert.match(content, /<meta property="og:description" content="[^"]+">/, `${page.file} has og:description`);
+        assert.match(content, /<meta property="og:image" content="https:\/\/rohanvarshney\.github\.io\/[^"]+">/, `${page.file} has og:image`);
+        assert.ok(content.includes('<meta name="twitter:card" content="summary_large_image">'), `${page.file} has twitter:card`);
+    }
+
+    const indexContent = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+    const jsonLdMatch = indexContent.match(/<script type="application\/ld\+json">\s*([\s\S]*?)\s*<\/script>/);
+    assert.ok(jsonLdMatch, 'index.html has JSON-LD structured data');
+    const jsonLd = JSON.parse(jsonLdMatch[1]);
+    assert.ok(Array.isArray(jsonLd['@graph']), 'index.html JSON-LD uses @graph');
+    const websiteNode = jsonLd['@graph'].find((node) => node['@type'] === 'WebSite');
+    const personNode = jsonLd['@graph'].find((node) => node['@type'] === 'Person');
+    assert.strictEqual(websiteNode.name, 'Rohan Varshney', 'WebSite schema sets site name');
+    assert.strictEqual(websiteNode.url, 'https://rohanvarshney.github.io/', 'WebSite schema sets root URL');
+    assert.strictEqual(personNode.name, 'Rohan Varshney', 'Person schema sets name');
+    assert.strictEqual(personNode.jobTitle, 'Senior Software Engineer', 'Person schema sets jobTitle');
+    assert.strictEqual(personNode.worksFor.name, 'Lyft', 'Person schema sets worksFor Lyft');
+    assert.ok(personNode.sameAs.includes('https://linkedin.com/in/rohanvarshney'), 'Person schema links LinkedIn');
+    assert.ok(personNode.sameAs.includes('https://github.com/rohanvarshney'), 'Person schema links GitHub');
+
+    const sitemap = fs.readFileSync(path.join(__dirname, '..', 'sitemap.xml'), 'utf8');
+    for (const page of pages) {
+        assert.ok(sitemap.includes(`<loc>${page.url}</loc>`), `sitemap.xml includes ${page.url}`);
+    }
+
+    const robots = fs.readFileSync(path.join(__dirname, '..', 'robots.txt'), 'utf8');
+    assert.ok(robots.includes('User-agent: *'), 'robots.txt allows all user agents');
+    assert.ok(robots.includes('Allow: /'), 'robots.txt allows root');
+    assert.ok(robots.includes('Sitemap: https://rohanvarshney.github.io/sitemap.xml'), 'robots.txt points to sitemap.xml');
 });
