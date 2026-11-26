@@ -527,7 +527,7 @@
           syncPlayState();
         });
         audio.addEventListener('error', function () {
-          // GitHub Releases signed redirect URLs can expire if paused for a long time; retry once.
+          // Retry once if playback errors mid-track (e.g. a transient network hiccup or expired remote URL).
           if (!retriedExpiredUrl && audio.currentTime > 0 && currentUrl) {
             retriedExpiredUrl = true;
             pendingResumeTime = audio.currentTime;
