@@ -423,6 +423,7 @@
       var currentTitle = player.getAttribute('data-track-title') || (titleEl ? titleEl.textContent.trim() : 'Track');
       var currentDurationLabel = player.getAttribute('data-track-duration') || '0:00';
       var activeRow = trackList ? trackList.querySelector('.release.is-active') : null;
+      var initialActiveRow = activeRow;
       var isLoading = false;
       var pendingSeekRatio = null;
       var pendingResumeTime = null;
@@ -433,7 +434,9 @@
           return;
         }
         var totalLabel = isFinite(durationSec) && durationSec > 0 ? formatTime(durationSec) : currentDurationLabel;
-        timeEl.textContent = formatTime(currentSec || 0) + ' / ' + totalLabel;
+        timeEl.textContent = totalLabel
+          ? formatTime(currentSec || 0) + ' / ' + totalLabel
+          : formatTime(currentSec || 0);
       }
 
       function syncPlayState() {
@@ -542,7 +545,12 @@
           pendingResumeTime = null;
           isLoading = false;
           syncPlayState();
-          showToast('Audio preview unavailable right now \u2014 listen on Spotify or check back soon.');
+          var hasSpotifyLink = Boolean(spotifyEl && !spotifyEl.hidden && spotifyEl.getAttribute('href') && spotifyEl.getAttribute('href') !== '#');
+          showToast(
+            hasSpotifyLink
+              ? 'Audio preview unavailable right now \u2014 listen on Spotify or check back soon.'
+              : 'Audio preview unavailable right now \u2014 check back soon.'
+          );
         });
 
         return audio;
@@ -614,14 +622,15 @@
 
         currentUrl = nextUrl;
         currentTitle = rowTitleEl ? rowTitleEl.textContent.trim() : 'Track';
-        currentDurationLabel = row.getAttribute('data-track-duration') || '0:00';
+        currentDurationLabel = row.getAttribute('data-track-duration') || '';
         pendingSeekRatio = null;
         pendingResumeTime = null;
         retriedExpiredUrl = false;
 
         if (kickerEl) {
-          var firstRow = trackList ? trackList.querySelector('.release[data-audio-file], .release[data-audio-src]') : null;
-          kickerEl.textContent = row === firstRow ? 'Latest release' : 'Now playing';
+          kickerEl.textContent =
+            row.getAttribute('data-track-kicker') ||
+            (initialActiveRow && row === initialActiveRow ? 'Latest release' : 'Now playing');
         }
         if (titleEl) {
           titleEl.textContent = currentTitle;

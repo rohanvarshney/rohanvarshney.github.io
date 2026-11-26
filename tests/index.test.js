@@ -418,28 +418,49 @@ test('production/index.html structure and content', () => {
     assert.ok(prodContent.includes('ROVA_session_final_v44.logicx'), 'Arrangement visual uses .logicx project file');
     assert.ok(!/ableton|fl studio|\.als\b/i.test(prodContent), 'Removes Ableton Live, FL Studio, and .als references');
 
+    // Featured player + Spotify embeds for Originals + Move Like I Do mashup card
     assert.ok(prodContent.includes('house pool party'), 'Has house pool party release');
-    assert.ok(prodContent.includes('href="https://open.spotify.com/track/6IoqO8jmnH9Ml3BTGxDk1B"'), 'Links to house pool party on Spotify');
-    assert.ok(prodContent.includes('data-analytics-label="house pool party Spotify" data-analytics-status="live"'), 'Tracks house pool party Spotify link as live');
+    assert.ok(prodContent.includes('href="https://open.spotify.com/track/6IoqO8jmnH9Ml3BTGxDk1B"'), 'Featured player links to house pool party on Spotify');
+    assert.ok(prodContent.includes('data-analytics-label="Featured house pool party Spotify" data-analytics-status="live"'), 'Tracks Featured house pool party Spotify link as live');
 
-    assert.ok(prodContent.includes('rainy overpass'), 'Has rainy overpass release');
-    assert.ok(prodContent.includes('href="https://open.spotify.com/track/1IG988cgn1YSuc0lhyk1uG"'), 'Links to rainy overpass on Spotify');
-    assert.ok(prodContent.includes('data-analytics-label="rainy overpass Spotify" data-analytics-status="live"'), 'Tracks rainy overpass Spotify link as live');
+    const spotifyEmbeds = [
+        { id: 'track/6IoqO8jmnH9Ml3BTGxDk1B', height: '152', title: 'Spotify Embed: house pool party' },
+        { id: 'track/1IG988cgn1YSuc0lhyk1uG', height: '152', title: 'Spotify Embed: rainy overpass' },
+        { id: 'track/2NtjENcey2LS5lbxTWFeaI', height: '152', title: 'Spotify Embed: DAWN OF THE DATASTREAM' },
+        { id: 'track/5WQWrRPrLNgfz5GdYFEOHl', height: '152', title: 'Spotify Embed: TO THE SKY' },
+        { id: 'album/2LE5QkOtkIjlmskNcmO7iO', height: '352', title: 'Spotify Embed: rough drafts (2024 - 2025)' },
+    ];
+    for (const embed of spotifyEmbeds) {
+        assert.ok(
+            prodContent.includes(`src="https://open.spotify.com/embed/${embed.id}?utm_source=generator"`),
+            `Includes Spotify embed iframe for ${embed.title}`
+        );
+        assert.ok(
+            prodContent.includes(`height="${embed.height}" title="${embed.title}"`),
+            `Sets height="${embed.height}" and accessible title for ${embed.title}`
+        );
+    }
+    assert.strictEqual(
+        (prodContent.match(/<li class="release release-embed" data-category="original">/g) || []).length,
+        5,
+        'Wraps all 5 Spotify Originals in filterable .release.release-embed items'
+    );
+    assert.strictEqual(
+        (prodContent.match(/class="spotify-embed"[^>]*loading="lazy"/g) || []).length,
+        5,
+        'Lazy-loads all 5 Spotify embed iframes'
+    );
 
-    assert.ok(prodContent.includes('DAWN OF THE DATASTREAM'), 'Has DAWN OF THE DATASTREAM release');
-    assert.ok(prodContent.includes('Single &middot; 1:20 &middot; 2025'), 'Marks DAWN OF THE DATASTREAM as a single');
-    assert.ok(prodContent.includes('href="https://open.spotify.com/track/2NtjENcey2LS5lbxTWFeaI"'), 'Links to DAWN OF THE DATASTREAM on Spotify');
-    assert.ok(prodContent.includes('data-analytics-label="DAWN OF THE DATASTREAM Spotify" data-analytics-status="live"'), 'Tracks DAWN OF THE DATASTREAM Spotify link as live');
-
-    assert.ok(prodContent.includes('TO THE SKY'), 'Has TO THE SKY release');
-    assert.ok(prodContent.includes('Single &middot; 3:47 &middot; 2025'), 'Marks TO THE SKY as a single');
-    assert.ok(prodContent.includes('href="https://open.spotify.com/track/5WQWrRPrLNgfz5GdYFEOHl"'), 'Links to TO THE SKY on Spotify');
-    assert.ok(prodContent.includes('data-analytics-label="TO THE SKY Spotify" data-analytics-status="live"'), 'Tracks TO THE SKY Spotify link as live');
-
-    assert.ok(prodContent.includes('rough drafts (2024 - 2025)'), 'Has rough drafts (2024 - 2025) EP release');
-    assert.ok(prodContent.includes('EP &middot; 5 Tracks &middot; 8:45 &middot; 2025'), 'Marks rough drafts (2024 - 2025) as an EP');
-    assert.ok(prodContent.includes('href="https://open.spotify.com/album/2LE5QkOtkIjlmskNcmO7iO"'), 'Links to rough drafts (2024 - 2025) on Spotify');
-    assert.ok(prodContent.includes('data-analytics-label="rough drafts (2024 - 2025) Spotify" data-analytics-status="live"'), 'Tracks rough drafts (2024 - 2025) Spotify link as live');
+    // Move Like I Do mashup card
+    assert.ok(
+        prodContent.includes('<li class="release" data-category="mashup" data-audio-file="move-like-i-do.mp3"'),
+        'Adds Move Like I Do mashup card under mashup category'
+    );
+    assert.ok(prodContent.includes('<div class="release-title">Move Like I Do</div>'), 'Has Move Like I Do title');
+    assert.ok(
+        prodContent.includes('Moves Like Jagger (Maroon 5) &times; Like I Do (David Guetta &amp; Martin Garrix)'),
+        'Describes Move Like I Do mashup tracks'
+    );
 
     assert.ok(prodContent.includes('href="https://open.spotify.com/artist/4rzG9xC24GurQlOwEtqB7x"'), 'Footer links to ROVA Spotify artist profile');
     assert.ok(prodContent.includes('data-analytics-label="Footer Spotify" data-analytics-status="live"'), 'Tracks Footer Spotify link as live');
@@ -447,33 +468,35 @@ test('production/index.html structure and content', () => {
     assert.ok(prodContent.includes('data-contact-email="rohanvar@gmail.com"'), 'Configures rohanvar@gmail.com as Production contact email');
     assert.ok(!prodContent.includes('collabs@example.com'), 'Removes collabs@example.com placeholder');
 
-    // Audio player & GitHub Releases wiring (zero eager audio tags on initial load)
+    // Audio player & same-origin assets/audio/ wiring (zero eager audio tags on initial load)
     assert.ok(prodContent.includes('data-audio-player'), 'Has declarative audio player container');
     assert.ok(
-        prodContent.includes('data-audio-base="https://github.com/rohanvarshney/rohanvarshney.github.io/releases/download/audio-v1/"'),
-        'Points audio player base URL to GitHub Releases audio-v1 tag'
+        prodContent.includes('data-audio-base="../assets/audio/"'),
+        'Points audio player base URL to same-origin ../assets/audio/ directory'
+    );
+    assert.ok(
+        prodContent.includes('data-audio-file="house-pool-party.mp3"'),
+        'Wires house-pool-party.mp3 on featured player'
     );
     assert.ok(!/<audio\b/i.test(prodContent), 'Omits eager <audio> tags so initial page load downloads 0 audio bytes');
-    for (const mp3File of [
-        'house-pool-party.mp3',
-        'rainy-overpass.mp3',
-        'dawn-of-the-datastream.mp3',
-        'to-the-sky.mp3',
-    ]) {
-        assert.ok(
-            prodContent.includes(`data-audio-file="${mp3File}"`),
-            `Wires ${mp3File} on release item`
-        );
-    }
     assert.strictEqual(
         (prodContent.match(/data-release-play/g) || []).length,
-        4,
-        'Adds row play buttons for the 4 individual released tracks'
+        1,
+        'Has row play button for Move Like I Do mashup card'
     );
+
+    const mp3Path = path.join(__dirname, '..', 'assets', 'audio', 'house-pool-party.mp3');
+    assert.ok(fs.existsSync(mp3Path), 'assets/audio/house-pool-party.mp3 exists on disk');
+    const mp3Header = fs.readFileSync(mp3Path).subarray(0, 3).toString('ascii');
+    assert.ok(mp3Header === 'ID3' || mp3Header.charCodeAt(0) === 0xff, 'house-pool-party.mp3 has valid MP3/ID3 header');
+
+    const cssContent = fs.readFileSync(path.join(__dirname, '..', 'assets', 'css', 'portfolio.css'), 'utf8');
+    assert.ok(cssContent.includes('.player-links a[hidden]'), 'CSS hides hidden player Spotify link');
+    assert.ok(cssContent.includes('.release.release-embed[hidden]'), 'CSS hides filtered-out Spotify embed rows');
 
     // Real 80-bar waveform peaks and empty-state banner instead of placeholder cards
     const peakMatches = [...prodContent.matchAll(/data-peaks="([0-9,]+)"/g)];
-    assert.strictEqual(peakMatches.length, 5, 'Has real data-peaks on featured waveform and 4 playable tracks');
+    assert.strictEqual(peakMatches.length, 1, 'Has real data-peaks on featured waveform');
     for (const match of peakMatches) {
         const peaks = match[1].split(',').map((n) => Number(n.trim()));
         assert.strictEqual(peaks.length, 80, 'Each data-peaks attribute has 80 bars');
@@ -1101,21 +1124,27 @@ test('assets/js/portfolio.js audio player lazy-loads GitHub Releases tracks, scr
     function makeReleaseRow({ file, title, meta, duration, seed, peaks, spotifyHref, imgSrc, active }) {
         const row = createMockElement('li', {
             attrs: Object.assign(
-                { 'data-audio-file': file, 'data-track-duration': duration, 'data-seed': seed },
+                { 'data-audio-file': file, 'data-seed': seed },
+                duration ? { 'data-track-duration': duration } : {},
                 peaks ? { 'data-peaks': peaks } : {}
             ),
             classes: active ? ['release', 'is-active'] : ['release'],
         });
-        const rowCoverImg = createMockElement('img', { attrs: { src: imgSrc, alt: title + ' cover art' } });
-        const rowCover = createMockElement('div', { classes: ['cover', 'has-art'] });
-        rowCover.appendChild(rowCoverImg);
+        const rowCoverImg = imgSrc ? createMockElement('img', { attrs: { src: imgSrc, alt: title + ' cover art' } }) : null;
+        const rowCover = createMockElement('div', {
+            classes: imgSrc ? ['cover', 'has-art'] : ['cover'],
+            textContent: imgSrc ? '' : 'MASHUP',
+        });
+        if (rowCoverImg) {
+            rowCover.appendChild(rowCoverImg);
+        }
         const rowTitle = createMockElement('div', { textContent: title });
         const rowMeta = createMockElement('div', { textContent: meta });
         const rowBtnIcon = createMockElement('i', { attrs: { class: 'fa fa-play' } });
         const rowBtn = createMockElement('button', { attrs: { 'data-release-play': '' } });
         rowBtn.appendChild(rowBtnIcon);
         rowBtn.parentRow = row;
-        const rowSpotify = createMockElement('a', { attrs: { href: spotifyHref } });
+        const rowSpotify = spotifyHref ? createMockElement('a', { attrs: { href: spotifyHref } }) : null;
 
         row.querySelector = (sel) => {
             if (sel === '.release-title') return rowTitle;
@@ -1149,23 +1178,30 @@ test('assets/js/portfolio.js audio player lazy-loads GitHub Releases tracks, scr
         imgSrc: 'https://i.scdn.co/image/track2',
         active: false,
     });
+    const mashupTrack = makeReleaseRow({
+        file: 'move-like-i-do.mp3',
+        title: 'Move Like I Do',
+        meta: 'Mashup · Moves Like Jagger (Maroon 5) × Like I Do (David Guetta & Martin Garrix)',
+        seed: '29',
+        active: false,
+    });
 
     const releaseList = createMockElement('ul', { attrs: { id: 'release-list' } });
     releaseList.querySelector = (sel) => {
-        if (sel === '.release.is-active') return [track1.row, track2.row].find((r) => r.classList.contains('is-active')) || null;
+        if (sel === '.release.is-active') return [track1.row, track2.row, mashupTrack.row].find((r) => r.classList.contains('is-active')) || null;
         if (sel === '.release[data-audio-file], .release[data-audio-src]') return track1.row;
         return null;
     };
     releaseList.querySelectorAll = (sel) => {
-        if (sel === '[data-release-play]') return [track1.rowBtn, track2.rowBtn];
-        if (sel === '.release.is-active') return [track1.row, track2.row].filter((r) => r.classList.contains('is-active'));
+        if (sel === '[data-release-play]') return [track1.rowBtn, track2.rowBtn, mashupTrack.rowBtn];
+        if (sel === '.release.is-active') return [track1.row, track2.row, mashupTrack.row].filter((r) => r.classList.contains('is-active'));
         return [];
     };
 
     const player = createMockElement('article', {
         attrs: {
             'data-audio-player': '',
-            'data-audio-base': 'https://github.com/rohanvarshney/rohanvarshney.github.io/releases/download/audio-v1/',
+            'data-audio-base': '../assets/audio/',
             'data-audio-file': 'house-pool-party.mp3',
             'data-track-title': 'house pool party',
             'data-track-duration': '3:32',
@@ -1272,15 +1308,15 @@ test('assets/js/portfolio.js audio player lazy-loads GitHub Releases tracks, scr
     assert.strictEqual(createdAudios.length, 0, 'Does not instantiate Audio on initial page load');
     assert.strictEqual(wave.children.length, 10, 'Renders waveform bars on page load');
 
-    // 2. Clicking Play lazy-loads house-pool-party.mp3 from GitHub Releases
+    // 2. Clicking Play lazy-loads house-pool-party.mp3 from ../assets/audio/
     playBtn.trigger('click');
     assert.strictEqual(createdAudios.length, 1, 'Creates Audio lazily on first Play click');
     const audio = createdAudios[0];
     assert.strictEqual(audio.preload, 'none', 'Sets preload="none" on Audio instance');
     assert.strictEqual(
         audio.src,
-        'https://github.com/rohanvarshney/rohanvarshney.github.io/releases/download/audio-v1/house-pool-party.mp3',
-        'Loads MP3 from GitHub Releases base + data-audio-file'
+        '../assets/audio/house-pool-party.mp3',
+        'Loads MP3 from ../assets/audio/ base + data-audio-file'
     );
     assert.strictEqual(audio.playCalls, 1, 'Starts playback');
     assert.strictEqual(playBtn.getAttribute('aria-pressed'), 'true', 'Updates featured play button aria-pressed');
@@ -1312,7 +1348,7 @@ test('assets/js/portfolio.js audio player lazy-loads GitHub Releases tracks, scr
     );
     assert.strictEqual(
         audio.src,
-        'https://github.com/rohanvarshney/rohanvarshney.github.io/releases/download/audio-v1/rainy-overpass.mp3',
+        '../assets/audio/rainy-overpass.mp3',
         'Switches audio.src to newly selected track'
     );
     assert.strictEqual(wave.children[3].style.height, '100%', 'Renders custom data-peaks heights when provided');
@@ -1323,12 +1359,27 @@ test('assets/js/portfolio.js audio player lazy-loads GitHub Releases tracks, scr
     track2.rowBtn.trigger('click');
     assert.strictEqual(audio.paused, true, 'Pauses when clicking active row play button again');
 
-    // 6. Audio error (e.g. MP3 not uploaded yet) resets state and shows toast
+    // 6. Audio error on Spotify-linked track resets state and shows Spotify fallback toast
     audio.currentTime = 0;
     audio.emit('error');
     assert.strictEqual(playBtn.getAttribute('aria-pressed'), 'false', 'Resets play button state on audio error');
     assert.strictEqual(banner.classList.contains('visible'), true, 'Shows fallback toast on audio error');
-    assert.ok(bannerText.textContent.includes('Audio preview unavailable'), 'Displays friendly fallback message');
+    assert.ok(bannerText.textContent.includes('listen on Spotify'), 'Displays Spotify fallback message when track has Spotify link');
+
+    // 7. Switching to non-Spotify mashup row hides Spotify pill, omits unknown duration, and uses non-Spotify error toast
+    mashupTrack.rowBtn.trigger('click');
+    assert.strictEqual(titleEl.textContent, 'Move Like I Do', 'Updates featured player title to mashup');
+    assert.strictEqual(kickerEl.textContent, 'Now playing', 'Updates kicker to Now playing');
+    assert.strictEqual(spotifyEl.hidden, true, 'Hides Spotify link for non-Spotify mashup');
+    assert.strictEqual(timeEl.textContent, '0:00', 'Omits / 0:00 when track duration is not yet known');
+    assert.strictEqual(audio.src, '../assets/audio/move-like-i-do.mp3', 'Loads mashup MP3 from ../assets/audio/');
+    audio.currentTime = 0;
+    audio.emit('error');
+    assert.strictEqual(
+        bannerText.textContent,
+        'Audio preview unavailable right now — check back soon.',
+        'Displays non-Spotify fallback message when track has no Spotify link'
+    );
 });
 
 test('assets/js/portfolio.js category filters show coming-soon banner for empty categories', () => {

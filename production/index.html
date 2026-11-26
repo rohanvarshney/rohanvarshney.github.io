@@ -132,14 +132,13 @@
         <span class="section-kicker">Start with the featured track.</span>
       </div>
 
-      <!-- Audio files are lazy-loaded on play from GitHub Releases (0 bytes downloaded on page load).
-           Upload MP3s to a release tagged `audio-v1` on rohanvarshney/rohanvarshney.github.io, or change
-           data-audio-base below to point at another release tag or Cloudflare R2 / CDN URL.
-           To add a new playable track, set data-audio-file="<filename>.mp3" (or a full data-audio-src)
-           and optionally data-peaks="<80 comma-separated values>" on the .release item. -->
+      <!-- Audio files are lazy-loaded on play from ../assets/audio/ (0 bytes downloaded on page load).
+           To add a new playable track, drop <filename>.mp3 into assets/audio/, set
+           data-audio-file="<filename>.mp3" (or a full data-audio-src), and optionally
+           data-peaks="<80 comma-separated values>" on the .release item. -->
       <article class="player"
         data-audio-player
-        data-audio-base="https://github.com/rohanvarshney/rohanvarshney.github.io/releases/download/audio-v1/"
+        data-audio-base="../assets/audio/"
         data-audio-file="house-pool-party.mp3"
         data-track-title="house pool party"
         data-track-duration="3:32"
@@ -181,90 +180,31 @@
       <!-- data-category accepts: original remix mashup performance.
            Add data-audio-file="<name>.mp3" (and optional data-peaks="...") to make any track playable. -->
       <ul class="release-list" id="release-list">
-        <li class="release is-active" data-category="original" data-audio-file="house-pool-party.mp3" data-track-duration="3:32" data-seed="42"
-          data-peaks="36,44,46,41,46,51,48,47,48,48,45,50,48,49,50,48,50,60,60,62,62,62,73,100,96,99,100,96,95,100,99,95,100,81,66,68,69,68,66,69,67,66,69,68,51,82,91,87,88,90,87,92,94,93,93,77,76,97,97,97,97,98,95,97,99,96,95,97,98,95,99,95,69,68,72,69,68,73,35,12">
-          <div class="cover has-art">
-            <img src="https://i.scdn.co/image/ab67616d0000b27358f8a361049a1700f49af6b8" alt="house pool party cover art" loading="lazy">
-          </div>
+        <li class="release release-embed" data-category="original">
+          <iframe class="spotify-embed" src="https://open.spotify.com/embed/track/6IoqO8jmnH9Ml3BTGxDk1B?utm_source=generator" width="100%" height="152" title="Spotify Embed: house pool party" allowfullscreen allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+        </li>
+        <li class="release release-embed" data-category="original">
+          <iframe class="spotify-embed" src="https://open.spotify.com/embed/track/1IG988cgn1YSuc0lhyk1uG?utm_source=generator" width="100%" height="152" title="Spotify Embed: rainy overpass" allowfullscreen allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+        </li>
+        <li class="release release-embed" data-category="original">
+          <iframe class="spotify-embed" src="https://open.spotify.com/embed/track/2NtjENcey2LS5lbxTWFeaI?utm_source=generator" width="100%" height="152" title="Spotify Embed: DAWN OF THE DATASTREAM" allowfullscreen allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+        </li>
+        <li class="release release-embed" data-category="original">
+          <iframe class="spotify-embed" src="https://open.spotify.com/embed/track/5WQWrRPrLNgfz5GdYFEOHl?utm_source=generator" width="100%" height="152" title="Spotify Embed: TO THE SKY" allowfullscreen allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+        </li>
+        <li class="release release-embed" data-category="original">
+          <iframe class="spotify-embed" src="https://open.spotify.com/embed/album/2LE5QkOtkIjlmskNcmO7iO?utm_source=generator" width="100%" height="352" title="Spotify Embed: rough drafts (2024 - 2025)" allowfullscreen allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+        </li>
+        <li class="release" data-category="mashup" data-audio-file="move-like-i-do.mp3" data-seed="29">
+          <div class="cover" aria-hidden="true">MASHUP</div>
           <div>
-            <div class="release-title">house pool party</div>
-            <div class="release-meta">Original &middot; 3:32 &middot; 2025</div>
+            <div class="release-title">Move Like I Do</div>
+            <div class="release-meta">Mashup &middot; Moves Like Jagger (Maroon 5) &times; Like I Do (David Guetta &amp; Martin Garrix)</div>
           </div>
           <div class="release-links">
-            <button type="button" class="release-play-btn" data-release-play aria-label="Play house pool party" aria-pressed="false">
+            <button type="button" class="release-play-btn" data-release-play aria-label="Play Move Like I Do" aria-pressed="false">
               <i class="fa fa-play" aria-hidden="true"></i>
             </button>
-            <a href="https://open.spotify.com/track/6IoqO8jmnH9Ml3BTGxDk1B" target="_blank" rel="noopener noreferrer" title="Listen to house pool party on Spotify"
-              data-analytics-event="production_release_click" data-analytics-category="production"
-              data-analytics-label="house pool party Spotify" data-analytics-status="live"><i class="fa fa-spotify" aria-hidden="true"></i><span class="sr-only">Spotify</span></a>
-          </div>
-        </li>
-        <li class="release" data-category="original" data-audio-file="rainy-overpass.mp3" data-track-duration="1:38" data-seed="17"
-          data-peaks="76,18,62,33,17,75,17,66,29,38,93,22,94,28,76,61,22,94,26,59,89,88,79,49,81,77,28,71,28,72,36,27,87,44,86,68,37,71,25,81,52,73,100,96,83,35,34,23,23,100,27,84,45,33,100,27,89,41,29,100,28,93,37,25,100,30,95,34,62,32,29,66,26,66,22,29,66,24,12,12">
-          <div class="cover has-art">
-            <img src="https://i.scdn.co/image/ab67616d0000b2730d5d81993826b21996565a4e" alt="rainy overpass cover art" loading="lazy">
-          </div>
-          <div>
-            <div class="release-title">rainy overpass</div>
-            <div class="release-meta">Original &middot; 1:38 &middot; 2025</div>
-          </div>
-          <div class="release-links">
-            <button type="button" class="release-play-btn" data-release-play aria-label="Play rainy overpass" aria-pressed="false">
-              <i class="fa fa-play" aria-hidden="true"></i>
-            </button>
-            <a href="https://open.spotify.com/track/1IG988cgn1YSuc0lhyk1uG" target="_blank" rel="noopener noreferrer" title="Listen to rainy overpass on Spotify"
-              data-analytics-event="production_release_click" data-analytics-category="production"
-              data-analytics-label="rainy overpass Spotify" data-analytics-status="live"><i class="fa fa-spotify" aria-hidden="true"></i><span class="sr-only">Spotify</span></a>
-          </div>
-        </li>
-        <li class="release" data-category="original" data-audio-file="dawn-of-the-datastream.mp3" data-track-duration="1:20" data-seed="63"
-          data-peaks="35,44,43,48,45,48,47,51,48,51,49,53,54,58,74,99,93,98,92,97,93,95,97,99,99,94,96,94,96,91,93,90,93,93,92,90,90,89,90,89,88,92,91,96,89,75,47,42,61,94,91,100,95,100,92,97,91,97,93,95,94,99,98,96,95,94,97,92,97,92,98,94,100,92,97,91,95,90,56,21">
-          <div class="cover has-art">
-            <img src="https://i.scdn.co/image/ab67616d0000b2735b00bf3a9878ec4d6f9e74bd" alt="DAWN OF THE DATASTREAM cover art" loading="lazy">
-          </div>
-          <div>
-            <div class="release-title">DAWN OF THE DATASTREAM</div>
-            <div class="release-meta">Single &middot; 1:20 &middot; 2025</div>
-          </div>
-          <div class="release-links">
-            <button type="button" class="release-play-btn" data-release-play aria-label="Play DAWN OF THE DATASTREAM" aria-pressed="false">
-              <i class="fa fa-play" aria-hidden="true"></i>
-            </button>
-            <a href="https://open.spotify.com/track/2NtjENcey2LS5lbxTWFeaI" target="_blank" rel="noopener noreferrer" title="Listen to DAWN OF THE DATASTREAM on Spotify"
-              data-analytics-event="production_release_click" data-analytics-category="production"
-              data-analytics-label="DAWN OF THE DATASTREAM Spotify" data-analytics-status="live"><i class="fa fa-spotify" aria-hidden="true"></i><span class="sr-only">Spotify</span></a>
-          </div>
-        </li>
-        <li class="release" data-category="original" data-audio-file="to-the-sky.mp3" data-track-duration="3:47" data-seed="91"
-          data-peaks="52,33,31,31,35,52,57,58,59,55,68,67,67,67,79,59,86,87,89,86,86,88,85,89,84,75,76,86,86,86,83,89,84,86,85,85,57,56,46,43,44,47,84,84,87,85,85,90,91,90,91,71,59,70,65,66,63,67,74,78,72,67,59,92,98,100,97,100,100,89,76,70,65,64,59,61,59,58,50,14">
-          <div class="cover has-art">
-            <img src="https://i.scdn.co/image/ab67616d0000b27387f6163736ea6de25f30abe2" alt="TO THE SKY cover art" loading="lazy">
-          </div>
-          <div>
-            <div class="release-title">TO THE SKY</div>
-            <div class="release-meta">Single &middot; 3:47 &middot; 2025</div>
-          </div>
-          <div class="release-links">
-            <button type="button" class="release-play-btn" data-release-play aria-label="Play TO THE SKY" aria-pressed="false">
-              <i class="fa fa-play" aria-hidden="true"></i>
-            </button>
-            <a href="https://open.spotify.com/track/5WQWrRPrLNgfz5GdYFEOHl" target="_blank" rel="noopener noreferrer" title="Listen to TO THE SKY on Spotify"
-              data-analytics-event="production_release_click" data-analytics-category="production"
-              data-analytics-label="TO THE SKY Spotify" data-analytics-status="live"><i class="fa fa-spotify" aria-hidden="true"></i><span class="sr-only">Spotify</span></a>
-          </div>
-        </li>
-        <li class="release" data-category="original">
-          <div class="cover has-art">
-            <img src="https://i.scdn.co/image/ab67616d0000b2730172cec58b422681a49f9d22" alt="rough drafts (2024 - 2025) cover art" loading="lazy">
-          </div>
-          <div>
-            <div class="release-title">rough drafts (2024 - 2025)</div>
-            <div class="release-meta">EP &middot; 5 Tracks &middot; 8:45 &middot; 2025</div>
-          </div>
-          <div class="release-links">
-            <a href="https://open.spotify.com/album/2LE5QkOtkIjlmskNcmO7iO" target="_blank" rel="noopener noreferrer" title="Listen to rough drafts (2024 - 2025) on Spotify"
-              data-analytics-event="production_release_click" data-analytics-category="production"
-              data-analytics-label="rough drafts (2024 - 2025) Spotify" data-analytics-status="live"><i class="fa fa-spotify" aria-hidden="true"></i><span class="sr-only">Spotify</span></a>
           </div>
         </li>
       </ul>

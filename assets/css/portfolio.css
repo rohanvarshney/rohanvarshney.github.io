@@ -1388,6 +1388,10 @@ button.chip[aria-pressed='true'] {
   color: #fff;
 }
 
+.player-links a[hidden] {
+  display: none;
+}
+
 /* ---------- Generic card grids ---------- */
 
 .grid-2,
@@ -1795,6 +1799,30 @@ details.faq .faq-body {
 
 .release[hidden] {
   display: none;
+}
+
+.release.release-embed {
+  display: block;
+  padding: 0;
+  border: none;
+  background: transparent;
+  overflow: hidden;
+}
+
+.release.release-embed:hover {
+  border-color: transparent;
+  background: transparent;
+}
+
+.release.release-embed[hidden] {
+  display: none;
+}
+
+.spotify-embed {
+  display: block;
+  width: 100%;
+  border: 0;
+  border-radius: var(--radius);
 }
 
 .release .cover {
