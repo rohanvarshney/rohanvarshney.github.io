@@ -450,6 +450,11 @@ test('production/index.html structure and content', () => {
     assert.ok(prodContent.includes('title="Copy page URL"'), 'Production share button advertises copying the page URL');
     assert.ok(prodContent.includes('id="coming-soon-banner"'), 'Production page has toast banner element');
     assert.ok(prodContent.includes('data-filter-group'), 'Has release filter buttons');
+    assert.ok(!prodContent.includes('data-filter="all"'), 'Removes All top-level release filter chip');
+    assert.ok(
+        prodContent.includes('<button type="button" class="chip" data-filter="original" aria-pressed="true">Originals</button>'),
+        'Defaults top-level release filter to Originals'
+    );
     assert.ok(prodContent.includes('class="arrangement"'), 'Has studio arrangement DAW visual');
     assert.ok(prodContent.includes('src="../assets/logo.png"'), 'Has main logo in header');
     assert.ok(prodContent.includes('src="../assets/freehand-signature-3.png"'), 'Has freehand signature logo in header');
@@ -1721,4 +1726,106 @@ test('assets/js/portfolio.js mashup sub-filters toggle visibility and filter by 
     assert.strictEqual(subFilterGroup.hidden, true, 'Hides mashup sub-filter when switching to Remixes');
     assert.strictEqual(subChips[0].getAttribute('aria-pressed'), 'true', 'Resets sub-filter to All Mashups');
     assert.strictEqual(items[2].hidden, false, 'Shows remix');
+});
+
+test('assets/js/portfolio.js applies initially pressed non-all filter on page load', () => {
+    const portfolioPath = path.join(__dirname, '..', 'assets', 'js', 'portfolio.js');
+    const portfolioJs = fs.readFileSync(portfolioPath, 'utf8');
+
+    let domReadyHandler = null;
+
+    function makeChip(attrName, value, label, pressed) {
+        const attrs = { [attrName]: value, 'aria-pressed': String(pressed) };
+        let clickHandler = null;
+        return {
+            textContent: label,
+            getAttribute(name) { return Object.prototype.hasOwnProperty.call(attrs, name) ? attrs[name] : null; },
+            setAttribute(name, val) { attrs[name] = String(val); },
+            addEventListener(type, fn) { if (type === 'click') clickHandler = fn; },
+            click() { if (clickHandler) clickHandler(); },
+        };
+    }
+
+    function makeItem(category, subcategory) {
+        return {
+            hidden: false,
+            getAttribute(name) {
+                if (name === 'data-category') return category;
+                if (name === 'data-subcategory') return subcategory || null;
+                return null;
+            },
+        };
+    }
+
+    const chips = [
+        makeChip('data-filter', 'original', 'Originals', true),
+        makeChip('data-filter', 'remix', 'Remixes & Edits', false),
+        makeChip('data-filter', 'mashup', 'Mashups', false),
+        makeChip('data-filter', 'performance', 'Performance Mixes', false),
+    ];
+    const subChips = [
+        makeChip('data-subfilter', 'all', 'All Mashups', true),
+        makeChip('data-subfilter', 'pure-usa', 'Pure USA', false),
+    ];
+    const items = [
+        makeItem('original', null),
+        makeItem('remix', null),
+        makeItem('mashup', 'pure-usa'),
+        makeItem('performance', null),
+    ];
+    const emptyEl = { hidden: false, querySelector() { return null; } };
+    const filterGroup = {
+        getAttribute(name) {
+            if (name === 'data-filter-group') return '#release-list';
+            if (name === 'data-filter-empty') return '#release-empty';
+            return null;
+        },
+        querySelectorAll(sel) { return sel === '[data-filter]' ? chips : []; },
+    };
+    const subFilterGroup = {
+        hidden: false,
+        getAttribute(name) {
+            if (name === 'data-subfilter-group') return '#release-list';
+            if (name === 'data-subfilter-for') return 'mashup';
+            return null;
+        },
+        querySelectorAll(sel) { return sel === '[data-subfilter]' ? subChips : []; },
+    };
+
+    const sandbox = {
+        location: { href: 'https://rohanvarshney.github.io/production/' },
+        isSecureContext: true,
+        document: {
+            title: 'ROVA Production',
+            body: { getAttribute() { return ''; } },
+            addEventListener(type, fn) { if (type === 'DOMContentLoaded') domReadyHandler = fn; },
+            querySelector(sel) { return sel === '#release-empty' ? emptyEl : null; },
+            querySelectorAll(sel) {
+                if (sel === '[data-filter-group]') return [filterGroup];
+                if (sel === '[data-subfilter-group]') return [subFilterGroup];
+                if (sel === '#release-list [data-category]') return items;
+                return [];
+            },
+            getElementById() { return null; },
+        },
+        setTimeout() { return 1; },
+        clearTimeout() {},
+    };
+    sandbox.window = sandbox;
+
+    vm.createContext(sandbox);
+    vm.runInContext(portfolioJs, sandbox);
+    domReadyHandler();
+
+    assert.strictEqual(items[0].hidden, false, 'Original item is visible on initial load');
+    assert.strictEqual(items[1].hidden, true, 'Remix item is hidden on initial load');
+    assert.strictEqual(items[2].hidden, true, 'Mashup item is hidden on initial load');
+    assert.strictEqual(items[3].hidden, true, 'Performance item is hidden on initial load');
+    assert.strictEqual(subFilterGroup.hidden, true, 'Mashup sub-filter stays hidden on initial load');
+    assert.strictEqual(emptyEl.hidden, true, 'Empty banner stays hidden when Originals has items');
+
+    chips[2].click(); // Mashups
+    assert.strictEqual(items[0].hidden, true, 'Hides original when Mashups is selected');
+    assert.strictEqual(items[2].hidden, false, 'Shows mashup when Mashups is selected');
+    assert.strictEqual(subFilterGroup.hidden, false, 'Shows mashup sub-filter when Mashups is selected');
 });

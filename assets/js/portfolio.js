@@ -782,7 +782,16 @@
       });
       var activeFilter = 'all';
       var activeSubfilter = 'all';
-      var activeButtonRef = buttons[0] || null;
+      var initialButton = null;
+      buttons.forEach(function (button) {
+        if (!initialButton && button.getAttribute('aria-pressed') === 'true') {
+          initialButton = button;
+        }
+      });
+      if (!initialButton && buttons.length) {
+        initialButton = buttons[0];
+      }
+      var activeButtonRef = initialButton;
 
       function updateVisibility() {
         var visibleCount = 0;
@@ -844,14 +853,10 @@
         });
       });
 
-      if (emptyEl) {
-        var initialVisible = 0;
-        document.querySelectorAll(targetSelector + ' [data-category]').forEach(function (item) {
-          if (!item.hidden) {
-            initialVisible++;
-          }
-        });
-        emptyEl.hidden = initialVisible > 0;
+      if (initialButton) {
+        applyFilter(initialButton);
+      } else {
+        updateVisibility();
       }
     });
   }
