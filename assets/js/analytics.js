@@ -18,17 +18,18 @@
 
   if (isConfigured) {
     var existingScript = document.querySelector(
-      'script[src*="googletagmanager.com/gtm.js"], script[src*="googletagmanager.com/gtag/js"]'
+      'script[src*="googletagmanager.com/gtag/js"]'
     );
     if (!existingScript) {
       var script = document.createElement('script');
       script.async = true;
       script.src =
-        'https://www.googletagmanager.com/gtm.js?id=' +
+        'https://www.googletagmanager.com/gtag/js?id=' +
         encodeURIComponent(GA_MEASUREMENT_ID);
       document.head.appendChild(script);
 
       window.gtag('js', new Date());
+      window.gtag('config', GA_MEASUREMENT_ID);
     }
   }
 
