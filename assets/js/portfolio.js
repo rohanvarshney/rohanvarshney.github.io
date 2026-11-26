@@ -424,6 +424,7 @@
       var currentDurationLabel = player.getAttribute('data-track-duration') || '0:00';
       var activeRow = trackList ? trackList.querySelector('.release.is-active') : null;
       var initialActiveRow = activeRow;
+      var initialKicker = kickerEl ? kickerEl.textContent.trim() : 'Featured Track';
       var isLoading = false;
       var pendingSeekRatio = null;
       var pendingResumeTime = null;
@@ -630,7 +631,7 @@
         if (kickerEl) {
           kickerEl.textContent =
             row.getAttribute('data-track-kicker') ||
-            (initialActiveRow && row === initialActiveRow ? 'Latest release' : 'Now playing');
+            (initialActiveRow && row === initialActiveRow ? initialKicker : 'Now playing');
         }
         if (titleEl) {
           titleEl.textContent = currentTitle;

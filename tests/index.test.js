@@ -419,6 +419,7 @@ test('production/index.html structure and content', () => {
     assert.ok(!/ableton|fl studio|\.als\b/i.test(prodContent), 'Removes Ableton Live, FL Studio, and .als references');
 
     // Featured player + Spotify embeds for Originals + Move Like I Do mashup card
+    assert.ok(prodContent.includes('data-player-kicker>Featured Track</div>'), 'Emphasizes featured player as Featured Track');
     assert.ok(prodContent.includes('house pool party'), 'Has house pool party release');
     assert.ok(prodContent.includes('href="https://open.spotify.com/track/6IoqO8jmnH9Ml3BTGxDk1B"'), 'Featured player links to house pool party on Spotify');
     assert.ok(prodContent.includes('data-analytics-label="Featured house pool party Spotify" data-analytics-status="live"'), 'Tracks Featured house pool party Spotify link as live');
@@ -1109,7 +1110,7 @@ test('assets/js/portfolio.js audio player lazy-loads GitHub Releases tracks, scr
     const coverEl = createMockElement('div', { attrs: { 'data-player-cover': '' }, classes: ['cover', 'has-art'] });
     coverEl.appendChild(coverImg);
 
-    const kickerEl = createMockElement('div', { attrs: { 'data-player-kicker': '' }, textContent: 'Latest release' });
+    const kickerEl = createMockElement('div', { attrs: { 'data-player-kicker': '' }, textContent: 'Featured Track' });
     const titleEl = createMockElement('h3', { attrs: { 'data-player-title': '' }, textContent: 'house pool party' });
     const metaEl = createMockElement('div', { attrs: { 'data-player-meta': '' }, textContent: 'Original · 3:32 · 2025' });
     const timeEl = createMockElement('span', { attrs: { 'data-player-time': '' }, textContent: '0:00 / 3:32' });
