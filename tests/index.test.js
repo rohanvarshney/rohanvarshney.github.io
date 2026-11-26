@@ -444,6 +444,8 @@ test('production/index.html structure and content', () => {
     assert.ok(prodContent.includes('href="https://open.spotify.com/artist/4rzG9xC24GurQlOwEtqB7x"'), 'Footer links to ROVA Spotify artist profile');
     assert.ok(prodContent.includes('data-analytics-label="Footer Spotify" data-analytics-status="live"'), 'Tracks Footer Spotify link as live');
     assert.ok(!prodContent.includes('data-coming-soon="Spotify artist profile"'), 'Removes coming-soon from Footer Spotify link');
+    assert.ok(prodContent.includes('data-contact-email="rohanvar@gmail.com"'), 'Configures rohanvar@gmail.com as Production contact email');
+    assert.ok(!prodContent.includes('collabs@example.com'), 'Removes collabs@example.com placeholder');
 });
 
 test('assets/js/analytics.js configuration and 100% link coverage', () => {
@@ -685,5 +687,207 @@ test('assets/js/portfolio.js share button copies URL and shows banner', async ()
         fallbackFailure.bannerText.textContent,
         'Copy this link: https://rohanvarshney.github.io/production/',
         'Displays fallback URL banner message when copy fails'
+    );
+});
+
+test('assets/js/analytics.js tracks click and middle-click (auxclick) with normalized link_url', () => {
+    const analyticsPath = path.join(__dirname, '..', 'assets', 'js', 'analytics.js');
+    const analyticsJs = fs.readFileSync(analyticsPath, 'utf8');
+
+    function runAnalyticsScenario(pageUrl, linkSpecs) {
+        let domReadyHandler = null;
+        const gtagCalls = [];
+        const links = linkSpecs.map((spec) => {
+            const listeners = {};
+            const attrs = Object.assign({}, spec.attrs);
+            return {
+                textContent: spec.textContent || '',
+                getAttribute(name) {
+                    return Object.prototype.hasOwnProperty.call(attrs, name) ? attrs[name] : null;
+                },
+                addEventListener(type, fn) {
+                    listeners[type] = fn;
+                },
+                trigger(type, eventObj) {
+                    if (listeners[type]) {
+                        listeners[type](eventObj);
+                    }
+                },
+            };
+        });
+
+        const parsed = new URL(pageUrl);
+        const sandbox = {
+            URL,
+            dataLayer: [],
+            gtag(...args) {
+                gtagCalls.push(args);
+            },
+            location: {
+                href: parsed.href,
+                pathname: parsed.pathname,
+                origin: parsed.origin,
+            },
+            document: {
+                querySelector() {
+                    return {};
+                },
+                querySelectorAll(selector) {
+                    return selector === 'a[href]' ? links : [];
+                },
+                addEventListener(type, fn) {
+                    if (type === 'DOMContentLoaded') {
+                        domReadyHandler = fn;
+                    }
+                },
+            },
+        };
+        sandbox.window = sandbox;
+
+        vm.runInNewContext(analyticsJs, sandbox);
+        assert.ok(domReadyHandler, 'Registers DOMContentLoaded listener');
+        domReadyHandler();
+
+        return { links, gtagCalls };
+    }
+
+    // 1. Click, middle-click (button 1), and non-middle auxclick (button 2)
+    const homeScenario = runAnalyticsScenario('https://rohanvarshney.github.io/', [
+        {
+            attrs: {
+                href: 'resume.pdf',
+                'data-analytics-event': 'resume_download',
+                'data-analytics-category': 'professional',
+                'data-analytics-label': 'Resume PDF',
+            },
+        },
+        {
+            attrs: {
+                href: '/dj',
+                'data-analytics-event': 'portfolio_link_click',
+                'data-analytics-category': 'portfolio',
+                'data-analytics-label': 'DJing',
+                'data-analytics-status': 'live',
+            },
+        },
+        {
+            attrs: {
+                href: 'https://linkedin.com/in/rohanvarshney',
+                'data-analytics-event': 'social_link_click',
+                'data-analytics-category': 'professional',
+                'data-analytics-label': 'LinkedIn',
+            },
+        },
+        {
+            attrs: {
+                href: '#',
+                'data-analytics-event': 'dj_mix_click',
+                'data-analytics-category': 'dj',
+                'data-analytics-label': 'Featured Mixcloud',
+                'data-analytics-status': 'coming_soon',
+            },
+        },
+    ]);
+
+    homeScenario.links[0].trigger('click');
+    homeScenario.links[0].trigger('auxclick', { button: 1 });
+    homeScenario.links[0].trigger('auxclick', { button: 2 }); // right-click should be ignored
+    homeScenario.links[1].trigger('click');
+    homeScenario.links[2].trigger('auxclick', { button: 1 });
+    homeScenario.links[3].trigger('click');
+
+    assert.deepStrictEqual(
+        JSON.parse(JSON.stringify(homeScenario.gtagCalls)),
+        [
+            [
+                'event',
+                'resume_download',
+                {
+                    page_path: '/',
+                    page_location: 'https://rohanvarshney.github.io/',
+                    transport_type: 'beacon',
+                    event_category: 'professional',
+                    event_label: 'Resume PDF',
+                    link_url: 'https://rohanvarshney.github.io/resume.pdf',
+                    link_status: 'live',
+                },
+            ],
+            [
+                'event',
+                'resume_download',
+                {
+                    page_path: '/',
+                    page_location: 'https://rohanvarshney.github.io/',
+                    transport_type: 'beacon',
+                    event_category: 'professional',
+                    event_label: 'Resume PDF',
+                    link_url: 'https://rohanvarshney.github.io/resume.pdf',
+                    link_status: 'live',
+                },
+            ],
+            [
+                'event',
+                'portfolio_link_click',
+                {
+                    page_path: '/',
+                    page_location: 'https://rohanvarshney.github.io/',
+                    transport_type: 'beacon',
+                    event_category: 'portfolio',
+                    event_label: 'DJing',
+                    link_url: 'https://rohanvarshney.github.io/dj/',
+                    link_status: 'live',
+                },
+            ],
+            [
+                'event',
+                'social_link_click',
+                {
+                    page_path: '/',
+                    page_location: 'https://rohanvarshney.github.io/',
+                    transport_type: 'beacon',
+                    event_category: 'professional',
+                    event_label: 'LinkedIn',
+                    link_url: 'https://linkedin.com/in/rohanvarshney',
+                    link_status: 'live',
+                },
+            ],
+            [
+                'event',
+                'dj_mix_click',
+                {
+                    page_path: '/',
+                    page_location: 'https://rohanvarshney.github.io/',
+                    transport_type: 'beacon',
+                    event_category: 'dj',
+                    event_label: 'Featured Mixcloud',
+                    link_url: '#',
+                    link_status: 'coming_soon',
+                },
+            ],
+        ],
+        'Tracks click and middle-click (button 1) with normalized link_url while ignoring right-click auxclick'
+    );
+
+    // 2. Relative links from subpages normalize consistently
+    const subpageScenario = runAnalyticsScenario('https://rohanvarshney.github.io/raas/', [
+        { attrs: { href: '../dj/', 'data-analytics-event': 'portfolio_link_click', 'data-analytics-label': 'Footer DJing' } },
+        { attrs: { href: '../', 'data-analytics-event': 'navigation_click', 'data-analytics-label': 'Home' } },
+        { attrs: { href: '../assets/logo.png', 'data-analytics-event': 'press_download', 'data-analytics-label': 'Logo PNG' } },
+        { attrs: { href: '#statistics', 'data-analytics-event': 'navigation_click', 'data-analytics-label': 'Nav Statistics' } },
+        { attrs: { href: 'mailto:rohanvar@gmail.com?subject=DJ%20Booking', 'data-analytics-event': 'contact_click', 'data-analytics-label': 'Booking Email' } },
+    ]);
+
+    subpageScenario.links.forEach((link) => link.trigger('click'));
+
+    assert.deepStrictEqual(
+        subpageScenario.gtagCalls.map((call) => call[2].link_url),
+        [
+            'https://rohanvarshney.github.io/dj/',
+            'https://rohanvarshney.github.io/',
+            'https://rohanvarshney.github.io/assets/logo.png',
+            '#statistics',
+            'mailto:rohanvar@gmail.com?subject=DJ%20Booking',
+        ],
+        'Normalizes relative directory/file links while preserving anchors and mailto URLs'
     );
 });
