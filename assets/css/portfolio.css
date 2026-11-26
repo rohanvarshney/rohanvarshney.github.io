@@ -1205,6 +1205,19 @@ button.chip[aria-pressed='true'] {
   color: #fff;
 }
 
+.chips[hidden] {
+  display: none;
+}
+
+.chips-sub {
+  margin: -4px 0 14px;
+}
+
+.chips-sub .chip {
+  padding: 4px 10px;
+  font-size: 0.74rem;
+}
+
 /* ---------- Player (featured mix / release) ---------- */
 
 .player {
@@ -1836,6 +1849,7 @@ details.faq .faq-body {
 
 .release .cover {
   font-size: 0.6rem;
+  line-height: 1.15;
   padding: 6px;
   border-radius: 8px;
 }

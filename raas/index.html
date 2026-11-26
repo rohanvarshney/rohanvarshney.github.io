@@ -31,6 +31,7 @@
 
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
   <script src="../assets/js/analytics.js"></script>
+  <script src="../assets/js/portfolio.js"></script>
   <style>
     * {
       margin: 0;
@@ -596,6 +597,283 @@
       color: #555;
     }
 
+    .section-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .section-head .section-title {
+      margin-bottom: 0;
+    }
+
+    .section-kicker {
+      font-size: 0.85rem;
+      color: #666;
+    }
+
+    .player {
+      display: grid;
+      grid-template-columns: 148px 1fr;
+      gap: 22px;
+      padding: 22px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #111 0%, #1b1b1b 100%);
+      color: #fff;
+      border: 1px solid rgba(220, 20, 60, 0.5);
+      box-shadow: 0 18px 40px -24px rgba(220, 20, 60, 0.6);
+    }
+
+    .cover {
+      aspect-ratio: 1;
+      border-radius: 10px;
+      background:
+        radial-gradient(circle at 30% 30%, #ff4d6d, transparent 55%),
+        radial-gradient(circle at 75% 80%, #6a0dad, transparent 55%),
+        #dc143c;
+      display: flex;
+      align-items: flex-end;
+      padding: 10px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      font-weight: 800;
+      font-size: 0.9rem;
+      letter-spacing: 0.08em;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cover::after {
+      content: '';
+      position: absolute;
+      inset: 18%;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: inset 0 0 0 10px rgba(255, 255, 255, 0.05), inset 0 0 0 22px rgba(255, 255, 255, 0.04);
+    }
+
+    .player-body {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .player-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      align-self: flex-start;
+      padding: 3px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 77, 109, 0.45);
+      background: rgba(220, 20, 60, 0.18);
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #ff6b86;
+      margin-bottom: 8px;
+    }
+
+    .player-title {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      line-height: 1.25;
+      margin-bottom: 4px;
+    }
+
+    .player-meta {
+      font-size: 0.8rem;
+      color: #bbb;
+      margin-bottom: 14px;
+    }
+
+    .player-controls {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-top: auto;
+    }
+
+    .play-btn {
+      flex-shrink: 0;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: none;
+      background: #dc143c;
+      color: #fff;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding-left: 3px;
+      transition: background-color 0.2s, transform 0.2s;
+    }
+
+    .play-btn.is-playing,
+    .play-btn.is-loading {
+      padding-left: 0;
+    }
+
+    .play-btn:hover {
+      background: #ff2b55;
+      transform: scale(1.05);
+    }
+
+    .waveform {
+      flex: 1;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    [data-audio-player] .waveform {
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .waveform span {
+      flex: 1;
+      min-width: 2px;
+      border-radius: 2px;
+      background: rgba(255, 255, 255, 0.28);
+      transition: background-color 0.12s;
+    }
+
+    [data-audio-player] .waveform:hover span:not(.played) {
+      background: rgba(255, 255, 255, 0.42);
+    }
+
+    .waveform span.played {
+      background: #dc143c;
+    }
+
+    .player-time {
+      font-size: 0.72rem;
+      color: #bbb;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .release-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .release {
+      display: grid;
+      grid-template-columns: 56px 1fr auto;
+      align-items: center;
+      gap: 16px;
+      padding: 10px 14px 10px 10px;
+      border: 1px solid #d0d0d0;
+      border-radius: 12px;
+      background: #fafafa;
+      transition: border-color 0.2s, background-color 0.2s;
+    }
+
+    .release:hover,
+    .release.is-active {
+      border-color: #dc143c;
+      background: #fff5f7;
+    }
+
+    .release .cover {
+      font-size: 0.6rem;
+      line-height: 1.15;
+      padding: 6px;
+      border-radius: 8px;
+    }
+
+    .release .cover::after {
+      inset: 22%;
+    }
+
+    .release:nth-child(6n + 2) .cover {
+      background: radial-gradient(circle at 70% 25%, #ffb347, transparent 55%), radial-gradient(circle at 20% 85%, #dc143c, transparent 60%), #7a0a22;
+    }
+
+    .release:nth-child(6n + 3) .cover {
+      background: radial-gradient(circle at 25% 25%, #00c2a8, transparent 55%), radial-gradient(circle at 80% 80%, #dc143c, transparent 55%), #0d2b3e;
+    }
+
+    .release:nth-child(6n + 4) .cover {
+      background: radial-gradient(circle at 60% 30%, #f5f5f5, transparent 45%), radial-gradient(circle at 30% 85%, #dc143c, transparent 60%), #222;
+    }
+
+    .release:nth-child(6n + 5) .cover {
+      background: radial-gradient(circle at 30% 70%, #ffd166, transparent 50%), radial-gradient(circle at 80% 20%, #ef476f, transparent 55%), #3a0ca3;
+    }
+
+    .release:nth-child(6n) .cover {
+      background: radial-gradient(circle at 50% 50%, #ff4d6d, transparent 60%), #111;
+    }
+
+    .release-title {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      font-weight: 600;
+      font-size: 1rem;
+      line-height: 1.3;
+    }
+
+    .release-meta {
+      font-size: 0.75rem;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .release-links {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .release-play-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid rgba(220, 20, 60, 0.45);
+      background: transparent;
+      color: #dc143c;
+      font-size: 0.78rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding-left: 2px;
+      transition: background-color 0.2s, color 0.2s, border-color 0.2s, transform 0.2s;
+    }
+
+    .release-play-btn:hover,
+    .release-play-btn.is-playing {
+      background: #dc143c;
+      border-color: #dc143c;
+      color: #fff;
+    }
+
+    .release-play-btn:hover {
+      transform: scale(1.06);
+    }
+
+    .release-play-btn.is-playing,
+    .release-play-btn.is-loading {
+      padding-left: 0;
+    }
+
     .resources {
       display: flex;
       flex-direction: column;
@@ -819,6 +1097,22 @@
       .topnav-brand .topnav-signature {
         height: 31px;
       }
+
+      .player {
+        grid-template-columns: 1fr;
+      }
+
+      .player .cover {
+        max-width: 120px;
+      }
+
+      .release {
+        grid-template-columns: 48px 1fr;
+      }
+
+      .release-links {
+        grid-column: 2;
+      }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -832,7 +1126,7 @@
 <body>
   <a class="skip-link" href="#main" data-analytics-event="navigation_click" data-analytics-category="navigation" data-analytics-label="Skip to content">Skip to content</a>
 
-  <nav class="topnav" aria-label="Page">
+  <nav class="topnav" data-custom-nav aria-label="Page">
     <div class="topnav-inner">
       <a class="topnav-brand" href="../" title="Home"
         data-analytics-event="navigation_click" data-analytics-category="navigation" data-analytics-label="Nav Logo Home">
@@ -842,6 +1136,7 @@
       <ul class="topnav-links">
         <li><a href="#statistics" data-analytics-event="navigation_click" data-analytics-category="raas" data-analytics-label="Nav Statistics">Statistics</a></li>
         <li><a href="#hall-of-fame" data-analytics-event="navigation_click" data-analytics-category="raas" data-analytics-label="Nav Hall Of Fame">Hall Of Fame</a></li>
+        <li><a href="#mashups" data-analytics-event="navigation_click" data-analytics-category="raas" data-analytics-label="Nav Mashups">Mashups</a></li>
       </ul>
       <a class="topnav-cta" href="#resources" data-analytics-event="navigation_click" data-analytics-category="raas" data-analytics-label="Nav Resources">
         <i class="fa fa-folder-open-o" aria-hidden="true"></i> Resources
@@ -1096,6 +1391,174 @@
           <li><strong>GT 2019-2020</strong></li>
         </ul>
       </div>
+    </section>
+
+    <section class="section" id="mashups">
+      <div class="section-head">
+        <h2 class="section-title">Mashups</h2>
+        <span class="section-kicker">Standalone Raas mashups &mdash; audio loads on play.</span>
+      </div>
+
+      <article class="player"
+        data-audio-player
+        data-audio-base="../assets/audio/"
+        data-analytics-event="raas_audio_play"
+        data-analytics-category="raas"
+        data-audio-file="mashups/raas/feel-so-raas.mp3"
+        data-track-title="Feel So Raas"
+        data-track-duration="1:46"
+        data-track-list="#raas-release-list">
+        <div class="cover" data-player-cover aria-hidden="true">RAAS</div>
+        <div class="player-body">
+          <div class="player-kicker" data-player-kicker>Featured Track</div>
+          <h3 class="player-title" data-player-title>Feel So Raas</h3>
+          <div class="player-meta" data-player-meta>Raas Mashup &middot; Feel So Close &times; Raas Blend &middot; 1:46</div>
+          <div class="player-controls">
+            <button type="button" class="play-btn" data-play-toggle aria-label="Play Feel So Raas" aria-pressed="false">
+              <i class="fa fa-play" aria-hidden="true"></i>
+            </button>
+            <div class="waveform" data-waveform data-seed="1" data-bars="80" data-progress="0"
+              data-peaks="12,12,12,12,17,29,24,35,35,25,27,38,48,31,45,47,45,51,59,57,40,35,51,48,60,61,37,52,61,59,58,61,56,67,77,81,77,82,75,96,100,89,92,91,93,90,90,89,89,92,98,92,90,91,93,92,99,95,97,95,96,81,28,39,37,25,33,37,43,32,36,38,28,27,12,12,12,12,12,12"
+              role="slider" tabindex="0" aria-label="Seek audio position" aria-valuemin="0" aria-val<!-- RAAS-AUDIO:START -->
+        <li class="release is-active" data-category="mashup" data-subcategory="raas" data-audio-file="mashups/raas/feel-so-raas.mp3" data-track-duration="1:46" data-seed="142"
+          data-peaks="12,12,12,12,17,29,24,35,35,25,27,38,48,31,45,47,45,51,59,57,40,35,51,48,60,61,37,52,61,59,58,61,56,67,77,81,77,82,75,96,100,89,92,91,93,90,90,89,89,92,98,92,90,91,93,92,99,95,97,95,96,81,28,39,37,25,33,37,43,32,36,38,28,27,12,12,12,12,12,12">
+          <div class="cover" aria-hidden="true">RAAS</div>
+          <div>
+            <div class="release-title">Feel So Raas</div>
+            <div class="release-meta">Raas Mashup &middot; Feel So Close &times; Raas Blend &middot; 1:46</div>
+          </div>
+          <div class="release-links">
+            <button type="button" class="release-play-btn" data-release-play aria-label="Play Feel So Raas" aria-pressed="false">
+              <i class="fa fa-play" aria-hidden="true"></i>
+            </button>
+          </div>
+        </li>
+        <li class="release" data-category="mashup" data-subcategory="raas" data-audio-file="mashups/raas/besharam-divya.mp3" data-track-duration="1:52" data-seed="757"
+          data-peaks="15,51,52,37,60,55,32,43,52,33,68,52,55,99,51,73,74,66,35,49,50,40,69,58,51,84,77,81,76,82,80,83,82,77,78,83,80,84,87,85,81,88,58,67,61,59,63,63,79,93,75,94,90,90,77,72,64,100,80,57,76,75,69,80,82,75,76,78,79,89,80,80,50,52,33,44,50,45,40,12">
+          <div class="cover" aria-hidden="true">RAAS</div>
+          <div>
+            <div class="release-title">Besharam Divya</div>
+            <div class="release-meta">Raas Mashup &middot; Besharam &times; Divya &middot; 1:52</div>
+          </div>
+          <div class="release-links">
+            <button type="button" class="release-play-btn" data-release-play aria-label="Play Besharam Divya" aria-pressed="false">
+              <i class="fa fa-play" aria-hidden="true"></i>
+            </button>
+          </div>
+        </li>
+        <li class="release" data-category="mashup" data-subcategory="raas" data-audio-file="mashups/raas/chunalida.mp3" data-track-duration="2:38" data-seed="129"
+          data-peaks="12,38,53,45,55,50,50,67,57,65,48,76,70,77,95,83,84,83,95,85,88,54,61,63,43,65,90,82,94,84,90,86,87,87,82,89,86,79,78,73,77,77,82,80,79,80,76,76,80,80,77,85,84,88,83,88,86,87,92,100,94,100,85,77,80,82,96,88,93,93,95,93,92,96,91,89,87,63,13,12">
+          <div class="cover" aria-hidden="true">RAAS</div>
+          <div>
+            <div class="release-title">Chunalida</div>
+            <div class="release-meta">Raas Mashup &middot; Gujarati Folk Mashup &middot; 2:38</div>
+          </div>
+          <div class="release-links">
+            <button type="button" class="release-play-btn" data-release-play aria-label="Play Chunalida" aria-pressed="false">
+              <i class="fa fa-play" aria-hidden="true"></i>
+            </button>
+          </div>
+        </li>
+        <li class="release" data-category="mashup" data-subcategory="raas" data-audio-file="mashups/raas/dankeroopty.mp3" data-track-duration="1:17" data-seed="336"
+          data-peaks="12,28,96,71,54,55,56,53,52,63,65,96,68,78,68,63,79,60,76,69,100,90,78,85,77,74,86,74,81,77,76,92,85,80,75,79,86,77,76,82,92,96,86,84,82,89,81,86,83,82,94,82,96,90,89,93,81,85,78,66,56,79,51,45,40,42,41,38,43,34,36,21,12,12,12,12,12,12,12,12">
+          <div class="cover" aria-hidden="true">RAAS</div>
+          <div>
+            <div class="release-title">Dankonteroopty</div>
+            <div class="release-meta">Raas Mashup &middot; Raas Fusion Mashup &middot; 1:17</div>
+          </div>
+          <div class="release-links">
+            <button type="button" class="release-play-btn" data-release-play aria-label="Play Dankonteroopty" aria-pressed="false">
+              <i class="fa fa-play" aria-hidden="true"></i>
+            </button>
+          </div>
+        </li>
+        <li class="release" data-category="mashup" data-subcategory="raas" data-audio-file="mashups/raas/kanudina-psycho.mp3" data-track-duration="2:22" data-seed="422"
+          data-peaks="12,21,25,20,26,18,21,18,27,32,35,34,32,32,30,40,52,54,53,49,50,54,53,50,76,78,79,84,81,84,83,86,96,99,100,96,93,95,92,78,54,50,50,49,47,48,48,57,59,60,54,51,48,51,49,74,81,79,80,80,82,82,46,37,30,35,38,36,35,31,37,28,25,23,24,21,25,13,12,12">
+          <div class="cover" aria-hidden="true">RAAS</div>
+          <div>
+            <div class="release-title">Kanudina Psycho</div>
+            <div class="release-meta">Raas Mashup &middot; Kanudina &times; Psycho &middot; 2:22</div>
+          </div>
+          <div class="release-links">
+            <button type="button" class="release-play-btn" data-release-play aria-label="Play Kanudina Psycho" aria-pressed="false">
+              <i class="fa fa-play" aria-hidden="true"></i>
+            </button>
+          </div>
+        </li>
+        <li class="release" data-category="mashup" data-subcategory="raas" data-audio-file="mashups/raas/mogal-rumble.mp3" data-track-duration="1:24" data-seed="479"
+          data-peaks="12,12,12,14,16,16,28,27,44,67,53,74,74,66,67,76,62,59,57,67,44,55,54,43,70,51,90,81,77,95,78,81,98,74,82,91,85,85,83,93,85,82,98,78,80,98,78,79,70,85,83,82,91,77,77,94,76,81,100,75,85,84,67,40,31,48,40,39,57,42,52,40,20,17,27,18,12,12,12,12">
+          <div class="cover" aria-hidden="true">RAAS</div>
+          <div>
+            <div class="release-title">Mogal Rumble</div>
+            <div class="release-meta">Raas Mashup &middot; Mogal &times; Rumble &middot; 1:24</div>
+          </div>
+          <div class="release-links">
+            <button type="button" class="release-play-btn" data-release-play aria-label="Play Mogal Rumble" aria-pressed="false">
+              <i class="fa fa-play" aria-hidden="true"></i>
+            </button>
+          </div>
+        </li>
+        <li class="release" data-category="mashup" data-subcategory="raas" data-audio-file="mashups/raas/patang-tu-meri.mp3" data-track-duration="1:04" data-seed="163"
+          data-peaks="12,44,33,27,27,27,27,32,32,36,43,43,42,43,48,52,63,78,77,74,80,81,81,83,81,79,82,81,78,78,78,78,77,79,79,87,86,89,97,89,79,83,80,84,91,91,100,66,21,15,13,16,12,18,14,14,12,14,16,15,13,16,33,29,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12">
+          <div class="cover" aria-hidden="true">RAAS</div>
+          <div>
+            <div class="release-title">Patang &times; Tu Meri</div>
+            <div class="release-meta">Raas Mashup &middot; Patang &times; Tu Meri &middot; 1:04</div>
+          </div>
+          <div class="release-links">
+            <button type="button" class="release-play-btn" data-release-play aria-label="Play Patang &times; Tu Meri" aria-pressed="false">
+              <i class="fa fa-play" aria-hidden="true"></i>
+            </button>
+          </div>
+        </li>
+        <li class="release" data-category="mashup" data-subcategory="raas" data-audio-file="mashups/raas/phool-jai.mp3" data-track-duration="0:51" data-seed="380"
+          data-peaks="12,31,53,96,38,39,38,44,58,62,63,57,57,74,76,53,61,67,61,78,56,57,78,84,88,80,95,88,85,87,82,89,86,85,84,87,78,96,85,96,90,92,88,93,95,98,89,94,94,100,94,95,90,100,97,85,97,92,100,92,93,94,100,92,96,93,99,71,100,22,13,12,12,12,12,12,12,12,12,12">
+          <div class="cover" aria-hidden="true">RAAS</div>
+          <div>
+            <div class="release-title">Phool &times; Jai</div>
+            <div class="release-meta">Raas Mashup &middot; Phool &times; Jai &middot; 0:51</div>
+          </div>
+          <div class="release-links">
+            <button type="button" class="release-play-btn" data-release-play aria-label="Play Phool &times; Jai" aria-pressed="false">
+              <i class="fa fa-play" aria-hidden="true"></i>
+            </button>
+          </div>
+        </li>
+        <li class="release" data-category="mashup" data-subcategory="raas" data-audio-file="mashups/raas/tongue-tied-greedy.mp3" data-track-duration="1:59" data-seed="535"
+          data-peaks="12,12,12,17,23,33,44,58,54,57,64,77,82,86,96,82,94,85,85,93,81,83,87,81,88,92,88,94,99,76,95,95,82,92,96,62,61,85,78,96,87,89,89,57,54,46,52,48,46,50,83,94,91,93,86,87,95,87,91,93,85,90,94,84,93,95,91,97,97,87,100,87,81,89,45,12,12,12,12,12">
+          <div class="cover" aria-hidden="true">RAAS</div>
+          <div>
+            <div class="release-title">Tongue Tied Greedy</div>
+            <div class="release-meta">Raas Mashup &middot; Tongue Tied &times; Greedy &middot; 1:59</div>
+          </div>
+          <div class="release-links">
+            <button type="button" class="release-play-btn" data-release-play aria-label="Play Tongue Tied Greedy" aria-pressed="false">
+              <i class="fa fa-play" aria-hidden="true"></i>
+            </button>
+          </div>
+        </li>
+        <li class="release" data-category="mashup" data-subcategory="raas" data-audio-file="mashups/raas/vari-dna.mp3" data-track-duration="1:29" data-seed="773"
+          data-peaks="12,12,53,36,26,28,24,25,62,82,100,88,82,87,87,83,83,97,92,66,52,80,99,95,82,92,83,89,88,90,89,85,76,86,82,82,86,86,79,80,54,75,71,74,77,70,76,73,74,75,77,71,73,67,74,70,60,74,79,72,73,80,85,76,78,78,87,79,82,85,89,83,81,69,22,25,12,12,12,12">
+          <div class="cover" aria-hidden="true">RAAS</div>
+          <div>
+            <div class="release-title">VariD(o)NA</div>
+            <div class="release-meta">Raas Mashup &middot; Vari &times; DNA &middot; 1:29</div>
+          </div>
+          <div class="release-links">
+            <button type="button" class="release-play-btn" data-release-play aria-label="Play VariD(o)NA" aria-pressed="false">
+              <i class="fa fa-play" aria-hidden="true"></i>
+            </button>
+          </div>
+        </li>
+        <!-- RAAS-AUDIO:END -->ass="player-time" data-player-time aria-live="off">0:00 / 1:46</span>
+          </div>
+        </div>
+      </article>
+
+      <ul class="release-list" id="raas-release-list">
+        <!-- RAAS-AUDIO:START -->
+        <!-- RAAS-AUDIO:END -->
+      </ul>
     </section>
 
     <section class="section" id="resources">

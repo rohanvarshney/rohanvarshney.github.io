@@ -245,12 +245,53 @@ test('raas/index.html structure and content', () => {
 
     const statsIndex = raasContent.indexOf('id="statistics"');
     const hofIndex = raasContent.indexOf('id="hall-of-fame"');
+    const mashupsIndex = raasContent.indexOf('id="mashups"');
     const resourcesIndex = raasContent.indexOf('id="resources"');
     assert.ok(
-        statsIndex !== -1 && hofIndex !== -1 && resourcesIndex !== -1 &&
-        statsIndex < hofIndex && hofIndex < resourcesIndex,
-        'Sections appear in order: Statistics -> Hall Of Fame -> Resources'
+        statsIndex !== -1 && hofIndex !== -1 && mashupsIndex !== -1 && resourcesIndex !== -1 &&
+        statsIndex < hofIndex && hofIndex < mashupsIndex && mashupsIndex < resourcesIndex,
+        'Sections appear in order: Statistics -> Hall Of Fame -> Mashups -> Resources'
     );
+
+    assert.ok(raasContent.includes('src="../assets/js/portfolio.js"'), 'Raas page includes portfolio.js for audio player');
+    assert.ok(raasContent.includes('href="#mashups"'), 'Topnav links to Mashups section');
+    assert.ok(raasContent.includes('data-audio-player'), 'Raas page has declarative audio player');
+    assert.ok(raasContent.includes('data-audio-base="../assets/audio/"'), 'Raas player points to ../assets/audio/');
+    assert.ok(!/<audio\b/i.test(raasContent), 'Raas page omits eager <audio> tags so initial load downloads 0 audio bytes');
+
+    const raasAudioDir = path.join(__dirname, '..', 'assets', 'audio', 'mashups', 'raas');
+    const raasDiskMp3s = fs.readdirSync(raasAudioDir)
+        .filter((f) => !f.startsWith('.') && f.toLowerCase().endsWith('.mp3'))
+        .map((f) => `mashups/raas/${f}`);
+    assert.strictEqual(raasDiskMp3s.length, 10, 'Discovers all 10 Raas MP3 files under assets/audio/mashups/raas/');
+
+    const raasRowMatches = [...raasContent.matchAll(/<li class="release(?:\s+is-active)?"[^>]*data-audio-file="([^"]+)"[^>]*>[\s\S]*?<\/li>/g)];
+    assert.strictEqual(raasRowMatches.length, raasDiskMp3s.length, 'Raas page renders one card per Raas MP3 on disk');
+
+    const raasRenderedFiles = new Set();
+    for (const [cardHtml, relFile] of raasRowMatches) {
+        assert.ok(relFile.startsWith('mashups/raas/'), `Raas page only renders mashups/raas/ files: ${relFile}`);
+        raasRenderedFiles.add(relFile);
+        const fullMp3Path = path.join(__dirname, '..', 'assets', 'audio', ...relFile.split('/'));
+        assert.ok(fs.existsSync(fullMp3Path), `Raas audio file exists on disk: ${relFile}`);
+        const mp3Header = fs.readFileSync(fullMp3Path).subarray(0, 3).toString('ascii');
+        assert.ok(mp3Header === 'ID3' || mp3Header.charCodeAt(0) === 0xff, `${relFile} has valid MP3/ID3 header`);
+        assert.match(cardHtml, /data-track-duration="\d+:\d{2}"/, `${relFile} card has formatted duration`);
+        assert.match(cardHtml, /<div class="release-title">[^<]+<\/div>/, `${relFile} card has non-empty title`);
+        assert.match(cardHtml, /<div class="release-meta">[^<]+<\/div>/, `${relFile} card has non-empty meta`);
+        assert.ok(cardHtml.includes('data-release-play'), `${relFile} card has play button`);
+    }
+    for (const relFile of raasDiskMp3s) {
+        assert.ok(raasRenderedFiles.has(relFile), `Every Raas MP3 on disk is rendered in raas/index.html: ${relFile}`);
+    }
+
+    const raasPeakMatches = [...raasContent.matchAll(/data-peaks="([0-9,]+)"/g)];
+    assert.strictEqual(raasPeakMatches.length, raasDiskMp3s.length + 1, 'Raas page has real data-peaks on featured waveform and all 10 rows');
+    for (const match of raasPeakMatches) {
+        const peaks = match[1].split(',').map((n) => Number(n.trim()));
+        assert.strictEqual(peaks.length, 80, 'Each Raas data-peaks attribute has 80 bars');
+        assert.ok(peaks.every((n) => Number.isInteger(n) && n >= 12 && n <= 100), 'All Raas peaks are integers in 12..100');
+    }
 
     assert.ok(raasContent.includes('<span class="resource-title">All Project Files</span>'), 'Has All Project Files section');
     assert.ok(raasContent.includes('href="https://drive.google.com/drive/folders/1RIb04DsH7YmGpx7YLLmsJvrYgw7L4jKg?usp=sharing"'), 'Has All Project Files Google Drive link');
@@ -411,6 +452,8 @@ test('production/index.html structure and content', () => {
         !/raas|garba|dandiya|national-champion|collegiate/i.test(prodWithoutFooter),
         'Production page body copy is agnostic of Raas/Garba'
     );
+    assert.ok(!prodContent.includes('data-subfilter="raas"'), 'Production page excludes Raas sub-filter chip');
+    assert.ok(!prodContent.includes('mashups/raas/'), 'Production page excludes mashups/raas/ tracks');
     assert.ok(!/soundcloud/i.test(prodContent), 'Removes all SoundCloud links and references');
     assert.ok(prodContent.includes('All Genres'), 'Production hero uses All Genres');
     assert.ok(!prodContent.includes('Desi &times; Electronic &times; Hip-Hop'), 'Removes Desi x Electronic x Hip-Hop');
@@ -418,9 +461,9 @@ test('production/index.html structure and content', () => {
     assert.ok(prodContent.includes('ROVA_session_final_v44.logicx'), 'Arrangement visual uses .logicx project file');
     assert.ok(!/ableton|fl studio|\.als\b/i.test(prodContent), 'Removes Ableton Live, FL Studio, and .als references');
 
-    // Featured player (always Move Like I Do) + Spotify embeds for Originals + Move Like I Do mashup card
+    // Featured player (always Move Like I Do) + Spotify embeds for Originals + all synced audio cards
     assert.ok(prodContent.includes('data-player-kicker>Featured Track</div>'), 'Emphasizes featured player as Featured Track');
-    assert.ok(prodContent.includes('data-audio-file="move-like-i-do.mp3"'), 'Wires move-like-i-do.mp3 on featured player');
+    assert.ok(prodContent.includes('data-audio-file="mashups/pure usa/move-like-i-do.mp3"'), 'Wires mashups/pure usa/move-like-i-do.mp3 on featured player');
     assert.ok(prodContent.includes('data-track-title="Move Like I Do"'), 'Sets Move Like I Do as featured track title');
     assert.ok(prodContent.includes('data-track-duration="2:52"'), 'Sets 2:52 duration for Move Like I Do');
     assert.ok(prodContent.includes('<h3 class="player-title" data-player-title>Move Like I Do</h3>'), 'Displays Move Like I Do in featured player');
@@ -433,6 +476,10 @@ test('production/index.html structure and content', () => {
     assert.ok(
         prodContent.indexOf('<article class="player"') < prodContent.indexOf('id="release-list"'),
         'Featured player appears above the filterable release list'
+    );
+    assert.ok(
+        prodContent.includes('data-subfilter-group="#release-list" data-subfilter-for="mashup" role="group" aria-label="Filter mashups by style" hidden'),
+        'Includes mashup sub-filter bar hidden by default'
     );
     assert.ok(!prodContent.includes('house-pool-party.mp3'), 'Removes all usage of house-pool-party.mp3');
     assert.ok(!prodContent.includes('Featured house pool party Spotify'), 'Removes Featured house pool party Spotify link');
@@ -475,8 +522,8 @@ test('production/index.html structure and content', () => {
 
     // Move Like I Do mashup card
     assert.ok(
-        prodContent.includes('<li class="release is-active" data-category="mashup" data-audio-file="move-like-i-do.mp3" data-track-duration="2:52"'),
-        'Marks Move Like I Do mashup card as active under mashup category'
+        prodContent.includes('<li class="release is-active" data-category="mashup" data-subcategory="pure-usa" data-audio-file="mashups/pure usa/move-like-i-do.mp3" data-track-duration="2:52"'),
+        'Marks Move Like I Do mashup card as active under mashup / pure-usa category'
     );
     assert.ok(prodContent.includes('<div class="release-title">Move Like I Do</div>'), 'Has Move Like I Do title');
     assert.ok(
@@ -497,26 +544,80 @@ test('production/index.html structure and content', () => {
         'Points audio player base URL to same-origin ../assets/audio/ directory'
     );
     assert.ok(!/<audio\b/i.test(prodContent), 'Omits eager <audio> tags so initial page load downloads 0 audio bytes');
-    assert.strictEqual(
-        (prodContent.match(/data-release-play/g) || []).length,
-        1,
-        'Has row play button for Move Like I Do mashup card'
-    );
 
     const removedMp3Path = path.join(__dirname, '..', 'assets', 'audio', 'house-pool-party.mp3');
     assert.ok(!fs.existsSync(removedMp3Path), 'assets/audio/house-pool-party.mp3 is removed from disk');
-    const mp3Path = path.join(__dirname, '..', 'assets', 'audio', 'move-like-i-do.mp3');
-    assert.ok(fs.existsSync(mp3Path), 'assets/audio/move-like-i-do.mp3 exists on disk');
-    const mp3Header = fs.readFileSync(mp3Path).subarray(0, 3).toString('ascii');
-    assert.ok(mp3Header === 'ID3' || mp3Header.charCodeAt(0) === 0xff, 'move-like-i-do.mp3 has valid MP3/ID3 header');
+
+    const audioRoot = path.join(__dirname, '..', 'assets', 'audio');
+    const diskMp3s = [];
+    function walkMp3s(dir) {
+        for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+            if (entry.name.startsWith('.')) continue;
+            const full = path.join(dir, entry.name);
+            if (entry.isDirectory()) walkMp3s(full);
+            else if (entry.isFile() && entry.name.toLowerCase().endsWith('.mp3')) {
+                const rel = path.relative(audioRoot, full).split(path.sep).join('/');
+                if (!rel.startsWith('mashups/raas/')) {
+                    diskMp3s.push(rel);
+                }
+            }
+        }
+    }
+    walkMp3s(audioRoot);
+    assert.strictEqual(diskMp3s.length, 24, 'Discovers all 24 non-Raas uploaded MP3 files under assets/audio/');
+
+    assert.strictEqual(
+        (prodContent.match(/data-release-play/g) || []).length,
+        diskMp3s.length,
+        'Has one row play button per uploaded MP3 file'
+    );
+
+    const expectedCategoryBySection = {
+        mashups: 'mashup',
+        remixes: 'remix',
+        performances: 'performance',
+    };
+    const rowMatches = [...prodContent.matchAll(/<li class="release(?:\s+is-active)?"[^>]*data-audio-file="([^"]+)"[^>]*>[\s\S]*?<\/li>/g)];
+    assert.strictEqual(rowMatches.length, diskMp3s.length, 'Renders one release card per MP3 on disk');
+
+    const renderedFiles = new Set();
+    for (const [cardHtml, relFile] of rowMatches) {
+        renderedFiles.add(relFile);
+        const fullMp3Path = path.join(audioRoot, ...relFile.split('/'));
+        assert.ok(fs.existsSync(fullMp3Path), `Audio file exists on disk: ${relFile}`);
+        const mp3Header = fs.readFileSync(fullMp3Path).subarray(0, 3).toString('ascii');
+        assert.ok(mp3Header === 'ID3' || mp3Header.charCodeAt(0) === 0xff, `${relFile} has valid MP3/ID3 header`);
+
+        const parts = relFile.split('/');
+        const expectedCategory = expectedCategoryBySection[parts[0]];
+        assert.ok(
+            cardHtml.includes(`data-category="${expectedCategory}"`),
+            `${relFile} card has data-category="${expectedCategory}"`
+        );
+        if (parts[0] === 'mashups' && parts.length > 2) {
+            const expectedSub = parts[1].trim().toLowerCase().replace(/[^a-z0-9]+/g, '-');
+            assert.ok(
+                cardHtml.includes(`data-subcategory="${expectedSub}"`),
+                `${relFile} card has data-subcategory="${expectedSub}"`
+            );
+        }
+        assert.match(cardHtml, /data-track-duration="\d+:\d{2}"/, `${relFile} card has formatted duration`);
+        assert.match(cardHtml, /<div class="release-title">[^<]+<\/div>/, `${relFile} card has non-empty title`);
+        assert.match(cardHtml, /<div class="release-meta">[^<]+<\/div>/, `${relFile} card has non-empty meta`);
+        assert.ok(cardHtml.includes('data-release-play'), `${relFile} card has play button`);
+    }
+    for (const relFile of diskMp3s) {
+        assert.ok(renderedFiles.has(relFile), `Every MP3 on disk is rendered in production/index.html: ${relFile}`);
+    }
 
     const cssContent = fs.readFileSync(path.join(__dirname, '..', 'assets', 'css', 'portfolio.css'), 'utf8');
     assert.ok(cssContent.includes('.player-links a[hidden]'), 'CSS hides hidden player Spotify link');
     assert.ok(cssContent.includes('.release.release-embed[hidden]'), 'CSS hides filtered-out Spotify embed rows');
+    assert.ok(cssContent.includes('.chips[hidden]'), 'CSS hides hidden sub-filter chip groups');
 
     // Real 80-bar waveform peaks and empty-state banner instead of placeholder cards
     const peakMatches = [...prodContent.matchAll(/data-peaks="([0-9,]+)"/g)];
-    assert.strictEqual(peakMatches.length, 2, 'Has real data-peaks on featured waveform and Move Like I Do row');
+    assert.strictEqual(peakMatches.length, diskMp3s.length + 1, 'Has real data-peaks on featured waveform and all 34 release rows');
     for (const match of peakMatches) {
         const peaks = match[1].split(',').map((n) => Number(n.trim()));
         assert.strictEqual(peaks.length, 80, 'Each data-peaks attribute has 80 bars');
@@ -1179,9 +1280,9 @@ test('assets/js/portfolio.js audio player lazy-loads tracks, scrubs, switches tr
     }
 
     const track1 = makeReleaseRow({
-        file: 'move-like-i-do.mp3',
+        file: 'mashups/pure usa/move-like-i-do.mp3',
         title: 'Move Like I Do',
-        meta: 'Mashup · Moves Like Jagger (Maroon 5) × Like I Do (David Guetta & Martin Garrix)',
+        meta: 'Mashup · Pure USA · Moves Like Jagger (Maroon 5) × Like I Do (David Guetta & Martin Garrix) · 2:52',
         duration: '2:52',
         seed: '29',
         active: true,
@@ -1221,7 +1322,7 @@ test('assets/js/portfolio.js audio player lazy-loads tracks, scrubs, switches tr
         attrs: {
             'data-audio-player': '',
             'data-audio-base': '../assets/audio/',
-            'data-audio-file': 'move-like-i-do.mp3',
+            'data-audio-file': 'mashups/pure usa/move-like-i-do.mp3',
             'data-track-title': 'Move Like I Do',
             'data-track-duration': '2:52',
             'data-track-list': '#release-list',
@@ -1327,15 +1428,15 @@ test('assets/js/portfolio.js audio player lazy-loads tracks, scrubs, switches tr
     assert.strictEqual(createdAudios.length, 0, 'Does not instantiate Audio on initial page load');
     assert.strictEqual(wave.children.length, 10, 'Renders waveform bars on page load');
 
-    // 2. Clicking Play lazy-loads move-like-i-do.mp3 from ../assets/audio/
+    // 2. Clicking Play lazy-loads mashups/pure usa/move-like-i-do.mp3 from ../assets/audio/ (URL-encoded)
     playBtn.trigger('click');
     assert.strictEqual(createdAudios.length, 1, 'Creates Audio lazily on first Play click');
     const audio = createdAudios[0];
     assert.strictEqual(audio.preload, 'none', 'Sets preload="none" on Audio instance');
     assert.strictEqual(
         audio.src,
-        '../assets/audio/move-like-i-do.mp3',
-        'Loads MP3 from ../assets/audio/ base + data-audio-file'
+        '../assets/audio/mashups/pure%20usa/move-like-i-do.mp3',
+        'Loads MP3 from ../assets/audio/ base + URL-encoded data-audio-file'
     );
     assert.strictEqual(audio.playCalls, 1, 'Starts playback');
     assert.strictEqual(playBtn.getAttribute('aria-pressed'), 'true', 'Updates featured play button aria-pressed');
@@ -1495,4 +1596,107 @@ test('assets/js/portfolio.js category filters show coming-soon banner for empty 
     chips[0].click(); // All
     assert.strictEqual(items.every((i) => !i.hidden), true, 'All filter restores all items');
     assert.strictEqual(emptyEl.hidden, true, 'All filter hides empty banner');
+});
+
+test('assets/js/portfolio.js mashup sub-filters toggle visibility and filter by subcategory', () => {
+    const portfolioPath = path.join(__dirname, '..', 'assets', 'js', 'portfolio.js');
+    const portfolioJs = fs.readFileSync(portfolioPath, 'utf8');
+
+    let domReadyHandler = null;
+
+    function makeChip(attrName, value, label, pressed) {
+        const attrs = { [attrName]: value, 'aria-pressed': String(pressed) };
+        let clickHandler = null;
+        return {
+            textContent: label,
+            getAttribute(name) { return Object.prototype.hasOwnProperty.call(attrs, name) ? attrs[name] : null; },
+            setAttribute(name, val) { attrs[name] = String(val); },
+            addEventListener(type, fn) { if (type === 'click') clickHandler = fn; },
+            click() { if (clickHandler) clickHandler(); },
+        };
+    }
+
+    function makeItem(category, subcategory) {
+        return {
+            hidden: false,
+            getAttribute(name) {
+                if (name === 'data-category') return category;
+                if (name === 'data-subcategory') return subcategory || null;
+                return null;
+            },
+        };
+    }
+
+    const chips = [
+        makeChip('data-filter', 'all', 'All', true),
+        makeChip('data-filter', 'mashup', 'Mashups', false),
+        makeChip('data-filter', 'remix', 'Remixes & Edits', false),
+    ];
+    const subChips = [
+        makeChip('data-subfilter', 'all', 'All Mashups', true),
+        makeChip('data-subfilter', 'pure-usa', 'Pure USA', false),
+        makeChip('data-subfilter', 'fusion', 'Fusion', false),
+    ];
+    const items = [
+        makeItem('mashup', 'pure-usa'),
+        makeItem('mashup', 'fusion'),
+        makeItem('remix', null),
+    ];
+
+    const filterGroup = {
+        getAttribute(name) { return name === 'data-filter-group' ? '#release-list' : null; },
+        querySelectorAll(sel) { return sel === '[data-filter]' ? chips : []; },
+    };
+    const subFilterGroup = {
+        hidden: true,
+        getAttribute(name) {
+            if (name === 'data-subfilter-group') return '#release-list';
+            if (name === 'data-subfilter-for') return 'mashup';
+            return null;
+        },
+        querySelectorAll(sel) { return sel === '[data-subfilter]' ? subChips : []; },
+    };
+
+    const sandbox = {
+        location: { href: 'https://rohanvarshney.github.io/production/' },
+        isSecureContext: true,
+        document: {
+            title: 'ROVA Production',
+            body: { getAttribute() { return ''; } },
+            addEventListener(type, fn) { if (type === 'DOMContentLoaded') domReadyHandler = fn; },
+            querySelector() { return null; },
+            querySelectorAll(sel) {
+                if (sel === '[data-filter-group]') return [filterGroup];
+                if (sel === '[data-subfilter-group]') return [subFilterGroup];
+                if (sel === '#release-list [data-category]') return items;
+                return [];
+            },
+            getElementById() { return null; },
+        },
+        setTimeout() { return 1; },
+        clearTimeout() {},
+    };
+    sandbox.window = sandbox;
+
+    vm.createContext(sandbox);
+    vm.runInContext(portfolioJs, sandbox);
+    domReadyHandler();
+
+    assert.strictEqual(subFilterGroup.hidden, true, 'Mashup sub-filter starts hidden');
+
+    chips[1].click(); // Mashups
+    assert.strictEqual(subFilterGroup.hidden, false, 'Reveals mashup sub-filter when Mashups is selected');
+    assert.strictEqual(items[0].hidden, false, 'Shows pure-usa mashup');
+    assert.strictEqual(items[1].hidden, false, 'Shows fusion mashup');
+    assert.strictEqual(items[2].hidden, true, 'Hides remix');
+
+    subChips[1].click(); // Pure USA
+    assert.strictEqual(items[0].hidden, false, 'Keeps pure-usa mashup visible');
+    assert.strictEqual(items[1].hidden, true, 'Hides fusion mashup');
+    assert.strictEqual(subChips[1].getAttribute('aria-pressed'), 'true', 'Marks Pure USA chip active');
+
+    chips[2].click(); // Remixes & Edits
+    assert.strictEqual(subFilterGroup.hidden, true, 'Hides mashup sub-filter when switching to Remixes');
+    assert.strictEqual(subChips[0].getAttribute('aria-pressed'), 'true', 'Resets sub-filter to All Mashups');
+    assert.strictEqual(items[2].hidden, false, 'Shows remix');
 });

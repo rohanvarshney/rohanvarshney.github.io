@@ -1,0 +1,475 @@
+#!/usr/bin/env node
+'use strict';
+
+const fs = require('node:fs');
+const path = require('node:path');
+const os = require('node:os');
+const { execFileSync } = require('node:child_process');
+
+const ROOT_DIR = path.resolve(__dirname, '..');
+const AUDIO_DIR = path.join(ROOT_DIR, 'assets', 'audio');
+const PRODUCTION_HTML = path.join(ROOT_DIR, 'production', 'index.html');
+const RAAS_HTML = path.join(ROOT_DIR, 'raas', 'index.html');
+
+const PROD_START_MARKER = '<!-- AUDIO-RELEASES:START -->';
+const PROD_END_MARKER = '<!-- AUDIO-RELEASES:END -->';
+const RAAS_START_MARKER = '<!-- RAAS-AUDIO:START -->';
+const RAAS_END_MARKER = '<!-- RAAS-AUDIO:END -->';
+
+const SECTION_CONFIG = {
+  mashups: { category: 'mashup', cover: 'MASHUP', label: 'Mashup', order: 0 },
+  remixes: { category: 'remix', cover: 'REMIX', label: 'Remix', order: 1 },
+  performances: { category: 'performance', cover: 'PERF MIX', label: 'Performance Mix', order: 2 },
+};
+
+const MASHUP_SUBFOLDER_ORDER = ['pure usa', 'fusion', 'pure desi', 'raas'];
+
+const MASHUP_SUBFOLDER_LABELS = {
+  'pure usa': 'Pure USA',
+  fusion: 'Fusion',
+  'pure desi': 'Pure Desi',
+  raas: 'Raas',
+};
+
+const ACRONYMS = new Set(['EDM', 'LRAD', 'DNA', 'ROVA', 'USA', 'DJ']);
+
+const CURATED_TRACKS = {
+  // Mashups — Pure USA
+  'mashups/pure usa/move-like-i-do.mp3': {
+    title: 'Move Like I Do',
+    description: 'Moves Like Jagger (Maroon 5) × Like I Do (David Guetta & Martin Garrix)',
+    seed: 29,
+    featured: true,
+  },
+  'mashups/pure usa/animalistic time.mp3': {
+    title: 'Animalistic Time',
+    description: 'Animals × Time Blend',
+  },
+  'mashups/pure usa/beggin-medley.mp3': {
+    title: "Beggin' Medley",
+    description: "Beggin' Mashup Medley",
+  },
+  'mashups/pure usa/cataclysmic_faint.mp3': {
+    title: 'Cataclysmic Faint',
+    description: 'Cataclysmic × Faint',
+  },
+  'mashups/pure usa/ghosts-have-done.mp3': {
+    title: 'Ghosts Have Done',
+    description: "Ghosts × What I've Done",
+  },
+  'mashups/pure usa/saxobeat-on-the-floor.mp3': {
+    title: 'Saxobeat On The Floor',
+    description: 'Mr. Saxobeat × On The Floor',
+  },
+  'mashups/pure usa/the-floor-has-levels.mp3': {
+    title: 'The Floor Has Levels',
+    description: 'On The Floor × Levels',
+  },
+
+  // Mashups — Fusion
+  'mashups/fusion/airplanes-945.mp3': {
+    title: 'Airplanes × 9:45',
+    description: 'Airplanes × 9:45',
+  },
+  'mashups/fusion/beautiful-raat.mp3': {
+    title: 'Beautiful Raat',
+    description: 'English × Hindi Crossover Mashup',
+  },
+  'mashups/fusion/don-n-night.mp3': {
+    title: "Don 'N' Night",
+    description: 'Don × Night Crossover Mashup',
+  },
+  'mashups/fusion/helpless-gulaab.mp3': {
+    title: 'Helpless Gulaab',
+    description: 'Helpless × Gulaab',
+  },
+  'mashups/fusion/is-shiela-worth-it.mp3': {
+    title: 'Is Sheila Worth It',
+    description: 'Sheila Ki Jawani × Worth It',
+  },
+  'mashups/fusion/laila-main-la-mama.mp3': {
+    title: 'Laila Main La Mama',
+    description: 'Laila Main Laila × La Mama',
+  },
+  'mashups/fusion/lrad-zindigani.mp3': {
+    title: 'LRAD Zindagani',
+    description: 'LRAD × Zindagani',
+  },
+  'mashups/fusion/prabhu-ka-naam-medley.mp3': {
+    title: 'Prabhu Ka Naam Medley',
+    description: 'Prabhu Ka Naam Fusion Medley',
+  },
+  'mashups/fusion/tanhayee-stars.mp3': {
+    title: 'Tanhayee Stars',
+    description: 'Tanhayee × Stars',
+  },
+  'mashups/fusion/tere-pyaar-i-want-you.mp3': {
+    title: 'Tere Pyaar × I Want You',
+    description: 'Tere Pyaar × I Want You',
+  },
+  'mashups/fusion/ye-mera-dil-enless-summer.mp3': {
+    title: 'Ye Mera Dil × Endless Summer',
+    description: 'Yeh Mera Dil × Endless Summer',
+  },
+
+  // Mashups — Pure Desi
+  'mashups/pure desi/dekhe-dance.mp3': {
+    title: 'Dekhe Dance',
+    description: 'Bollywood Dance Mashup',
+  },
+
+  // Mashups — Raas
+  'mashups/raas/besharam-divya.mp3': {
+    title: 'Besharam Divya',
+    description: 'Besharam × Divya',
+  },
+  'mashups/raas/chunalida.mp3': {
+    title: 'Chunalida',
+    description: 'Gujarati Folk Mashup',
+  },
+  'mashups/raas/dankeroopty.mp3': {
+    title: 'Dankonteroopty',
+    description: 'Raas Fusion Mashup',
+  },
+  'mashups/raas/feel-so-raas.mp3': {
+    title: 'Feel So Raas',
+    description: 'Feel So Close × Raas Blend',
+    featured: true,
+  },
+  'mashups/raas/kanudina-psycho.mp3': {
+    title: 'Kanudina Psycho',
+    description: 'Kanudina × Psycho',
+  },
+  'mashups/raas/mogal-rumble.mp3': {
+    title: 'Mogal Rumble',
+    description: 'Mogal × Rumble',
+  },
+  'mashups/raas/patang-tu-meri.mp3': {
+    title: 'Patang × Tu Meri',
+    description: 'Patang × Tu Meri',
+  },
+  'mashups/raas/phool-jai.mp3': {
+    title: 'Phool × Jai',
+    description: 'Phool × Jai',
+  },
+  'mashups/raas/tongue-tied-greedy.mp3': {
+    title: 'Tongue Tied Greedy',
+    description: 'Tongue Tied × Greedy',
+  },
+  'mashups/raas/vari-dna.mp3': {
+    title: 'VariD(o)NA',
+    description: 'Vari × DNA',
+  },
+
+  // Remixes
+  'remixes/ghoomaremix.mp3': {
+    title: 'Ghoomar (ROVA Remix)',
+    description: 'Club Edit',
+  },
+  'remixes/khuda-jaane-urban.mp3': {
+    title: 'Khuda Jaane (Urban Remix)',
+    description: 'Urban Edit',
+  },
+  'remixes/rangilo-rova.mp3': {
+    title: 'Rangilo (ROVA Remix)',
+    description: 'ROVA Flip',
+  },
+  'remixes/sachi-edm.mp3': {
+    title: 'Sachi (EDM Remix)',
+    description: 'EDM Flip',
+  },
+
+  // Performances
+  'performances/zerena-time-to-disco.mp3': {
+    title: 'Zerena — Time To Disco',
+    description: 'Custom Stage Routine',
+  },
+};
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/\u00b7/g, '&middot;')
+    .replace(/\u00d7/g, '&times;')
+    .replace(/\u2014/g, '&mdash;');
+}
+
+function slugify(value) {
+  return String(value)
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function toTitleCase(rawName) {
+  return rawName
+    .replace(/\.mp3$/i, '')
+    .split(/[-_\s]+/)
+    .filter(Boolean)
+    .map((word) => {
+      const upper = word.toUpperCase();
+      if (ACRONYMS.has(upper)) {
+        return upper;
+      }
+      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+    })
+    .join(' ');
+}
+
+function stableSeed(relPath) {
+  let hash = 0;
+  for (let i = 0; i < relPath.length; i++) {
+    hash = (hash * 31 + relPath.charCodeAt(i)) % 997;
+  }
+  return (hash % 999) + 1;
+}
+
+function formatDuration(seconds) {
+  const total = Math.floor(seconds);
+  const mins = Math.floor(total / 60);
+  const secs = total % 60;
+  return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+}
+
+function getAudioDuration(filePath) {
+  const out = execFileSync('afinfo', [filePath], { encoding: 'utf8' });
+  const match = out.match(/estimated duration:\s*([0-9.]+)\s*sec/i);
+  if (!match) {
+    throw new Error(`Could not determine duration from afinfo for ${filePath}`);
+  }
+  return formatDuration(parseFloat(match[1]));
+}
+
+function parseWavDataChunk(buffer) {
+  if (buffer.toString('ascii', 0, 4) !== 'RIFF' || buffer.toString('ascii', 8, 12) !== 'WAVE') {
+    throw new Error('Invalid WAV header');
+  }
+  let offset = 12;
+  while (offset + 8 <= buffer.length) {
+    const chunkId = buffer.toString('ascii', offset, offset + 4);
+    const chunkSize = buffer.readUInt32LE(offset + 4);
+    const dataStart = offset + 8;
+    if (chunkId === 'data') {
+      return buffer.subarray(dataStart, Math.min(buffer.length, dataStart + chunkSize));
+    }
+    offset = dataStart + chunkSize + (chunkSize % 2);
+  }
+  throw new Error('WAV data chunk not found');
+}
+
+function getWaveformPeaks(filePath, bars = 80) {
+  const tmpWav = path.join(
+    os.tmpdir(),
+    `rova_peaks_${process.pid}_${Date.now()}_${Math.random().toString(36).slice(2)}.wav`
+  );
+  try {
+    execFileSync('afconvert', ['-f', 'WAVE', '-d', 'LEI16@8000', '-c', '1', filePath, tmpWav], {
+      stdio: 'ignore',
+    });
+    const wavBuf = fs.readFileSync(tmpWav);
+    const pcm = parseWavDataChunk(wavBuf);
+    const totalSamples = Math.floor(pcm.length / 2);
+    const chunkSize = Math.max(1, Math.floor(totalSamples / bars));
+    const rmsValues = [];
+    for (let i = 0; i < bars; i++) {
+      const startSample = i * chunkSize;
+      const endSample = i === bars - 1 ? totalSamples : Math.min(totalSamples, (i + 1) * chunkSize);
+      let sumSq = 0;
+      let count = 0;
+      for (let s = startSample; s < endSample; s++) {
+        const sample = pcm.readInt16LE(s * 2);
+        sumSq += sample * sample;
+        count++;
+      }
+      rmsValues.push(count > 0 ? Math.sqrt(sumSq / count) : 0);
+    }
+    const maxRms = Math.max(...rmsValues) || 1;
+    return rmsValues.map((v) => Math.max(12, Math.min(100, Math.round((v / maxRms) * 100))));
+  } finally {
+    if (fs.existsSync(tmpWav)) {
+      fs.unlinkSync(tmpWav);
+    }
+  }
+}
+
+function collectMp3Files(dir) {
+  const results = [];
+  if (!fs.existsSync(dir)) {
+    return results;
+  }
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (entry.name.startsWith('.')) {
+      continue;
+    }
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      results.push(...collectMp3Files(fullPath));
+    } else if (entry.isFile() && entry.name.toLowerCase().endsWith('.mp3')) {
+      results.push(fullPath);
+    }
+  }
+  return results;
+}
+
+function buildTrackMetadata(fullPath) {
+  const relPath = path.relative(AUDIO_DIR, fullPath).split(path.sep).join('/');
+  const parts = relPath.split('/');
+  const sectionKey = parts[0];
+  const section = SECTION_CONFIG[sectionKey];
+  if (!section) {
+    return null;
+  }
+
+  const subfolder = parts.length > 2 ? parts[1] : null;
+  const subLabel = subfolder
+    ? MASHUP_SUBFOLDER_LABELS[subfolder] || toTitleCase(subfolder)
+    : null;
+  const subcategory = subfolder ? slugify(subfolder) : null;
+
+  const curated = CURATED_TRACKS[relPath];
+  const title = curated ? curated.title : toTitleCase(parts[parts.length - 1]);
+  const description = curated
+    ? curated.description
+    : subLabel
+      ? `${subLabel} ${section.label}`
+      : section.label;
+
+  const duration = getAudioDuration(fullPath);
+  const peaks = getWaveformPeaks(fullPath, 80);
+  const seed = curated && curated.seed ? curated.seed : stableSeed(relPath);
+
+  const isRaas = sectionKey === 'mashups' && subfolder === 'raas';
+  const cover = isRaas ? 'RAAS' : section.cover;
+
+  const metaParts = isRaas ? ['Raas Mashup'] : [section.label];
+  if (!isRaas && subLabel) {
+    metaParts.push(subLabel);
+  }
+  if (description) {
+    metaParts.push(description);
+  }
+  metaParts.push(duration);
+
+  return {
+    relPath,
+    sectionKey,
+    sectionOrder: section.order,
+    category: section.category,
+    cover,
+    subfolder,
+    subcategory,
+    title,
+    meta: metaParts.join(' \u00b7 '),
+    duration,
+    peaks: peaks.join(','),
+    seed,
+    featured: Boolean(curated && curated.featured),
+  };
+}
+
+function compareTracks(a, b) {
+  if (a.sectionOrder !== b.sectionOrder) {
+    return a.sectionOrder - b.sectionOrder;
+  }
+  if (a.sectionKey === 'mashups') {
+    const idxA = MASHUP_SUBFOLDER_ORDER.indexOf(a.subfolder || '');
+    const idxB = MASHUP_SUBFOLDER_ORDER.indexOf(b.subfolder || '');
+    const rankA = idxA === -1 ? 999 : idxA;
+    const rankB = idxB === -1 ? 999 : idxB;
+    if (rankA !== rankB) {
+      return rankA - rankB;
+    }
+    if ((a.subfolder || '') !== (b.subfolder || '')) {
+      return (a.subfolder || '').localeCompare(b.subfolder || '');
+    }
+  }
+  if (a.featured !== b.featured) {
+    return a.featured ? -1 : 1;
+  }
+  return a.title.localeCompare(b.title);
+}
+
+function renderReleaseItem(track) {
+  const classes = track.featured ? 'release is-active' : 'release';
+  const subAttr = track.subcategory ? ` data-subcategory="${escapeHtml(track.subcategory)}"` : '';
+  return [
+    `        <li class="${classes}" data-category="${escapeHtml(track.category)}"${subAttr} data-audio-file="${escapeHtml(track.relPath)}" data-track-duration="${escapeHtml(track.duration)}" data-seed="${track.seed}"`,
+    `          data-peaks="${track.peaks}">`,
+    `          <div class="cover" aria-hidden="true">${escapeHtml(track.cover)}</div>`,
+    '          <div>',
+    `            <div class="release-title">${escapeHtml(track.title)}</div>`,
+    `            <div class="release-meta">${escapeHtml(track.meta)}</div>`,
+    '          </div>',
+    '          <div class="release-links">',
+    `            <button type="button" class="release-play-btn" data-release-play aria-label="Play ${escapeHtml(track.title)}" aria-pressed="false">`,
+    '              <i class="fa fa-play" aria-hidden="true"></i>',
+    '            </button>',
+    '          </div>',
+    '        </li>',
+  ].join('\n');
+}
+
+function updateHtmlWithTracks(htmlPath, startMarker, endMarker, tracks) {
+  let html = fs.readFileSync(htmlPath, 'utf8');
+  const startIdx = html.indexOf(startMarker);
+  const endIdx = html.indexOf(endMarker);
+  if (startIdx === -1 || endIdx === -1 || endIdx < startIdx) {
+    throw new Error(`Missing ${startMarker} / ${endMarker} markers in ${htmlPath}`);
+  }
+
+  const featured = tracks.find((t) => t.featured) || tracks[0];
+  if (featured) {
+    html = html
+      .replace(/data-audio-file="[^"]*"/, `data-audio-file="${escapeHtml(featured.relPath)}"`)
+      .replace(/data-track-title="[^"]*"/, `data-track-title="${escapeHtml(featured.title)}"`)
+      .replace(/data-track-duration="[^"]*"/, `data-track-duration="${escapeHtml(featured.duration)}"`)
+      .replace(
+        /<div class="cover" data-player-cover aria-hidden="true">[\s\S]*?<\/div>/,
+        `<div class="cover" data-player-cover aria-hidden="true">${escapeHtml(featured.cover)}</div>`
+      )
+      .replace(
+        /<h3 class="player-title" data-player-title>[\s\S]*?<\/h3>/,
+        `<h3 class="player-title" data-player-title>${escapeHtml(featured.title)}</h3>`
+      )
+      .replace(
+        /<div class="player-meta" data-player-meta>[\s\S]*?<\/div>/,
+        `<div class="player-meta" data-player-meta>${escapeHtml(featured.meta)}</div>`
+      )
+      .replace(
+        /(<button[^>]*data-play-toggle[^>]*aria-label=")Play [^"]*(")/,
+        `$1Play ${escapeHtml(featured.title)}$2`
+      )
+      .replace(
+        /(<article class="player"[\s\S]*?data-peaks=")[^"]*(")/,
+        `$1${featured.peaks}$2`
+      )
+      .replace(
+        /(<span class="player-time" data-player-time aria-live="off">)0:00 \/ [^<]*(<\/span>)/,
+        `$10:00 / ${escapeHtml(featured.duration)}$2`
+      );
+  }
+
+  const renderedBlock = `${startMarker}\n${tracks.map(renderReleaseItem).join('\n')}\n        ${endMarker}`;
+  html = html.slice(0, startIdx) + renderedBlock + html.slice(endIdx + endMarker.length);
+
+  fs.writeFileSync(htmlPath, html, 'utf8');
+}
+
+function syncAudioReleases() {
+  const allMp3s = collectMp3Files(AUDIO_DIR);
+  const tracks = allMp3s.map(buildTrackMetadata).filter(Boolean).sort(compareTracks);
+
+  const raasTracks = tracks.filter((t) => t.sectionKey === 'mashups' && t.subfolder === 'raas');
+  const productionTracks = tracks.filter((t) => !(t.sectionKey === 'mashups' && t.subfolder === 'raas'));
+
+  updateHtmlWithTracks(PRODUCTION_HTML, PROD_START_MARKER, PROD_END_MARKER, productionTracks);
+  updateHtmlWithTracks(RAAS_HTML, RAAS_START_MARKER, RAAS_END_MARKER, raasTracks);
+
+  console.log(`Synced ${productionTracks.length} production tracks and ${raasTracks.length} Raas tracks.`);
+}
+
+syncAudioReleases();

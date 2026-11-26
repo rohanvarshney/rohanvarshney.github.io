@@ -380,7 +380,17 @@
     if (normalizedBase && normalizedBase.slice(-1) !== '/') {
       normalizedBase += '/';
     }
-    return normalizedBase + trimmedFile;
+    var encodedFile = trimmedFile
+      .split('/')
+      .map(function (segment) {
+        try {
+          return encodeURIComponent(decodeURIComponent(segment));
+        } catch (e) {
+          return encodeURIComponent(segment);
+        }
+      })
+      .join('/');
+    return normalizedBase + encodedFile;
   }
 
   function setButtonIcon(button, iconClass) {
@@ -574,8 +584,8 @@
           syncPlayState();
         }
         if (instance.paused || instance.ended) {
-          track('production_audio_play', {
-            event_category: 'production',
+          track(player.getAttribute('data-analytics-event') || 'production_audio_play', {
+            event_category: player.getAttribute('data-analytics-category') || 'production',
             event_label: currentTitle,
           });
           var playPromise = instance.play();
@@ -765,16 +775,22 @@
       var emptyEl = emptySelector ? document.querySelector(emptySelector) : null;
       var emptyTitleEl = emptyEl ? emptyEl.querySelector('[data-empty-title]') : null;
       var buttons = group.querySelectorAll('[data-filter]');
+      var subGroups = Array.prototype.slice.call(
+        document.querySelectorAll('[data-subfilter-group]')
+      ).filter(function (subGroup) {
+        return subGroup.getAttribute('data-subfilter-group') === targetSelector;
+      });
+      var activeFilter = 'all';
+      var activeSubfilter = 'all';
+      var activeButtonRef = buttons[0] || null;
 
-      function applyFilter(activeButton) {
-        var filter = activeButton.getAttribute('data-filter');
-        buttons.forEach(function (b) {
-          b.setAttribute('aria-pressed', String(b === activeButton));
-        });
+      function updateVisibility() {
         var visibleCount = 0;
         document.querySelectorAll(targetSelector + ' [data-category]').forEach(function (item) {
           var categories = item.getAttribute('data-category').split(' ');
-          var isHidden = filter !== 'all' && categories.indexOf(filter) === -1;
+          var matchesCategory = activeFilter === 'all' || categories.indexOf(activeFilter) !== -1;
+          var matchesSub = activeSubfilter === 'all' || item.getAttribute('data-subcategory') === activeSubfilter;
+          var isHidden = !(matchesCategory && matchesSub);
           item.hidden = isHidden;
           if (!isHidden) {
             visibleCount++;
@@ -782,15 +798,49 @@
         });
         if (emptyEl) {
           emptyEl.hidden = visibleCount > 0;
-          if (visibleCount === 0 && emptyTitleEl) {
-            emptyTitleEl.textContent = activeButton.textContent.trim() + ' \u2014 coming soon';
+          if (visibleCount === 0 && emptyTitleEl && activeButtonRef) {
+            emptyTitleEl.textContent = activeButtonRef.textContent.trim() + ' \u2014 coming soon';
           }
         }
+      }
+
+      function syncSubGroups() {
+        subGroups.forEach(function (subGroup) {
+          var isMatch = subGroup.getAttribute('data-subfilter-for') === activeFilter;
+          subGroup.hidden = !isMatch;
+          subGroup.querySelectorAll('[data-subfilter]').forEach(function (subBtn) {
+            subBtn.setAttribute('aria-pressed', String(subBtn.getAttribute('data-subfilter') === 'all'));
+          });
+        });
+      }
+
+      function applyFilter(activeButton) {
+        activeButtonRef = activeButton;
+        activeFilter = activeButton.getAttribute('data-filter');
+        activeSubfilter = 'all';
+        buttons.forEach(function (b) {
+          b.setAttribute('aria-pressed', String(b === activeButton));
+        });
+        syncSubGroups();
+        updateVisibility();
       }
 
       buttons.forEach(function (button) {
         button.addEventListener('click', function () {
           applyFilter(button);
+        });
+      });
+
+      subGroups.forEach(function (subGroup) {
+        var subButtons = subGroup.querySelectorAll('[data-subfilter]');
+        subButtons.forEach(function (subBtn) {
+          subBtn.addEventListener('click', function () {
+            activeSubfilter = subBtn.getAttribute('data-subfilter') || 'all';
+            subButtons.forEach(function (b) {
+              b.setAttribute('aria-pressed', String(b === subBtn));
+            });
+            updateVisibility();
+          });
         });
       });
 
@@ -808,7 +858,7 @@
 
   function initNav() {
     var nav = document.querySelector('.topnav');
-    if (!nav) {
+    if (!nav || nav.hasAttribute('data-custom-nav')) {
       return;
     }
     var onScroll = function () {
