@@ -446,6 +446,52 @@ test('production/index.html structure and content', () => {
     assert.ok(!prodContent.includes('data-coming-soon="Spotify artist profile"'), 'Removes coming-soon from Footer Spotify link');
     assert.ok(prodContent.includes('data-contact-email="rohanvar@gmail.com"'), 'Configures rohanvar@gmail.com as Production contact email');
     assert.ok(!prodContent.includes('collabs@example.com'), 'Removes collabs@example.com placeholder');
+
+    // Audio player & GitHub Releases wiring (zero eager audio tags on initial load)
+    assert.ok(prodContent.includes('data-audio-player'), 'Has declarative audio player container');
+    assert.ok(
+        prodContent.includes('data-audio-base="https://github.com/rohanvarshney/rohanvarshney.github.io/releases/download/audio-v1/"'),
+        'Points audio player base URL to GitHub Releases audio-v1 tag'
+    );
+    assert.ok(!/<audio\b/i.test(prodContent), 'Omits eager <audio> tags so initial page load downloads 0 audio bytes');
+    for (const mp3File of [
+        'house-pool-party.mp3',
+        'rainy-overpass.mp3',
+        'dawn-of-the-datastream.mp3',
+        'to-the-sky.mp3',
+    ]) {
+        assert.ok(
+            prodContent.includes(`data-audio-file="${mp3File}"`),
+            `Wires ${mp3File} on release item`
+        );
+    }
+    assert.strictEqual(
+        (prodContent.match(/data-release-play/g) || []).length,
+        4,
+        'Adds row play buttons for the 4 individual released tracks'
+    );
+
+    // Real 80-bar waveform peaks and empty-state banner instead of placeholder cards
+    const peakMatches = [...prodContent.matchAll(/data-peaks="([0-9,]+)"/g)];
+    assert.strictEqual(peakMatches.length, 5, 'Has real data-peaks on featured waveform and 4 playable tracks');
+    for (const match of peakMatches) {
+        const peaks = match[1].split(',').map((n) => Number(n.trim()));
+        assert.strictEqual(peaks.length, 80, 'Each data-peaks attribute has 80 bars');
+        assert.ok(peaks.every((n) => Number.isInteger(n) && n >= 12 && n <= 100), 'All peaks are integers in 12..100');
+    }
+
+    assert.ok(prodContent.includes('data-filter-empty="#release-empty"'), 'Wires empty-state banner to release filter group');
+    assert.ok(prodContent.includes('id="release-empty"'), 'Has release-empty coming-soon banner');
+    for (const placeholder of [
+        '[Artist &ndash; Song]',
+        '[Bollywood Hit]',
+        '[Custom Performance Mix]',
+        '[Song] (ROVA Desi House Edit)',
+        '[Competition Mixtape Intro]',
+        'Release 06 YouTube',
+    ]) {
+        assert.ok(!prodContent.includes(placeholder), `Removes placeholder release card: ${placeholder}`);
+    }
 });
 
 test('assets/js/analytics.js configuration and 100% link coverage', () => {
@@ -936,4 +982,441 @@ test('SEO metadata, JSON-LD schema, sitemap.xml, and robots.txt', () => {
     assert.ok(robots.includes('User-agent: *'), 'robots.txt allows all user agents');
     assert.ok(robots.includes('Allow: /'), 'robots.txt allows root');
     assert.ok(robots.includes('Sitemap: https://rohanvarshney.github.io/sitemap.xml'), 'robots.txt points to sitemap.xml');
+});
+
+test('assets/js/portfolio.js audio player lazy-loads GitHub Releases tracks, scrubs, switches tracks, and handles errors', () => {
+    const portfolioPath = path.join(__dirname, '..', 'assets', 'js', 'portfolio.js');
+    const portfolioJs = fs.readFileSync(portfolioPath, 'utf8');
+
+    function createMockClassList(initial = []) {
+        const set = new Set(initial);
+        return {
+            add(cls) { set.add(cls); },
+            remove(cls) { set.delete(cls); },
+            contains(cls) { return set.has(cls); },
+            toggle(cls, force) {
+                if (force === undefined) {
+                    if (set.has(cls)) { set.delete(cls); return false; }
+                    set.add(cls); return true;
+                }
+                if (force) set.add(cls);
+                else set.delete(cls);
+                return Boolean(force);
+            },
+        };
+    }
+
+    function createMockElement(tag, { attrs = {}, classes = [], textContent = '' } = {}) {
+        const attrMap = Object.assign({}, attrs);
+        const listeners = {};
+        const children = [];
+        let _text = textContent;
+        const el = {
+            tagName: tag.toUpperCase(),
+            style: {},
+            hidden: false,
+            children,
+            classList: createMockClassList(classes),
+            parentRow: null,
+            get className() { return attrMap.class || ''; },
+            set className(val) { attrMap.class = val; },
+            get textContent() { return _text; },
+            set textContent(val) {
+                _text = String(val);
+                if (val === '') children.length = 0;
+            },
+            getAttribute(name) {
+                return Object.prototype.hasOwnProperty.call(attrMap, name) ? attrMap[name] : null;
+            },
+            setAttribute(name, val) {
+                attrMap[name] = String(val);
+            },
+            removeAttribute(name) {
+                delete attrMap[name];
+            },
+            hasAttribute(name) {
+                return Object.prototype.hasOwnProperty.call(attrMap, name);
+            },
+            appendChild(child) {
+                if (child && child._isFragment) {
+                    child.children.forEach((c) => children.push(c));
+                } else {
+                    children.push(child);
+                }
+                return child;
+            },
+            addEventListener(type, fn) {
+                listeners[type] = listeners[type] || [];
+                listeners[type].push(fn);
+            },
+            trigger(type, eventObj) {
+                (listeners[type] || []).forEach((fn) => fn(eventObj || {}));
+            },
+            closest(selector) {
+                return selector === '.release' ? el.parentRow : null;
+            },
+            querySelectorAll(selector) {
+                if (selector === 'span') return children;
+                return [];
+            },
+            querySelector(selector) {
+                if (selector === 'i') return children.find((c) => c.tagName === 'I') || null;
+                return null;
+            },
+        };
+        return el;
+    }
+
+    const playBtnIcon = createMockElement('i', { attrs: { class: 'fa fa-play' } });
+    const playBtn = createMockElement('button', { attrs: { 'data-play-toggle': '' } });
+    playBtn.appendChild(playBtnIcon);
+
+    const wave = createMockElement('div', {
+        attrs: {
+            'data-waveform': '',
+            'data-seed': '42',
+            'data-bars': '10',
+            'data-progress': '0',
+            role: 'slider',
+        },
+    });
+    wave.getBoundingClientRect = () => ({ left: 100, width: 200 });
+
+    const coverImg = createMockElement('img', { attrs: { src: 'https://i.scdn.co/image/track1', alt: 'house pool party cover art' } });
+    const coverEl = createMockElement('div', { attrs: { 'data-player-cover': '' }, classes: ['cover', 'has-art'] });
+    coverEl.appendChild(coverImg);
+
+    const kickerEl = createMockElement('div', { attrs: { 'data-player-kicker': '' }, textContent: 'Latest release' });
+    const titleEl = createMockElement('h3', { attrs: { 'data-player-title': '' }, textContent: 'house pool party' });
+    const metaEl = createMockElement('div', { attrs: { 'data-player-meta': '' }, textContent: 'Original · 3:32 · 2025' });
+    const timeEl = createMockElement('span', { attrs: { 'data-player-time': '' }, textContent: '0:00 / 3:32' });
+    const spotifyEl = createMockElement('a', {
+        attrs: {
+            'data-player-spotify': '',
+            href: 'https://open.spotify.com/track/6IoqO8jmnH9Ml3BTGxDk1B',
+            'data-analytics-label': 'Featured house pool party Spotify',
+        },
+    });
+
+    function makeReleaseRow({ file, title, meta, duration, seed, peaks, spotifyHref, imgSrc, active }) {
+        const row = createMockElement('li', {
+            attrs: Object.assign(
+                { 'data-audio-file': file, 'data-track-duration': duration, 'data-seed': seed },
+                peaks ? { 'data-peaks': peaks } : {}
+            ),
+            classes: active ? ['release', 'is-active'] : ['release'],
+        });
+        const rowCoverImg = createMockElement('img', { attrs: { src: imgSrc, alt: title + ' cover art' } });
+        const rowCover = createMockElement('div', { classes: ['cover', 'has-art'] });
+        rowCover.appendChild(rowCoverImg);
+        const rowTitle = createMockElement('div', { textContent: title });
+        const rowMeta = createMockElement('div', { textContent: meta });
+        const rowBtnIcon = createMockElement('i', { attrs: { class: 'fa fa-play' } });
+        const rowBtn = createMockElement('button', { attrs: { 'data-release-play': '' } });
+        rowBtn.appendChild(rowBtnIcon);
+        rowBtn.parentRow = row;
+        const rowSpotify = createMockElement('a', { attrs: { href: spotifyHref } });
+
+        row.querySelector = (sel) => {
+            if (sel === '.release-title') return rowTitle;
+            if (sel === '.release-meta') return rowMeta;
+            if (sel === '.cover img') return rowCoverImg;
+            if (sel === '.cover') return rowCover;
+            if (sel === '.release-links a[href^="http"]') return rowSpotify;
+            return null;
+        };
+        return { row, rowBtn, rowBtnIcon };
+    }
+
+    const track1 = makeReleaseRow({
+        file: 'house-pool-party.mp3',
+        title: 'house pool party',
+        meta: 'Original · 3:32 · 2025',
+        duration: '3:32',
+        seed: '42',
+        spotifyHref: 'https://open.spotify.com/track/6IoqO8jmnH9Ml3BTGxDk1B',
+        imgSrc: 'https://i.scdn.co/image/track1',
+        active: true,
+    });
+    const track2 = makeReleaseRow({
+        file: 'rainy-overpass.mp3',
+        title: 'rainy overpass',
+        meta: 'Original · 1:38 · 2025',
+        duration: '1:38',
+        seed: '17',
+        peaks: '20, 40, 80, 100, 60, 30, 50, 90, 70, 10',
+        spotifyHref: 'https://open.spotify.com/track/1IG988cgn1YSuc0lhyk1uG',
+        imgSrc: 'https://i.scdn.co/image/track2',
+        active: false,
+    });
+
+    const releaseList = createMockElement('ul', { attrs: { id: 'release-list' } });
+    releaseList.querySelector = (sel) => {
+        if (sel === '.release.is-active') return [track1.row, track2.row].find((r) => r.classList.contains('is-active')) || null;
+        if (sel === '.release[data-audio-file], .release[data-audio-src]') return track1.row;
+        return null;
+    };
+    releaseList.querySelectorAll = (sel) => {
+        if (sel === '[data-release-play]') return [track1.rowBtn, track2.rowBtn];
+        if (sel === '.release.is-active') return [track1.row, track2.row].filter((r) => r.classList.contains('is-active'));
+        return [];
+    };
+
+    const player = createMockElement('article', {
+        attrs: {
+            'data-audio-player': '',
+            'data-audio-base': 'https://github.com/rohanvarshney/rohanvarshney.github.io/releases/download/audio-v1/',
+            'data-audio-file': 'house-pool-party.mp3',
+            'data-track-title': 'house pool party',
+            'data-track-duration': '3:32',
+            'data-track-list': '#release-list',
+        },
+    });
+    player.querySelector = (sel) => {
+        if (sel === '[data-play-toggle]') return playBtn;
+        if (sel === '[data-waveform]') return wave;
+        if (sel === '[data-player-cover]') return coverEl;
+        if (sel === '[data-player-kicker]') return kickerEl;
+        if (sel === '[data-player-title]') return titleEl;
+        if (sel === '[data-player-meta]') return metaEl;
+        if (sel === '[data-player-time]') return timeEl;
+        if (sel === '[data-player-spotify]') return spotifyEl;
+        return null;
+    };
+
+    const banner = createMockElement('div');
+    const bannerText = createMockElement('span', { textContent: 'Coming soon!' });
+    const trackedEvents = [];
+    const createdAudios = [];
+    let domReadyHandler = null;
+
+    class MockAudio {
+        constructor() {
+            this.preload = '';
+            this.src = '';
+            this.currentTime = 0;
+            this.duration = NaN;
+            this.paused = true;
+            this.ended = false;
+            this._listeners = {};
+            this.playCalls = 0;
+            this.pauseCalls = 0;
+            createdAudios.push(this);
+        }
+        addEventListener(type, fn) {
+            this._listeners[type] = this._listeners[type] || [];
+            this._listeners[type].push(fn);
+        }
+        emit(type) {
+            (this._listeners[type] || []).forEach((fn) => fn({}));
+        }
+        play() {
+            this.playCalls++;
+            this.paused = false;
+            this.ended = false;
+            this.emit('playing');
+            return Promise.resolve();
+        }
+        pause() {
+            this.pauseCalls++;
+            this.paused = true;
+            this.emit('pause');
+        }
+        load() {}
+    }
+
+    const sandbox = {
+        Audio: MockAudio,
+        location: { href: 'https://rohanvarshney.github.io/production/' },
+        isSecureContext: true,
+        trackAnalyticsEvent(name, params) {
+            trackedEvents.push({ name, params });
+        },
+        document: {
+            title: 'ROVA Production',
+            body: { getAttribute() { return ''; } },
+            addEventListener(type, fn) {
+                if (type === 'DOMContentLoaded') domReadyHandler = fn;
+            },
+            querySelector(sel) {
+                if (sel === '#release-list') return releaseList;
+                return null;
+            },
+            querySelectorAll(sel) {
+                if (sel === '[data-waveform]') return [wave];
+                if (sel === '[data-audio-player]') return [player];
+                return [];
+            },
+            getElementById(id) {
+                if (id === 'coming-soon-banner') return banner;
+                if (id === 'coming-soon-text') return bannerText;
+                return null;
+            },
+            createDocumentFragment() {
+                return { _isFragment: true, children: [], appendChild(c) { this.children.push(c); } };
+            },
+            createElement(tag) {
+                return createMockElement(tag);
+            },
+        },
+        setTimeout() { return 1; },
+        clearTimeout() {},
+    };
+    sandbox.window = sandbox;
+
+    vm.createContext(sandbox);
+    vm.runInContext(portfolioJs, sandbox);
+    domReadyHandler();
+
+    // 1. Zero Audio instances created on page load
+    assert.strictEqual(createdAudios.length, 0, 'Does not instantiate Audio on initial page load');
+    assert.strictEqual(wave.children.length, 10, 'Renders waveform bars on page load');
+
+    // 2. Clicking Play lazy-loads house-pool-party.mp3 from GitHub Releases
+    playBtn.trigger('click');
+    assert.strictEqual(createdAudios.length, 1, 'Creates Audio lazily on first Play click');
+    const audio = createdAudios[0];
+    assert.strictEqual(audio.preload, 'none', 'Sets preload="none" on Audio instance');
+    assert.strictEqual(
+        audio.src,
+        'https://github.com/rohanvarshney/rohanvarshney.github.io/releases/download/audio-v1/house-pool-party.mp3',
+        'Loads MP3 from GitHub Releases base + data-audio-file'
+    );
+    assert.strictEqual(audio.playCalls, 1, 'Starts playback');
+    assert.strictEqual(playBtn.getAttribute('aria-pressed'), 'true', 'Updates featured play button aria-pressed');
+    assert.strictEqual(track1.rowBtn.getAttribute('aria-pressed'), 'true', 'Syncs active row play button');
+    assert.strictEqual(trackedEvents[0].name, 'production_audio_play', 'Tracks production_audio_play GA4 event');
+
+    // 3. Timeupdate updates waveform progress and time readout
+    audio.duration = 212;
+    audio.currentTime = 65;
+    audio.emit('loadedmetadata');
+    audio.emit('timeupdate');
+    assert.strictEqual(timeEl.textContent, '1:05 / 3:32', 'Updates time readout during playback');
+    assert.strictEqual(wave.getAttribute('aria-valuenow'), '31', 'Updates slider aria-valuenow');
+    assert.ok(wave.children[0].classList.contains('played'), 'Marks elapsed waveform bars as played');
+    assert.ok(!wave.children[9].classList.contains('played'), 'Leaves future waveform bars unplayed');
+
+    // 4. Clicking waveform seeks proportionally (left=100, width=200, clientX=200 -> 50%)
+    wave.trigger('click', { clientX: 200 });
+    assert.strictEqual(audio.currentTime, 106, 'Seeks audio.currentTime when waveform is clicked');
+
+    // 5. Clicking another row switches track, updates UI & peaks, and plays new MP3
+    track2.rowBtn.trigger('click');
+    assert.strictEqual(titleEl.textContent, 'rainy overpass', 'Updates featured player title');
+    assert.strictEqual(kickerEl.textContent, 'Now playing', 'Updates kicker to Now playing');
+    assert.strictEqual(
+        spotifyEl.getAttribute('href'),
+        'https://open.spotify.com/track/1IG988cgn1YSuc0lhyk1uG',
+        'Updates featured Spotify link'
+    );
+    assert.strictEqual(
+        audio.src,
+        'https://github.com/rohanvarshney/rohanvarshney.github.io/releases/download/audio-v1/rainy-overpass.mp3',
+        'Switches audio.src to newly selected track'
+    );
+    assert.strictEqual(wave.children[3].style.height, '100%', 'Renders custom data-peaks heights when provided');
+    assert.ok(track2.row.classList.contains('is-active'), 'Marks selected row as active');
+    assert.ok(!track1.row.classList.contains('is-active'), 'Clears active class from previous row');
+
+    // Clicking active row play button again pauses
+    track2.rowBtn.trigger('click');
+    assert.strictEqual(audio.paused, true, 'Pauses when clicking active row play button again');
+
+    // 6. Audio error (e.g. MP3 not uploaded yet) resets state and shows toast
+    audio.currentTime = 0;
+    audio.emit('error');
+    assert.strictEqual(playBtn.getAttribute('aria-pressed'), 'false', 'Resets play button state on audio error');
+    assert.strictEqual(banner.classList.contains('visible'), true, 'Shows fallback toast on audio error');
+    assert.ok(bannerText.textContent.includes('Audio preview unavailable'), 'Displays friendly fallback message');
+});
+
+test('assets/js/portfolio.js category filters show coming-soon banner for empty categories', () => {
+    const portfolioPath = path.join(__dirname, '..', 'assets', 'js', 'portfolio.js');
+    const portfolioJs = fs.readFileSync(portfolioPath, 'utf8');
+
+    let domReadyHandler = null;
+
+    function makeChip(filter, label, pressed) {
+        const attrs = { 'data-filter': filter, 'aria-pressed': String(pressed) };
+        let clickHandler = null;
+        return {
+            textContent: label,
+            getAttribute(name) { return Object.prototype.hasOwnProperty.call(attrs, name) ? attrs[name] : null; },
+            setAttribute(name, val) { attrs[name] = String(val); },
+            addEventListener(type, fn) { if (type === 'click') clickHandler = fn; },
+            click() { if (clickHandler) clickHandler(); },
+        };
+    }
+
+    function makeItem(category) {
+        return {
+            hidden: false,
+            getAttribute(name) { return name === 'data-category' ? category : null; },
+        };
+    }
+
+    const chips = [
+        makeChip('all', 'All', true),
+        makeChip('original', 'Originals', false),
+        makeChip('remix', 'Remixes & Edits', false),
+        makeChip('mashup', 'Mashups', false),
+    ];
+    const items = [makeItem('original'), makeItem('original')];
+    const emptyTitle = { textContent: 'More releases on the way' };
+    const emptyEl = {
+        hidden: true,
+        querySelector(sel) { return sel === '[data-empty-title]' ? emptyTitle : null; },
+    };
+    const filterGroup = {
+        getAttribute(name) {
+            if (name === 'data-filter-group') return '#release-list';
+            if (name === 'data-filter-empty') return '#release-empty';
+            return null;
+        },
+        querySelectorAll(sel) { return sel === '[data-filter]' ? chips : []; },
+    };
+
+    const sandbox = {
+        location: { href: 'https://rohanvarshney.github.io/production/' },
+        isSecureContext: true,
+        document: {
+            title: 'ROVA Production',
+            body: { getAttribute() { return ''; } },
+            addEventListener(type, fn) { if (type === 'DOMContentLoaded') domReadyHandler = fn; },
+            querySelector(sel) { return sel === '#release-empty' ? emptyEl : null; },
+            querySelectorAll(sel) {
+                if (sel === '[data-filter-group]') return [filterGroup];
+                if (sel === '#release-list [data-category]') return items;
+                return [];
+            },
+            getElementById() { return null; },
+        },
+        setTimeout() { return 1; },
+        clearTimeout() {},
+    };
+    sandbox.window = sandbox;
+
+    vm.createContext(sandbox);
+    vm.runInContext(portfolioJs, sandbox);
+    domReadyHandler();
+
+    assert.strictEqual(emptyEl.hidden, true, 'Empty banner starts hidden when items are visible');
+
+    chips[1].click(); // Originals
+    assert.strictEqual(items.every((i) => !i.hidden), true, 'Originals filter keeps original items visible');
+    assert.strictEqual(emptyEl.hidden, true, 'Empty banner stays hidden when category has items');
+
+    chips[2].click(); // Remixes & Edits
+    assert.strictEqual(items.every((i) => i.hidden), true, 'Remixes filter hides non-matching items');
+    assert.strictEqual(emptyEl.hidden, false, 'Empty banner becomes visible when category has 0 items');
+    assert.strictEqual(emptyTitle.textContent, 'Remixes & Edits — coming soon', 'Updates banner title to selected category');
+
+    chips[3].click(); // Mashups
+    assert.strictEqual(emptyEl.hidden, false, 'Empty banner stays visible for Mashups');
+    assert.strictEqual(emptyTitle.textContent, 'Mashups — coming soon', 'Updates banner title to Mashups');
+
+    chips[0].click(); // All
+    assert.strictEqual(items.every((i) => !i.hidden), true, 'All filter restores all items');
+    assert.strictEqual(emptyEl.hidden, true, 'All filter hides empty banner');
 });

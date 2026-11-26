@@ -9,8 +9,9 @@
  *   [data-copy-email]             copies the contact email
  *   [data-copy-target="#id"]      copies the text of another element
  *   form[data-mailto-form]        inquiry form -> pre-filled email (no backend needed)
- *   [data-waveform]               decorative waveform bars (data-seed, data-progress)
- *   [data-filter-group]           chip filters for [data-category] items
+ *   [data-waveform]               waveform bars (data-peaks or data-seed, data-progress)
+ *   [data-audio-player]           lazy-loaded HTML5 audio player + interactive waveform & track list
+ *   [data-filter-group]           chip filters for [data-category] items (optional data-filter-empty)
  *   [data-bio-tab] / [data-bio-panel]  short / long bio switcher
  *   [data-year]                   current year
  */
@@ -273,42 +274,525 @@
     };
   }
 
+  function parsePeaks(rawPeaks) {
+    if (!rawPeaks) {
+      return null;
+    }
+    var values = rawPeaks
+      .split(',')
+      .map(function (part) {
+        return parseFloat(part.trim());
+      })
+      .filter(function (num) {
+        return !isNaN(num) && isFinite(num) && num >= 0;
+      });
+    if (!values.length) {
+      return null;
+    }
+    var max = values.reduce(function (acc, val) {
+      return val > acc ? val : acc;
+    }, 0);
+    // Normalize 0..1 values or >1 percentages into 0..1.
+    var scale = max > 1 ? (max > 100 ? max : 100) : 1;
+    return values.map(function (val) {
+      return Math.max(0.12, Math.min(1, val / scale));
+    });
+  }
+
+  function renderWaveform(wave) {
+    if (!wave) {
+      return;
+    }
+    var peaks = parsePeaks(wave.getAttribute('data-peaks'));
+    var bars = peaks ? peaks.length : parseInt(wave.getAttribute('data-bars') || '72', 10);
+    var progress = parseFloat(wave.getAttribute('data-progress') || '0');
+    var rand = seededRandom(parseInt(wave.getAttribute('data-seed') || '7', 10));
+    var fragment = document.createDocumentFragment();
+    wave.textContent = '';
+    for (var i = 0; i < bars; i++) {
+      var height;
+      if (peaks) {
+        height = peaks[i];
+      } else {
+        var envelope = 0.45 + 0.55 * Math.sin((i / bars) * Math.PI);
+        height = Math.max(0.12, envelope * (0.35 + rand() * 0.65));
+      }
+      var bar = document.createElement('span');
+      bar.style.height = Math.round(height * 100) + '%';
+      if (i / bars < progress) {
+        bar.className = 'played';
+      }
+      fragment.appendChild(bar);
+    }
+    wave.appendChild(fragment);
+  }
+
+  function setWaveformProgress(wave, ratio) {
+    if (!wave) {
+      return;
+    }
+    var clamped = Math.max(0, Math.min(1, isFinite(ratio) ? ratio : 0));
+    wave.setAttribute('data-progress', String(clamped));
+    if (wave.getAttribute('role') === 'slider') {
+      wave.setAttribute('aria-valuenow', String(Math.round(clamped * 100)));
+    }
+    var bars = wave.querySelectorAll ? wave.querySelectorAll('span') : [];
+    var total = bars.length;
+    for (var i = 0; i < total; i++) {
+      var isPlayed = clamped > 0 && i / total < clamped;
+      if (bars[i].classList) {
+        bars[i].classList.toggle('played', isPlayed);
+      } else {
+        bars[i].className = isPlayed ? 'played' : '';
+      }
+    }
+  }
+
   function initWaveforms() {
     document.querySelectorAll('[data-waveform]').forEach(function (wave) {
-      var bars = parseInt(wave.getAttribute('data-bars') || '72', 10);
-      var progress = parseFloat(wave.getAttribute('data-progress') || '0');
-      var rand = seededRandom(parseInt(wave.getAttribute('data-seed') || '7', 10));
-      var fragment = document.createDocumentFragment();
-      for (var i = 0; i < bars; i++) {
-        var envelope = 0.45 + 0.55 * Math.sin((i / bars) * Math.PI);
-        var height = Math.max(0.12, envelope * (0.35 + rand() * 0.65));
-        var bar = document.createElement('span');
-        bar.style.height = Math.round(height * 100) + '%';
-        if (i / bars < progress) {
-          bar.className = 'played';
+      renderWaveform(wave);
+    });
+  }
+
+  function formatTime(seconds) {
+    if (typeof seconds !== 'number' || !isFinite(seconds) || seconds < 0) {
+      return '0:00';
+    }
+    var total = Math.floor(seconds);
+    var mins = Math.floor(total / 60);
+    var secs = total % 60;
+    return mins + ':' + (secs < 10 ? '0' : '') + secs;
+  }
+
+  function resolveAudioUrl(base, file, src) {
+    var trimmedSrc = (src || '').trim();
+    if (trimmedSrc) {
+      return trimmedSrc;
+    }
+    var trimmedFile = (file || '').trim();
+    if (!trimmedFile) {
+      return '';
+    }
+    if (/^https?:\/\//i.test(trimmedFile) || trimmedFile.charAt(0) === '/' || trimmedFile.charAt(0) === '.') {
+      return trimmedFile;
+    }
+    var normalizedBase = (base || '').trim();
+    if (normalizedBase && normalizedBase.slice(-1) !== '/') {
+      normalizedBase += '/';
+    }
+    return normalizedBase + trimmedFile;
+  }
+
+  function setButtonIcon(button, iconClass) {
+    if (!button) {
+      return;
+    }
+    var icon = button.querySelector('i');
+    if (icon) {
+      icon.className = 'fa ' + iconClass;
+    }
+  }
+
+  function initAudioPlayers() {
+    var players = document.querySelectorAll('[data-audio-player]');
+    if (!players || !players.length) {
+      return;
+    }
+
+    players.forEach(function (player) {
+      var audioBase = player.getAttribute('data-audio-base') || '';
+      var playBtn = player.querySelector('[data-play-toggle]');
+      var wave = player.querySelector('[data-waveform]');
+      var coverEl = player.querySelector('[data-player-cover]');
+      var kickerEl = player.querySelector('[data-player-kicker]');
+      var titleEl = player.querySelector('[data-player-title]');
+      var metaEl = player.querySelector('[data-player-meta]');
+      var timeEl = player.querySelector('[data-player-time]');
+      var spotifyEl = player.querySelector('[data-player-spotify]');
+      var trackListSelector = player.getAttribute('data-track-list');
+      var trackList = trackListSelector ? document.querySelector(trackListSelector) : null;
+      var rowButtons = trackList ? trackList.querySelectorAll('[data-release-play]') : [];
+
+      var audio = null;
+      var loadedUrl = '';
+      var currentUrl = resolveAudioUrl(
+        audioBase,
+        player.getAttribute('data-audio-file'),
+        player.getAttribute('data-audio-src')
+      );
+      var currentTitle = player.getAttribute('data-track-title') || (titleEl ? titleEl.textContent.trim() : 'Track');
+      var currentDurationLabel = player.getAttribute('data-track-duration') || '0:00';
+      var activeRow = trackList ? trackList.querySelector('.release.is-active') : null;
+      var isLoading = false;
+      var pendingSeekRatio = null;
+      var pendingResumeTime = null;
+      var retriedExpiredUrl = false;
+
+      function updateTimeDisplay(currentSec, durationSec) {
+        if (!timeEl) {
+          return;
         }
-        fragment.appendChild(bar);
+        var totalLabel = isFinite(durationSec) && durationSec > 0 ? formatTime(durationSec) : currentDurationLabel;
+        timeEl.textContent = formatTime(currentSec || 0) + ' / ' + totalLabel;
       }
-      wave.appendChild(fragment);
+
+      function syncPlayState() {
+        var isPlaying = Boolean(audio && !audio.paused && !audio.ended && loadedUrl === currentUrl);
+        if (playBtn) {
+          if (playBtn.classList) {
+            playBtn.classList.toggle('is-playing', isPlaying);
+            playBtn.classList.toggle('is-loading', isLoading);
+          }
+          playBtn.setAttribute('aria-pressed', String(isPlaying));
+          playBtn.setAttribute('aria-label', (isPlaying ? 'Pause ' : 'Play ') + currentTitle);
+          setButtonIcon(playBtn, isLoading ? 'fa-spinner fa-spin' : (isPlaying ? 'fa-pause' : 'fa-play'));
+        }
+
+        rowButtons.forEach(function (btn) {
+          var row = btn.closest ? btn.closest('.release') : null;
+          var isRowActive = Boolean(row && row === activeRow);
+          var isRowPlaying = isRowActive && isPlaying;
+          var isRowLoading = isRowActive && isLoading;
+          var rowTitleEl = row ? row.querySelector('.release-title') : null;
+          var rowTitle = rowTitleEl ? rowTitleEl.textContent.trim() : 'track';
+
+          if (btn.classList) {
+            btn.classList.toggle('is-playing', isRowPlaying);
+            btn.classList.toggle('is-loading', isRowLoading);
+          }
+          btn.setAttribute('aria-pressed', String(isRowPlaying));
+          btn.setAttribute('aria-label', (isRowPlaying ? 'Pause ' : 'Play ') + rowTitle);
+          setButtonIcon(btn, isRowLoading ? 'fa-spinner fa-spin' : (isRowPlaying ? 'fa-pause' : 'fa-play'));
+        });
+      }
+
+      function ensureAudio() {
+        if (audio) {
+          return audio;
+        }
+        if (typeof window.Audio !== 'function') {
+          showToast('Audio playback is not supported in this browser.');
+          return null;
+        }
+        audio = new window.Audio();
+        audio.preload = 'none';
+
+        audio.addEventListener('loadstart', function () {
+          isLoading = true;
+          syncPlayState();
+        });
+        audio.addEventListener('waiting', function () {
+          isLoading = true;
+          syncPlayState();
+        });
+        audio.addEventListener('canplay', function () {
+          isLoading = false;
+          syncPlayState();
+        });
+        audio.addEventListener('playing', function () {
+          isLoading = false;
+          syncPlayState();
+        });
+        audio.addEventListener('pause', function () {
+          isLoading = false;
+          syncPlayState();
+        });
+        audio.addEventListener('loadedmetadata', function () {
+          if (pendingResumeTime !== null && isFinite(audio.duration) && audio.duration > 0) {
+            audio.currentTime = Math.min(pendingResumeTime, audio.duration);
+            pendingResumeTime = null;
+          } else if (pendingSeekRatio !== null && isFinite(audio.duration) && audio.duration > 0) {
+            audio.currentTime = pendingSeekRatio * audio.duration;
+            pendingSeekRatio = null;
+          }
+          if (isFinite(audio.duration) && audio.duration > 0) {
+            currentDurationLabel = formatTime(audio.duration);
+          }
+          updateTimeDisplay(audio.currentTime || 0, audio.duration);
+        });
+        audio.addEventListener('timeupdate', function () {
+          if (isFinite(audio.duration) && audio.duration > 0) {
+            setWaveformProgress(wave, audio.currentTime / audio.duration);
+            updateTimeDisplay(audio.currentTime, audio.duration);
+          }
+        });
+        audio.addEventListener('ended', function () {
+          isLoading = false;
+          setWaveformProgress(wave, 0);
+          updateTimeDisplay(0, audio.duration);
+          syncPlayState();
+        });
+        audio.addEventListener('error', function () {
+          // GitHub Releases signed redirect URLs can expire if paused for a long time; retry once.
+          if (!retriedExpiredUrl && audio.currentTime > 0 && currentUrl) {
+            retriedExpiredUrl = true;
+            pendingResumeTime = audio.currentTime;
+            audio.src = currentUrl;
+            if (typeof audio.load === 'function') {
+              audio.load();
+            }
+            var retryPromise = audio.play();
+            if (retryPromise && typeof retryPromise.catch === 'function') {
+              retryPromise.catch(function () {});
+            }
+            return;
+          }
+          loadedUrl = '';
+          pendingSeekRatio = null;
+          pendingResumeTime = null;
+          isLoading = false;
+          syncPlayState();
+          showToast('Audio preview unavailable right now \u2014 listen on Spotify or check back soon.');
+        });
+
+        return audio;
+      }
+
+      function togglePlay() {
+        if (!currentUrl) {
+          showToast('Audio preview coming soon!');
+          return;
+        }
+        var instance = ensureAudio();
+        if (!instance) {
+          return;
+        }
+        if (loadedUrl !== currentUrl) {
+          loadedUrl = currentUrl;
+          retriedExpiredUrl = false;
+          isLoading = true;
+          instance.src = currentUrl;
+          syncPlayState();
+        }
+        if (instance.paused || instance.ended) {
+          track('production_audio_play', {
+            event_category: 'production',
+            event_label: currentTitle,
+          });
+          var playPromise = instance.play();
+          if (playPromise && typeof playPromise.catch === 'function') {
+            playPromise.catch(function (err) {
+              if (err && err.name === 'AbortError') {
+                return;
+              }
+              isLoading = false;
+              syncPlayState();
+            });
+          }
+        } else {
+          instance.pause();
+        }
+      }
+
+      function loadTrackFromRow(row, autoPlay) {
+        if (!row) {
+          return;
+        }
+        var nextUrl = resolveAudioUrl(
+          audioBase,
+          row.getAttribute('data-audio-file'),
+          row.getAttribute('data-audio-src')
+        );
+        if (!nextUrl) {
+          showToast('Audio preview coming soon!');
+          return;
+        }
+
+        if (trackList) {
+          trackList.querySelectorAll('.release.is-active').forEach(function (item) {
+            item.classList.remove('is-active');
+          });
+        }
+        row.classList.add('is-active');
+        activeRow = row;
+
+        var rowTitleEl = row.querySelector('.release-title');
+        var rowMetaEl = row.querySelector('.release-meta');
+        var rowCoverImg = row.querySelector('.cover img');
+        var rowCover = row.querySelector('.cover');
+        var rowSpotify = row.querySelector('.release-links a[href^="http"]');
+
+        currentUrl = nextUrl;
+        currentTitle = rowTitleEl ? rowTitleEl.textContent.trim() : 'Track';
+        currentDurationLabel = row.getAttribute('data-track-duration') || '0:00';
+        pendingSeekRatio = null;
+        pendingResumeTime = null;
+        retriedExpiredUrl = false;
+
+        if (kickerEl) {
+          var firstRow = trackList ? trackList.querySelector('.release[data-audio-file], .release[data-audio-src]') : null;
+          kickerEl.textContent = row === firstRow ? 'Latest release' : 'Now playing';
+        }
+        if (titleEl) {
+          titleEl.textContent = currentTitle;
+        }
+        if (metaEl && rowMetaEl) {
+          metaEl.textContent = rowMetaEl.textContent.trim();
+        }
+        if (coverEl) {
+          coverEl.textContent = '';
+          if (rowCoverImg) {
+            coverEl.classList.add('has-art');
+            var img = document.createElement('img');
+            img.src = rowCoverImg.getAttribute('src') || '';
+            img.alt = rowCoverImg.getAttribute('alt') || currentTitle + ' cover art';
+            coverEl.appendChild(img);
+          } else {
+            coverEl.classList.remove('has-art');
+            coverEl.textContent = rowCover ? rowCover.textContent.trim() : 'ROVA';
+          }
+        }
+        if (spotifyEl) {
+          if (rowSpotify) {
+            spotifyEl.hidden = false;
+            spotifyEl.setAttribute('href', rowSpotify.getAttribute('href') || '#');
+            spotifyEl.setAttribute('data-analytics-label', 'Featured ' + currentTitle + ' Spotify');
+          } else {
+            spotifyEl.hidden = true;
+          }
+        }
+        if (wave) {
+          var peaks = row.getAttribute('data-peaks');
+          var seed = row.getAttribute('data-seed') || '42';
+          if (peaks) {
+            wave.setAttribute('data-peaks', peaks);
+          } else {
+            wave.removeAttribute('data-peaks');
+          }
+          wave.setAttribute('data-seed', seed);
+          wave.setAttribute('data-progress', '0');
+          renderWaveform(wave);
+          setWaveformProgress(wave, 0);
+        }
+        updateTimeDisplay(0, NaN);
+
+        if (audio && !audio.paused) {
+          audio.pause();
+        }
+        loadedUrl = '';
+        isLoading = false;
+        syncPlayState();
+
+        if (autoPlay) {
+          togglePlay();
+        }
+      }
+
+      function seekToRatio(ratio) {
+        var clamped = Math.max(0, Math.min(1, ratio));
+        setWaveformProgress(wave, clamped);
+        if (audio && loadedUrl === currentUrl && isFinite(audio.duration) && audio.duration > 0) {
+          audio.currentTime = clamped * audio.duration;
+          updateTimeDisplay(audio.currentTime, audio.duration);
+        } else {
+          pendingSeekRatio = clamped;
+          togglePlay();
+        }
+      }
+
+      if (playBtn) {
+        playBtn.addEventListener('click', function () {
+          togglePlay();
+        });
+      }
+
+      if (wave) {
+        wave.addEventListener('click', function (event) {
+          var rect = wave.getBoundingClientRect ? wave.getBoundingClientRect() : null;
+          if (!rect || !rect.width) {
+            return;
+          }
+          var ratio = (event.clientX - rect.left) / rect.width;
+          seekToRatio(ratio);
+        });
+        wave.addEventListener('keydown', function (event) {
+          if (event.key === ' ' || event.key === 'Enter') {
+            event.preventDefault();
+            togglePlay();
+          } else if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
+            if (audio && loadedUrl === currentUrl && isFinite(audio.duration) && audio.duration > 0) {
+              event.preventDefault();
+              var delta = event.key === 'ArrowRight' ? 5 : -5;
+              var nextTime = Math.max(0, Math.min(audio.duration, audio.currentTime + delta));
+              audio.currentTime = nextTime;
+              setWaveformProgress(wave, nextTime / audio.duration);
+              updateTimeDisplay(nextTime, audio.duration);
+            }
+          } else if (event.key === 'Home' || event.key === 'End') {
+            if (audio && loadedUrl === currentUrl && isFinite(audio.duration) && audio.duration > 0) {
+              event.preventDefault();
+              var targetTime = event.key === 'End' ? audio.duration : 0;
+              audio.currentTime = targetTime;
+              setWaveformProgress(wave, targetTime / audio.duration);
+              updateTimeDisplay(targetTime, audio.duration);
+            }
+          }
+        });
+      }
+
+      rowButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+          var row = button.closest ? button.closest('.release') : null;
+          if (!row) {
+            return;
+          }
+          if (row === activeRow) {
+            togglePlay();
+          } else {
+            loadTrackFromRow(row, true);
+          }
+        });
+      });
+
+      syncPlayState();
     });
   }
 
   function initFilters() {
     document.querySelectorAll('[data-filter-group]').forEach(function (group) {
       var targetSelector = group.getAttribute('data-filter-group');
+      var emptySelector = group.getAttribute('data-filter-empty');
+      var emptyEl = emptySelector ? document.querySelector(emptySelector) : null;
+      var emptyTitleEl = emptyEl ? emptyEl.querySelector('[data-empty-title]') : null;
       var buttons = group.querySelectorAll('[data-filter]');
+
+      function applyFilter(activeButton) {
+        var filter = activeButton.getAttribute('data-filter');
+        buttons.forEach(function (b) {
+          b.setAttribute('aria-pressed', String(b === activeButton));
+        });
+        var visibleCount = 0;
+        document.querySelectorAll(targetSelector + ' [data-category]').forEach(function (item) {
+          var categories = item.getAttribute('data-category').split(' ');
+          var isHidden = filter !== 'all' && categories.indexOf(filter) === -1;
+          item.hidden = isHidden;
+          if (!isHidden) {
+            visibleCount++;
+          }
+        });
+        if (emptyEl) {
+          emptyEl.hidden = visibleCount > 0;
+          if (visibleCount === 0 && emptyTitleEl) {
+            emptyTitleEl.textContent = activeButton.textContent.trim() + ' \u2014 coming soon';
+          }
+        }
+      }
+
       buttons.forEach(function (button) {
         button.addEventListener('click', function () {
-          var filter = button.getAttribute('data-filter');
-          buttons.forEach(function (b) {
-            b.setAttribute('aria-pressed', String(b === button));
-          });
-          document.querySelectorAll(targetSelector + ' [data-category]').forEach(function (item) {
-            var categories = item.getAttribute('data-category').split(' ');
-            item.hidden = filter !== 'all' && categories.indexOf(filter) === -1;
-          });
+          applyFilter(button);
         });
       });
+
+      if (emptyEl) {
+        var initialVisible = 0;
+        document.querySelectorAll(targetSelector + ' [data-category]').forEach(function (item) {
+          if (!item.hidden) {
+            initialVisible++;
+          }
+        });
+        emptyEl.hidden = initialVisible > 0;
+      }
     });
   }
 
@@ -390,6 +874,7 @@
     initBioTabs();
     initForms();
     initWaveforms();
+    initAudioPlayers();
     initFilters();
     initNav();
     initReveal();
