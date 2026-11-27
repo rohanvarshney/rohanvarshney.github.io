@@ -237,6 +237,9 @@ test('raas/index.html structure and content', () => {
     assert.ok(!raasContent.includes('class="hof-card"'), 'Hall Of Fame does not use cards');
     assert.ok(raasContent.includes('Raas All Stars</a> Team Mixes (7)</h3>'), 'Has Raas All Stars Team Mixes (7) subsection');
     assert.ok(raasContent.includes('<h3 class="hof-group-title">Competition Mixtapes (9)</h3>'), 'Has Competition Mixtapes (9) subsection');
+    assert.strictEqual((raasContent.match(/<details class="hof-group">/g) || []).length, 2, 'Both Hall of Fame groups are collapsible <details> drawers starting closed');
+    assert.strictEqual((raasContent.match(/<summary class="hof-group-summary">/g) || []).length, 2, 'Both Hall of Fame groups have <summary> headers');
+    assert.ok(raasContent.includes('See more') && raasContent.includes('See less'), 'Hall of Fame collapsible groups have See more / See less labels');
     for (const [label, badge] of [
         ['GT Ramblin\' Raas (2019&ndash;20 &middot; Raas All Stars XII)', 'hof-badge-mp3">MP3<'],
         ['Dirty South Dandiya (2021&ndash;22 &middot; Raas All Stars XIV)', 'hof-badge-mp3">MP3<'],
