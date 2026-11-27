@@ -348,6 +348,20 @@ test('raas/index.html structure and content', () => {
     assert.ok(raasContent.includes('<span class="resource-title">ROVA Raas Sounds</span>'), 'Has ROVA Raas Sounds section');
     assert.ok(raasContent.includes('data-analytics-label="ROVA Raas Sounds" data-analytics-status="live"'), 'Tracks ROVA Raas Sounds as live');
     assert.ok(raasContent.includes('href="https://drive.google.com/drive/folders/1tneKiwTXmKsR8wzAICItM6zUChy3d5NX?usp=sharing"'), 'Has ROVA Raas Sounds Google Drive link');
+    assert.ok(raasContent.includes('class="resource-card resource-card-embed"'), 'Has nested Spotify playlist resource card');
+    assert.ok(raasContent.includes('<span class="resource-title">Raas &amp; Garba Playlist</span>'), 'Has Raas & Garba Playlist title');
+    assert.ok(
+        raasContent.includes('href="https://open.spotify.com/playlist/5QM4XZEV8vLRkLwHpTxPxP?si=15cacaca032f486a"') &&
+        raasContent.includes('data-analytics-label="Raas &amp; Garba Spotify Playlist" data-analytics-status="live"'),
+        'Has tracked outbound link to Spotify playlist'
+    );
+    assert.ok(
+        raasContent.includes('src="https://open.spotify.com/embed/playlist/5QM4XZEV8vLRkLwHpTxPxP?utm_source=generator&amp;si=29a16ad001c64708"') &&
+        raasContent.includes('height="352"') &&
+        raasContent.includes('loading="lazy"') &&
+        raasContent.includes('title="Spotify Embed: Raas &amp; Garba Playlist"'),
+        'Has lazy-loaded Spotify playlist embed iframe with accessible title'
+    );
     assert.ok(raasContent.includes('coming-soon-banner'), 'Has coming soon banner for unavailable links');
     assert.ok(raasContent.includes('src="../assets/logo.png"'), 'Has main logo');
     assert.ok(raasContent.includes('src="../assets/freehand-signature-3.png"'), 'Has freehand signature logo');
