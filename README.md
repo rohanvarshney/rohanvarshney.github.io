@@ -11,7 +11,7 @@ Personal website and ROVA music portfolio hosted on GitHub Pages at [rohanvarshn
 
 ## Adding Audio Tracks
 
-1. Drop `.mp3` files into `assets/audio/mashups/` (subfolders `pure usa/`, `fusion/`, `pure desi/` sync to `production/index.html`; `raas/` syncs to `raas/index.html`), `assets/audio/remixes/`, or `assets/audio/performances/`.
+1. Drop `.mp3` files into `assets/audio/mashups/` (subfolders `western/`, `indo-western-fusion/`, `desi/` sync to `production/index.html`; `raas/` syncs to `raas/index.html`), `assets/audio/remixes/`, or `assets/audio/performances/`.
 2. Run the sync script (uses macOS `afinfo` and `afconvert`) to extract durations, compute 80-bar waveform peaks, and update `production/index.html` and `raas/index.html`:
 
 ```bash

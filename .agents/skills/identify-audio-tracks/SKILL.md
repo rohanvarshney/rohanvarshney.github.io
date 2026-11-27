@@ -27,7 +27,7 @@ Multimodal workflow for auditing `.mp3` files in `assets/audio/`, identifying al
      - Report confidence (`High`, `Medium`, `Low`) per item and explicitly flag anything uncertain rather than guessing.
 
 3. **Present review table before editing**
-   - Aggregate all subagent findings into grouped markdown tables (`Mashups — Pure USA`, `Mashups — Fusion`, `Mashups — Pure Desi`, `Mashups — Raas`, `Remixes`, `Performances`).
+   - Aggregate all subagent findings into grouped markdown tables (`Mashups — Western`, `Mashups — Indo-Western Fusion`, `Mashups — Desi`, `Mashups — Raas`, `Remixes`, `Performances`).
    - Include a top checklist highlighting any `Low`/`Medium` confidence items, unidentified backing instrumentals, or unconfirmed regional/traditional recording artists.
    - Pause for the user to confirm or correct before editing `scripts/sync-audio-releases.js`.
 

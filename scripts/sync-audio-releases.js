@@ -22,98 +22,98 @@ const SECTION_CONFIG = {
   performances: { category: 'performance', cover: 'PERF MIX', label: 'Performance Mix', order: 2 },
 };
 
-const MASHUP_SUBFOLDER_ORDER = ['pure usa', 'fusion', 'pure desi', 'raas'];
+const MASHUP_SUBFOLDER_ORDER = ['western', 'indo-western-fusion', 'desi', 'raas'];
 
 const MASHUP_SUBFOLDER_LABELS = {
-  'pure usa': 'Pure USA',
-  fusion: 'Fusion',
-  'pure desi': 'Pure Desi',
+  western: 'Western',
+  'indo-western-fusion': 'Indo-Western Fusion',
+  desi: 'Desi',
   raas: 'Raas',
 };
 
 const ACRONYMS = new Set(['EDM', 'LRAD', 'DNA', 'ROVA', 'USA', 'DJ']);
 
 const CURATED_TRACKS = {
-  // Mashups — Pure USA
-  'mashups/pure usa/move-like-i-do.mp3': {
+  // Mashups — Western
+  'mashups/western/move-like-i-do.mp3': {
     title: 'Move Like I Do',
     description: 'Moves Like Jagger (Maroon 5) × Like I Do (David Guetta & Martin Garrix)',
     seed: 29,
     featured: true,
   },
-  'mashups/pure usa/animalistic time.mp3': {
+  'mashups/western/animalistic time.mp3': {
     title: 'Animalistic Time',
     description: 'Animals (Martin Garrix) × Time of Our Lives (Pitbull & Ne-Yo)',
   },
-  'mashups/pure usa/beggin-medley.mp3': {
+  'mashups/western/beggin-medley.mp3': {
     title: "Beggin' Medley",
     description: "Beggin' (Måneskin) × Beauty and a Beat (Justin Bieber) × Moves Like Jagger (Maroon 5)",
   },
-  'mashups/pure usa/cataclysmic_faint.mp3': {
+  'mashups/western/cataclysmic_faint.mp3': {
     title: 'Cataclysmic Faint',
     description: 'The Catalyst × Faint (Linkin Park)',
   },
-  'mashups/pure usa/ghosts-have-done.mp3': {
+  'mashups/western/ghosts-have-done.mp3': {
     title: 'Ghosts Have Done',
     description: "Ghost Town (Adam Lambert) × What I've Done (Linkin Park)",
   },
-  'mashups/pure usa/saxobeat-on-the-floor.mp3': {
+  'mashups/western/saxobeat-on-the-floor.mp3': {
     title: 'Saxobeat On The Floor',
     description: 'Mr. Saxobeat (Alexandra Stan) × On the Floor (Jennifer Lopez & Pitbull)',
   },
-  'mashups/pure usa/the-floor-has-levels.mp3': {
+  'mashups/western/the-floor-has-levels.mp3': {
     title: 'The Floor Has Levels',
     description: 'On the Floor (Jennifer Lopez & Pitbull) × Levels (Avicii)',
   },
 
-  // Mashups — Fusion
-  'mashups/fusion/airplanes-945.mp3': {
+  // Mashups — Indo-Western Fusion
+  'mashups/indo-western-fusion/airplanes-945.mp3': {
     title: 'Airplanes × 9:45',
     description: 'Airplanes (B.o.B feat. Hayley Williams) × 9:45 (Prabh Singh)',
   },
-  'mashups/fusion/beautiful-raat.mp3': {
+  'mashups/indo-western-fusion/beautiful-raat.mp3': {
     title: 'Beautiful Raat',
     description: 'Aaj Ki Raat (Madhubanti Bagchi & Sachin-Jigar) × Beautiful Escape (Tom Misch feat. Zak Abel)',
   },
-  'mashups/fusion/don-n-night.mp3': {
+  'mashups/indo-western-fusion/don-n-night.mp3': {
     title: "Don 'N' Night",
     description: "Main Hoon Don (Shaan) × Day 'N' Nite (Kid Cudi & Crookers)",
   },
-  'mashups/fusion/helpless-gulaab.mp3': {
+  'mashups/indo-western-fusion/helpless-gulaab.mp3': {
     title: 'Helpless Gulaab',
     description: 'Akhiyaan Gulaab (Mitraz) × Helpless (John Mayer)',
   },
-  'mashups/fusion/is-shiela-worth-it.mp3': {
+  'mashups/indo-western-fusion/is-shiela-worth-it.mp3': {
     title: 'Is Sheila Worth It',
     description: 'Sheila Ki Jawani (Sunidhi Chauhan & Vishal-Shekhar) × Worth It (Fifth Harmony feat. Kid Ink)',
   },
-  'mashups/fusion/laila-main-la-mama.mp3': {
+  'mashups/indo-western-fusion/laila-main-la-mama.mp3': {
     title: 'Laila Main La Mama',
     description: 'Laila Main Laila (Pawni Pandey) × La Mamá de la Mamá (El Alfa, CJ & El Cherry Scom)',
   },
-  'mashups/fusion/lrad-zindigani.mp3': {
+  'mashups/indo-western-fusion/lrad-zindigani.mp3': {
     title: 'LRAD Zindagani',
     description: 'Ek Toh Kum Zindagani (Neha Kakkar) × LRAD (Knife Party)',
   },
-  'mashups/fusion/prabhu-ka-naam-medley.mp3': {
+  'mashups/indo-western-fusion/prabhu-ka-naam-medley.mp3': {
     title: 'Prabhu Ka Naam Medley',
     description: 'Leke Prabhu Ka Naam (Arijit Singh & Pritam) × Everybody (Logic) × Lil Bit (K Camp) × KMT (Drake) × Limitless (Martin Garrix & Mesto)',
   },
-  'mashups/fusion/tanhayee-stars.mp3': {
+  'mashups/indo-western-fusion/tanhayee-stars.mp3': {
     title: 'Tanhayee Stars',
     description: 'Tanhayee (Sonu Nigam) × All the Stars (Kendrick Lamar & SZA)',
   },
-  'mashups/fusion/tere-pyaar-i-want-you.mp3': {
+  'mashups/indo-western-fusion/tere-pyaar-i-want-you.mp3': {
     title: 'Tere Pyaar × I Want You',
     description: 'Tere Pyaar Mein (Arijit Singh & Pritam) × I Want You to Know (Zedd feat. Selena Gomez)',
   },
-  'mashups/fusion/ye-mera-dil-enless-summer.mp3': {
+  'mashups/indo-western-fusion/ye-mera-dil-enless-summer.mp3': {
     title: 'Ye Mera Dil × Endless Summer',
     description: 'Yeh Mera Dil (Sunidhi Chauhan) × Endless Summer (Alan Walker & Zak Abel)',
   },
 
-  // Mashups — Pure Desi
-  'mashups/pure desi/dekhe-dance.mp3': {
+  // Mashups — Desi
+  'mashups/desi/dekhe-dance.mp3': {
     title: 'Dekhe Dance',
     description: 'Khwab Dekhe (Monali Thakur & Pritam) × Dance (F1rstman feat. H-Dhami, Juggy D, Mumzy Stranger & Raxstar)',
   },
@@ -168,15 +168,15 @@ const CURATED_TRACKS = {
   // Remixes
   'remixes/ghoomaremix.mp3': {
     title: 'Ghoomar (ROVA Remix)',
-    description: 'Ghoomar (Shreya Ghoshal & Swaroop Khan) · Club Edit',
+    description: 'Ghoomar (Shreya Ghoshal & Swaroop Khan) · Lounge Edit',
   },
   'remixes/khuda-jaane-urban.mp3': {
-    title: 'Khuda Jaane (Urban Remix)',
+    title: 'Khuda Jaane (ROVA Remix)',
     description: 'Khuda Jaane (KK & Shilpa Rao) · Urban Edit',
   },
   'remixes/rangilo-rova.mp3': {
     title: 'Rangilo (ROVA Remix)',
-    description: 'Rangilo Maro Dholna (Shubha Mudgal & Sukhwinder Singh) · ROVA Flip',
+    description: 'Rangilo Maro Dholna (Shubha Mudgal & Sukhwinder Singh) · Hype Edit',
   },
 
   // Performances

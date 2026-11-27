@@ -480,7 +480,7 @@ test('production/index.html structure and content', () => {
 
     // Featured player (always Move Like I Do) + Spotify embeds for Originals + all synced audio cards
     assert.ok(prodContent.includes('data-player-kicker>Featured Track</div>'), 'Emphasizes featured player as Featured Track');
-    assert.ok(prodContent.includes('data-audio-file="mashups/pure usa/move-like-i-do.mp3"'), 'Wires mashups/pure usa/move-like-i-do.mp3 on featured player');
+    assert.ok(prodContent.includes('data-audio-file="mashups/western/move-like-i-do.mp3"'), 'Wires mashups/western/move-like-i-do.mp3 on featured player');
     assert.ok(prodContent.includes('data-track-title="Move Like I Do"'), 'Sets Move Like I Do as featured track title');
     assert.ok(prodContent.includes('data-track-duration="2:52"'), 'Sets 2:52 duration for Move Like I Do');
     assert.ok(prodContent.includes('<h3 class="player-title" data-player-title>Move Like I Do</h3>'), 'Displays Move Like I Do in featured player');
@@ -489,7 +489,7 @@ test('production/index.html structure and content', () => {
     assert.ok(prodContent.includes('<div class="cover" data-player-cover aria-hidden="true">MASHUP</div>'), 'Featured player shows MASHUP cover');
     const featuredPlayerMatch = prodContent.match(/<article class="player"[\s\S]*?<\/article>/);
     assert.ok(featuredPlayerMatch, 'Has featured player article');
-    assert.ok(featuredPlayerMatch[0].includes('data-audio-file="mashups/pure usa/move-like-i-do.mp3"'), 'Featured player article itself wires mashups/pure usa/move-like-i-do.mp3');
+    assert.ok(featuredPlayerMatch[0].includes('data-audio-file="mashups/western/move-like-i-do.mp3"'), 'Featured player article itself wires mashups/western/move-like-i-do.mp3');
     assert.ok(featuredPlayerMatch[0].includes('aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>'), 'Featured player waveform div is intact');
     assert.ok(featuredPlayerMatch[0].includes('<span class="player-time" data-player-time aria-live="off">0:00 / 2:52</span>'), 'Featured player time span is intact');
     assert.ok(!featuredPlayerMatch[0].includes('<li') && !featuredPlayerMatch[0].includes('AUDIO-RELEASES:'), 'Featured player contains no list items or sync markers');
@@ -545,8 +545,8 @@ test('production/index.html structure and content', () => {
 
     // Move Like I Do mashup card
     assert.ok(
-        prodContent.includes('<li class="release is-active" data-category="mashup" data-subcategory="pure-usa" data-audio-file="mashups/pure usa/move-like-i-do.mp3" data-track-duration="2:52"'),
-        'Marks Move Like I Do mashup card as active under mashup / pure-usa category'
+        prodContent.includes('<li class="release is-active" data-category="mashup" data-subcategory="western" data-audio-file="mashups/western/move-like-i-do.mp3" data-track-duration="2:52"'),
+        'Marks Move Like I Do mashup card as active under mashup / western category'
     );
     assert.ok(prodContent.includes('<div class="release-title">Move Like I Do</div>'), 'Has Move Like I Do title');
     assert.ok(
@@ -1307,9 +1307,9 @@ test('assets/js/portfolio.js audio player lazy-loads tracks, scrubs, switches tr
     }
 
     const track1 = makeReleaseRow({
-        file: 'mashups/pure usa/move-like-i-do.mp3',
+        file: 'mashups/western/move like i do.mp3',
         title: 'Move Like I Do',
-        meta: 'Mashup · Pure USA · Moves Like Jagger (Maroon 5) × Like I Do (David Guetta & Martin Garrix) · 2:52',
+        meta: 'Mashup · Western · Moves Like Jagger (Maroon 5) × Like I Do (David Guetta & Martin Garrix) · 2:52',
         duration: '2:52',
         seed: '29',
         active: true,
@@ -1349,7 +1349,7 @@ test('assets/js/portfolio.js audio player lazy-loads tracks, scrubs, switches tr
         attrs: {
             'data-audio-player': '',
             'data-audio-base': '../assets/audio/',
-            'data-audio-file': 'mashups/pure usa/move-like-i-do.mp3',
+            'data-audio-file': 'mashups/western/move like i do.mp3',
             'data-track-title': 'Move Like I Do',
             'data-track-duration': '2:52',
             'data-track-list': '#release-list',
@@ -1455,14 +1455,14 @@ test('assets/js/portfolio.js audio player lazy-loads tracks, scrubs, switches tr
     assert.strictEqual(createdAudios.length, 0, 'Does not instantiate Audio on initial page load');
     assert.strictEqual(wave.children.length, 10, 'Renders waveform bars on page load');
 
-    // 2. Clicking Play lazy-loads mashups/pure usa/move-like-i-do.mp3 from ../assets/audio/ (URL-encoded)
+    // 2. Clicking Play lazy-loads mashups/western/move like i do.mp3 from ../assets/audio/ (URL-encoded)
     playBtn.trigger('click');
     assert.strictEqual(createdAudios.length, 1, 'Creates Audio lazily on first Play click');
     const audio = createdAudios[0];
     assert.strictEqual(audio.preload, 'none', 'Sets preload="none" on Audio instance');
     assert.strictEqual(
         audio.src,
-        '../assets/audio/mashups/pure%20usa/move-like-i-do.mp3',
+        '../assets/audio/mashups/western/move%20like%20i%20do.mp3',
         'Loads MP3 from ../assets/audio/ base + URL-encoded data-audio-file'
     );
     assert.strictEqual(audio.playCalls, 1, 'Starts playback');
@@ -1661,12 +1661,12 @@ test('assets/js/portfolio.js mashup sub-filters toggle visibility and filter by 
     ];
     const subChips = [
         makeChip('data-subfilter', 'all', 'All Mashups', true),
-        makeChip('data-subfilter', 'pure-usa', 'Pure USA', false),
-        makeChip('data-subfilter', 'fusion', 'Fusion', false),
+        makeChip('data-subfilter', 'western', 'Western', false),
+        makeChip('data-subfilter', 'indo-western-fusion', 'Indo-Western Fusion', false),
     ];
     const items = [
-        makeItem('mashup', 'pure-usa'),
-        makeItem('mashup', 'fusion'),
+        makeItem('mashup', 'western'),
+        makeItem('mashup', 'indo-western-fusion'),
         makeItem('remix', null),
     ];
 
@@ -1713,14 +1713,14 @@ test('assets/js/portfolio.js mashup sub-filters toggle visibility and filter by 
 
     chips[1].click(); // Mashups
     assert.strictEqual(subFilterGroup.hidden, false, 'Reveals mashup sub-filter when Mashups is selected');
-    assert.strictEqual(items[0].hidden, false, 'Shows pure-usa mashup');
-    assert.strictEqual(items[1].hidden, false, 'Shows fusion mashup');
+    assert.strictEqual(items[0].hidden, false, 'Shows western mashup');
+    assert.strictEqual(items[1].hidden, false, 'Shows indo-western-fusion mashup');
     assert.strictEqual(items[2].hidden, true, 'Hides remix');
 
-    subChips[1].click(); // Pure USA
-    assert.strictEqual(items[0].hidden, false, 'Keeps pure-usa mashup visible');
-    assert.strictEqual(items[1].hidden, true, 'Hides fusion mashup');
-    assert.strictEqual(subChips[1].getAttribute('aria-pressed'), 'true', 'Marks Pure USA chip active');
+    subChips[1].click(); // Western
+    assert.strictEqual(items[0].hidden, false, 'Keeps western mashup visible');
+    assert.strictEqual(items[1].hidden, true, 'Hides indo-western-fusion mashup');
+    assert.strictEqual(subChips[1].getAttribute('aria-pressed'), 'true', 'Marks Western chip active');
 
     chips[2].click(); // Remixes & Edits
     assert.strictEqual(subFilterGroup.hidden, true, 'Hides mashup sub-filter when switching to Remixes');
@@ -1765,12 +1765,12 @@ test('assets/js/portfolio.js applies initially pressed non-all filter on page lo
     ];
     const subChips = [
         makeChip('data-subfilter', 'all', 'All Mashups', true),
-        makeChip('data-subfilter', 'pure-usa', 'Pure USA', false),
+        makeChip('data-subfilter', 'western', 'Western', false),
     ];
     const items = [
         makeItem('original', null),
         makeItem('remix', null),
-        makeItem('mashup', 'pure-usa'),
+        makeItem('mashup', 'western'),
         makeItem('performance', null),
     ];
     const emptyEl = { hidden: false, querySelector() { return null; } };
@@ -2189,16 +2189,16 @@ test('assets/js/portfolio.js syncs song title and controls to Media Session and 
         }
 
         const row1 = makeRow({
-            file: 'mashups/fusion/airplanes-945.mp3',
+            file: 'mashups/indo-western-fusion/airplanes-945.mp3',
             title: 'Airplanes × 9:45',
-            meta: 'Mashup · Fusion · 2:48',
+            meta: 'Mashup · Indo-Western Fusion · 2:48',
             duration: '2:48',
             active: true,
         });
         const row2 = makeRow({
-            file: 'mashups/fusion/beautiful-raat.mp3',
+            file: 'mashups/indo-western-fusion/beautiful-raat.mp3',
             title: 'Beautiful Raat',
-            meta: 'Mashup · Fusion · 3:21',
+            meta: 'Mashup · Indo-Western Fusion · 3:21',
             duration: '3:21',
             active: false,
         });
@@ -2226,7 +2226,7 @@ test('assets/js/portfolio.js syncs song title and controls to Media Session and 
                 'data-audio-player': '',
                 'data-audio-base': '../assets/audio/',
                 'data-analytics-category': category,
-                'data-audio-file': 'mashups/fusion/airplanes-945.mp3',
+                'data-audio-file': 'mashups/indo-western-fusion/airplanes-945.mp3',
                 'data-track-title': 'Airplanes × 9:45',
                 'data-track-duration': '2:48',
                 'data-track-list': '#release-list',
