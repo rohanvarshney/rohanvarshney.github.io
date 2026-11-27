@@ -1530,7 +1530,7 @@ test('assets/js/portfolio.js audio player lazy-loads tracks, scrubs, switches tr
     audio.emit('error');
     assert.strictEqual(
         bannerText.textContent,
-        'Audio preview unavailable right now — check back soon.',
+        'Audio preview unavailable right now; check back soon.',
         'Displays non-Spotify fallback message when track has no Spotify link'
     );
 });
@@ -1614,11 +1614,11 @@ test('assets/js/portfolio.js category filters show coming-soon banner for empty 
     chips[2].click(); // Remixes & Edits
     assert.strictEqual(items.every((i) => i.hidden), true, 'Remixes filter hides non-matching items');
     assert.strictEqual(emptyEl.hidden, false, 'Empty banner becomes visible when category has 0 items');
-    assert.strictEqual(emptyTitle.textContent, 'Remixes & Edits — coming soon', 'Updates banner title to selected category');
+    assert.strictEqual(emptyTitle.textContent, 'Remixes & Edits: coming soon', 'Updates banner title to selected category');
 
     chips[3].click(); // Mashups
     assert.strictEqual(emptyEl.hidden, false, 'Empty banner stays visible for Mashups');
-    assert.strictEqual(emptyTitle.textContent, 'Mashups — coming soon', 'Updates banner title to Mashups');
+    assert.strictEqual(emptyTitle.textContent, 'Mashups: coming soon', 'Updates banner title to Mashups');
 
     chips[0].click(); // All
     assert.strictEqual(items.every((i) => !i.hidden), true, 'All filter restores all items');
@@ -2092,4 +2092,301 @@ test('waveform downsamples to mobile width so finger tap aligns with played bars
     assert.strictEqual(wave.children.length, 80, 'Restores all 80 bars when widened to desktop width');
     const playedAfterResize = wave.children.filter((bar) => bar.classList.contains('played')).length;
     assert.strictEqual(playedAfterResize, 40, 'Preserves 50% played bar ratio (40 of 80 bars) after resize');
+});
+
+test('assets/js/portfolio.js syncs song title and controls to Media Session and document.title', () => {
+    const portfolioPath = path.join(__dirname, '..', 'assets', 'js', 'portfolio.js');
+    const portfolioJs = fs.readFileSync(portfolioPath, 'utf8');
+
+    function runPlayerScenario({ category, pageUrl, initialDocTitle }) {
+        function createMockClassList(initial = []) {
+            const set = new Set(initial);
+            return {
+                add(c) { set.add(c); },
+                remove(c) { set.delete(c); },
+                toggle(c, force) {
+                    if (force === undefined) {
+                        if (set.has(c)) { set.delete(c); return false; }
+                        set.add(c); return true;
+                    }
+                    if (force) set.add(c); else set.delete(c);
+                    return force;
+                },
+                contains(c) { return set.has(c); },
+            };
+        }
+
+        function createMockElement(tag, { attrs = {}, classes = [], textContent = '' } = {}) {
+            const attrMap = Object.assign({}, attrs);
+            const listeners = {};
+            const children = [];
+            let _text = textContent;
+            const el = {
+                tagName: tag.toUpperCase(),
+                style: {},
+                hidden: false,
+                children,
+                classList: createMockClassList(classes),
+                get className() { return attrMap.class || ''; },
+                set className(val) { attrMap.class = val; },
+                get textContent() { return _text; },
+                set textContent(val) {
+                    _text = String(val);
+                    if (val === '') children.length = 0;
+                },
+                getAttribute(name) {
+                    return Object.prototype.hasOwnProperty.call(attrMap, name) ? attrMap[name] : null;
+                },
+                setAttribute(name, val) {
+                    attrMap[name] = String(val);
+                },
+                removeAttribute(name) {
+                    delete attrMap[name];
+                },
+                hasAttribute(name) {
+                    return Object.prototype.hasOwnProperty.call(attrMap, name);
+                },
+                appendChild(child) {
+                    if (child && child._isFragment) {
+                        child.children.forEach((c) => children.push(c));
+                    } else {
+                        children.push(child);
+                    }
+                    return child;
+                },
+                addEventListener(type, fn) {
+                    listeners[type] = listeners[type] || [];
+                    listeners[type].push(fn);
+                },
+                trigger(type, eventObj) {
+                    (listeners[type] || []).forEach((fn) => fn(eventObj || {}));
+                },
+                querySelectorAll(selector) {
+                    if (selector === 'span') return children;
+                    return [];
+                },
+                querySelector() {
+                    return null;
+                },
+            };
+            return el;
+        }
+
+        function makeRow({ file, title, meta, duration, active }) {
+            const row = createMockElement('li', {
+                attrs: { 'data-audio-file': file, 'data-track-duration': duration, 'data-seed': '11' },
+                classes: active ? ['release', 'is-active'] : ['release'],
+            });
+            const rowTitle = createMockElement('div', { textContent: title });
+            const rowMeta = createMockElement('div', { textContent: meta });
+            const rowBtn = createMockElement('button', { attrs: { 'data-release-play': '' } });
+            row.querySelector = (sel) => {
+                if (sel === '.release-title') return rowTitle;
+                if (sel === '.release-meta') return rowMeta;
+                return null;
+            };
+            return { row, rowBtn };
+        }
+
+        const row1 = makeRow({
+            file: 'mashups/fusion/airplanes-945.mp3',
+            title: 'Airplanes × 9:45',
+            meta: 'Mashup · Fusion · 2:48',
+            duration: '2:48',
+            active: true,
+        });
+        const row2 = makeRow({
+            file: 'mashups/fusion/beautiful-raat.mp3',
+            title: 'Beautiful Raat',
+            meta: 'Mashup · Fusion · 3:21',
+            duration: '3:21',
+            active: false,
+        });
+
+        const releaseList = createMockElement('ul', { attrs: { id: 'release-list' } });
+        releaseList.querySelector = (sel) => {
+            if (sel === '.release.is-active') return [row1.row, row2.row].find((r) => r.classList.contains('is-active')) || null;
+            return null;
+        };
+        releaseList.querySelectorAll = (sel) => {
+            if (sel === '[data-release-play]') return [row1.rowBtn, row2.rowBtn];
+            if (sel === '.release.is-active') return [row1.row, row2.row].filter((r) => r.classList.contains('is-active'));
+            if (sel === '.release[data-audio-file], .release[data-audio-src]') return [row1.row, row2.row];
+            return [];
+        };
+
+        const playBtn = createMockElement('button', { attrs: { 'data-play-toggle': '' } });
+        const wave = createMockElement('div', { attrs: { 'data-waveform': '', 'data-bars': '10', 'data-progress': '0' } });
+        wave.getBoundingClientRect = () => ({ left: 0, width: 200 });
+        const titleEl = createMockElement('h3', { attrs: { 'data-player-title': '' }, textContent: 'Airplanes × 9:45' });
+        const coverEl = createMockElement('div', { attrs: { 'data-player-cover': '' }, textContent: 'MASHUP' });
+
+        const player = createMockElement('article', {
+            attrs: {
+                'data-audio-player': '',
+                'data-audio-base': '../assets/audio/',
+                'data-analytics-category': category,
+                'data-audio-file': 'mashups/fusion/airplanes-945.mp3',
+                'data-track-title': 'Airplanes × 9:45',
+                'data-track-duration': '2:48',
+                'data-track-list': '#release-list',
+            },
+        });
+        player.querySelector = (sel) => {
+            if (sel === '[data-play-toggle]') return playBtn;
+            if (sel === '[data-waveform]') return wave;
+            if (sel === '[data-player-title]') return titleEl;
+            if (sel === '[data-player-cover]') return coverEl;
+            return null;
+        };
+
+        const createdAudios = [];
+        class MockAudio {
+            constructor() {
+                this.preload = '';
+                this.src = '';
+                this.currentTime = 0;
+                this.duration = 168;
+                this.playbackRate = 1;
+                this.paused = true;
+                this.ended = false;
+                this._listeners = {};
+                createdAudios.push(this);
+            }
+            addEventListener(type, fn) {
+                this._listeners[type] = this._listeners[type] || [];
+                this._listeners[type].push(fn);
+            }
+            emit(type) {
+                (this._listeners[type] || []).forEach((fn) => fn({}));
+            }
+            play() {
+                this.paused = false;
+                this.ended = false;
+                this.emit('loadedmetadata');
+                this.emit('playing');
+                return Promise.resolve();
+            }
+            pause() {
+                this.paused = true;
+                this.emit('pause');
+            }
+        }
+
+        const actionHandlers = {};
+        const positionStates = [];
+        const mediaSession = {
+            metadata: null,
+            playbackState: 'none',
+            setActionHandler(action, fn) {
+                actionHandlers[action] = fn;
+            },
+            setPositionState(state) {
+                positionStates.push(state);
+            },
+        };
+
+        class MockMediaMetadata {
+            constructor(init) {
+                Object.assign(this, init);
+            }
+        }
+
+        let domReadyHandler = null;
+        const sandbox = {
+            Audio: MockAudio,
+            MediaMetadata: MockMediaMetadata,
+            URL,
+            navigator: { mediaSession },
+            location: { href: pageUrl },
+            isSecureContext: true,
+            document: {
+                title: initialDocTitle,
+                body: { getAttribute() { return ''; } },
+                addEventListener(type, fn) {
+                    if (type === 'DOMContentLoaded') domReadyHandler = fn;
+                },
+                querySelector(sel) {
+                    if (sel === '#release-list') return releaseList;
+                    return null;
+                },
+                querySelectorAll(sel) {
+                    if (sel === '[data-waveform]') return [wave];
+                    if (sel === '[data-audio-player]') return [player];
+                    return [];
+                },
+                getElementById() { return null; },
+                createDocumentFragment() {
+                    return { _isFragment: true, children: [], appendChild(c) { this.children.push(c); } };
+                },
+                createElement(tag) {
+                    return createMockElement(tag);
+                },
+            },
+            setTimeout() { return 1; },
+            clearTimeout() {},
+        };
+        sandbox.window = sandbox;
+
+        vm.createContext(sandbox);
+        vm.runInContext(portfolioJs, sandbox);
+        domReadyHandler();
+
+        return { sandbox, playBtn, wave, createdAudios, mediaSession, actionHandlers, positionStates };
+    }
+
+    const prod = runPlayerScenario({
+        category: 'production',
+        pageUrl: 'https://rohanvarshney.github.io/production/',
+        initialDocTitle: 'ROVA Production — Collabs, Remixes & Custom Mixes | Rohan Varshney',
+    });
+
+    prod.playBtn.trigger('click');
+    assert.strictEqual(prod.mediaSession.playbackState, 'playing', 'Sets mediaSession.playbackState to playing');
+    assert.strictEqual(prod.mediaSession.metadata.title, 'Airplanes × 9:45', 'Sets mediaSession.metadata.title to playing song');
+    assert.strictEqual(prod.mediaSession.metadata.artist, 'ROVA', 'Sets mediaSession.metadata.artist to ROVA');
+    assert.strictEqual(prod.mediaSession.metadata.album, 'ROVA Production', 'Sets mediaSession.metadata.album for production');
+    assert.strictEqual(
+        prod.mediaSession.metadata.artwork[0].src,
+        'https://rohanvarshney.github.io/assets/logo.png',
+        'Resolves fallback artwork URL relative to page'
+    );
+    assert.strictEqual(prod.sandbox.document.title, '▶ Airplanes × 9:45 | ROVA', 'Updates document.title while playing');
+    assert.ok(prod.positionStates.length >= 1, 'Reports duration/position to mediaSession.setPositionState');
+
+    // Test Media Session action handlers: seekto, seekforward, seekbackward, nexttrack, previoustrack, pause, play
+    const audio = prod.createdAudios[0];
+    prod.actionHandlers.seekto({ seekTime: 50 });
+    assert.strictEqual(audio.currentTime, 50, 'Handles mediaSession seekto');
+    prod.actionHandlers.seekforward({ seekOffset: 10 });
+    assert.strictEqual(audio.currentTime, 60, 'Handles mediaSession seekforward');
+    prod.actionHandlers.seekbackward({ seekOffset: 15 });
+    assert.strictEqual(audio.currentTime, 45, 'Handles mediaSession seekbackward');
+
+    prod.actionHandlers.nexttrack();
+    assert.strictEqual(prod.mediaSession.metadata.title, 'Beautiful Raat', 'Updates mediaSession title on nexttrack');
+    assert.strictEqual(prod.sandbox.document.title, '▶ Beautiful Raat | ROVA', 'Updates document.title on nexttrack');
+
+    prod.actionHandlers.previoustrack();
+    assert.strictEqual(prod.mediaSession.metadata.title, 'Airplanes × 9:45', 'Restores previous track on previoustrack');
+
+    prod.actionHandlers.pause();
+    assert.strictEqual(prod.mediaSession.playbackState, 'paused', 'Sets mediaSession.playbackState to paused');
+    assert.strictEqual(
+        prod.sandbox.document.title,
+        'ROVA Production — Collabs, Remixes & Custom Mixes | Rohan Varshney',
+        'Restores original document.title when paused'
+    );
+
+    prod.actionHandlers.play();
+    assert.strictEqual(prod.mediaSession.playbackState, 'playing', 'Resumes playback on mediaSession play');
+
+    const raas = runPlayerScenario({
+        category: 'raas',
+        pageUrl: 'https://rohanvarshney.github.io/raas/',
+        initialDocTitle: 'RAS XII - XV | Rohan Varshney',
+    });
+    raas.playBtn.trigger('click');
+    assert.strictEqual(raas.mediaSession.metadata.album, 'ROVA Raas', 'Uses ROVA Raas album on Raas page');
+    assert.strictEqual(raas.sandbox.document.title, '▶ Airplanes × 9:45 | ROVA', 'Updates Raas tab title while playing');
 });

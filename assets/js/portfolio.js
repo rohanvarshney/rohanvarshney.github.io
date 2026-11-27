@@ -63,7 +63,7 @@
     if (event) {
       event.preventDefault();
     }
-    showToast(label + ' \u2014 coming soon!');
+    showToast(label + ': coming soon!');
   };
 
   /* ---------- Clipboard ---------- */
@@ -146,7 +146,7 @@
     document.querySelectorAll('[data-coming-soon]').forEach(function (el) {
       el.addEventListener('click', function (event) {
         event.preventDefault();
-        showToast(el.getAttribute('data-coming-soon') + ' \u2014 coming soon!');
+        showToast(el.getAttribute('data-coming-soon') + ': coming soon!');
       });
     });
   }
@@ -190,7 +190,7 @@
         }
         var text = target.innerText.replace(/\n{3,}/g, '\n\n').trim();
         copyText(text).then(function () {
-          flashCopied(button, 'Copied \u2014 ready to paste into your flyer or listing.');
+          flashCopied(button, 'Copied! Ready to paste into your flyer or listing.');
           track('press_copy', { event_category: 'press', event_label: selector });
         });
       });
@@ -532,6 +532,143 @@
       var pendingSeekRatio = null;
       var pendingResumeTime = null;
       var retriedExpiredUrl = false;
+      var originalDocTitle = document.title;
+      var didSetDocTitle = false;
+      var playerAlbum = player.getAttribute('data-analytics-category') === 'raas' ? 'ROVA Raas' : 'ROVA Production';
+      var mediaHandlersRegistered = false;
+
+      function resolveMediaArtworkUrl() {
+        var coverImg = coverEl && coverEl.querySelector ? coverEl.querySelector('img') : null;
+        var rawSrc = (coverImg && coverImg.getAttribute && coverImg.getAttribute('src')) || '../assets/logo.png';
+        if (!rawSrc) {
+          return '';
+        }
+        try {
+          if (typeof URL === 'function' && window.location && window.location.href) {
+            return new URL(rawSrc, window.location.href).href;
+          }
+        } catch (e) {
+          return rawSrc;
+        }
+        return rawSrc;
+      }
+
+      function updateMediaSessionMetadata() {
+        if (typeof navigator === 'undefined' || !navigator.mediaSession || typeof window.MediaMetadata !== 'function') {
+          return;
+        }
+        var artworkUrl = resolveMediaArtworkUrl();
+        var artwork = [];
+        if (artworkUrl) {
+          var entry = { src: artworkUrl };
+          if (/\.png(\?|$)/i.test(artworkUrl)) {
+            entry.type = 'image/png';
+          }
+          artwork.push(entry);
+        }
+        try {
+          navigator.mediaSession.metadata = new window.MediaMetadata({
+            title: currentTitle,
+            artist: 'ROVA',
+            album: playerAlbum,
+            artwork: artwork,
+          });
+        } catch (e) {}
+      }
+
+      function updateMediaSessionPosition() {
+        if (typeof navigator === 'undefined' || !navigator.mediaSession || typeof navigator.mediaSession.setPositionState !== 'function') {
+          return;
+        }
+        if (audio && loadedUrl === currentUrl && isFinite(audio.duration) && audio.duration > 0) {
+          try {
+            navigator.mediaSession.setPositionState({
+              duration: audio.duration,
+              playbackRate: audio.playbackRate || 1,
+              position: Math.max(0, Math.min(audio.duration, audio.currentTime || 0)),
+            });
+          } catch (e) {}
+        }
+      }
+
+      function stepTrack(delta) {
+        if (!trackList || !trackList.querySelectorAll) {
+          return;
+        }
+        var rows = Array.prototype.slice
+          .call(trackList.querySelectorAll('.release[data-audio-file], .release[data-audio-src]'))
+          .filter(function (row) {
+            return !row.hidden;
+          });
+        if (rows.length <= 1) {
+          return;
+        }
+        var currentIndex = rows.indexOf(activeRow);
+        var nextIndex = currentIndex === -1 ? 0 : (currentIndex + delta + rows.length) % rows.length;
+        loadTrackFromRow(rows[nextIndex], true);
+      }
+
+      function registerMediaSessionHandlers() {
+        if (mediaHandlersRegistered) {
+          return;
+        }
+        if (typeof navigator === 'undefined' || !navigator.mediaSession || typeof navigator.mediaSession.setActionHandler !== 'function') {
+          return;
+        }
+        mediaHandlersRegistered = true;
+
+        function bindHandler(action, handler) {
+          try {
+            navigator.mediaSession.setActionHandler(action, handler);
+          } catch (e) {}
+        }
+
+        bindHandler('play', function () {
+          if (!audio || audio.paused || audio.ended) {
+            togglePlay();
+          }
+        });
+        bindHandler('pause', function () {
+          if (audio && !audio.paused) {
+            audio.pause();
+          }
+        });
+        bindHandler('seekbackward', function (details) {
+          if (audio && loadedUrl === currentUrl && isFinite(audio.duration) && audio.duration > 0) {
+            var offset = (details && details.seekOffset) || 10;
+            var nextTime = Math.max(0, audio.currentTime - offset);
+            audio.currentTime = nextTime;
+            setWaveformProgress(wave, nextTime / audio.duration);
+            updateTimeDisplay(nextTime, audio.duration);
+            updateMediaSessionPosition();
+          }
+        });
+        bindHandler('seekforward', function (details) {
+          if (audio && loadedUrl === currentUrl && isFinite(audio.duration) && audio.duration > 0) {
+            var offset = (details && details.seekOffset) || 10;
+            var nextTime = Math.min(audio.duration, audio.currentTime + offset);
+            audio.currentTime = nextTime;
+            setWaveformProgress(wave, nextTime / audio.duration);
+            updateTimeDisplay(nextTime, audio.duration);
+            updateMediaSessionPosition();
+          }
+        });
+        bindHandler('seekto', function (details) {
+          if (details && typeof details.seekTime === 'number' && audio && loadedUrl === currentUrl && isFinite(audio.duration) && audio.duration > 0) {
+            var nextTime = Math.max(0, Math.min(audio.duration, details.seekTime));
+            audio.currentTime = nextTime;
+            setWaveformProgress(wave, nextTime / audio.duration);
+            updateTimeDisplay(nextTime, audio.duration);
+            updateMediaSessionPosition();
+          }
+        });
+        bindHandler('previoustrack', function () {
+          stepTrack(-1);
+        });
+        bindHandler('nexttrack', function () {
+          stepTrack(1);
+        });
+      }
 
       function updateTimeDisplay(currentSec, durationSec) {
         if (!timeEl) {
@@ -545,6 +682,23 @@
 
       function syncPlayState() {
         var isPlaying = Boolean(audio && !audio.paused && !audio.ended && loadedUrl === currentUrl);
+        if (isPlaying) {
+          document.title = '\u25B6 ' + currentTitle + ' | ROVA';
+          didSetDocTitle = true;
+          if (typeof navigator !== 'undefined' && navigator.mediaSession) {
+            navigator.mediaSession.playbackState = 'playing';
+          }
+          updateMediaSessionMetadata();
+          updateMediaSessionPosition();
+        } else {
+          if (didSetDocTitle) {
+            document.title = originalDocTitle;
+            didSetDocTitle = false;
+          }
+          if (typeof navigator !== 'undefined' && navigator.mediaSession && audio) {
+            navigator.mediaSession.playbackState = loadedUrl === currentUrl ? 'paused' : 'none';
+          }
+        }
         if (playBtn) {
           if (playBtn.classList) {
             playBtn.classList.toggle('is-playing', isPlaying);
@@ -616,6 +770,8 @@
             currentDurationLabel = formatTime(audio.duration);
           }
           updateTimeDisplay(audio.currentTime || 0, audio.duration);
+          updateMediaSessionMetadata();
+          updateMediaSessionPosition();
         });
         audio.addEventListener('timeupdate', function () {
           if (isFinite(audio.duration) && audio.duration > 0) {
@@ -652,8 +808,8 @@
           var hasSpotifyLink = Boolean(spotifyEl && !spotifyEl.hidden && spotifyEl.getAttribute('href') && spotifyEl.getAttribute('href') !== '#');
           showToast(
             hasSpotifyLink
-              ? 'Audio preview unavailable right now \u2014 listen on Spotify or check back soon.'
-              : 'Audio preview unavailable right now \u2014 check back soon.'
+              ? 'Audio preview unavailable right now; listen on Spotify or check back soon.'
+              : 'Audio preview unavailable right now; check back soon.'
           );
         });
 
@@ -681,6 +837,8 @@
             event_category: player.getAttribute('data-analytics-category') || 'production',
             event_label: currentTitle,
           });
+          updateMediaSessionMetadata();
+          registerMediaSessionHandlers();
           var playPromise = instance.play();
           if (playPromise && typeof playPromise.catch === 'function') {
             playPromise.catch(function (err) {
@@ -797,6 +955,7 @@
         if (audio && loadedUrl === currentUrl && isFinite(audio.duration) && audio.duration > 0) {
           audio.currentTime = clamped * audio.duration;
           updateTimeDisplay(audio.currentTime, audio.duration);
+          updateMediaSessionPosition();
         } else {
           pendingSeekRatio = clamped;
           togglePlay();
@@ -830,6 +989,7 @@
               audio.currentTime = nextTime;
               setWaveformProgress(wave, nextTime / audio.duration);
               updateTimeDisplay(nextTime, audio.duration);
+              updateMediaSessionPosition();
             }
           } else if (event.key === 'Home' || event.key === 'End') {
             if (audio && loadedUrl === currentUrl && isFinite(audio.duration) && audio.duration > 0) {
@@ -838,6 +998,7 @@
               audio.currentTime = targetTime;
               setWaveformProgress(wave, targetTime / audio.duration);
               updateTimeDisplay(targetTime, audio.duration);
+              updateMediaSessionPosition();
             }
           }
         });
@@ -901,7 +1062,7 @@
         if (emptyEl) {
           emptyEl.hidden = visibleCount > 0;
           if (visibleCount === 0 && emptyTitleEl && activeButtonRef) {
-            emptyTitleEl.textContent = activeButtonRef.textContent.trim() + ' \u2014 coming soon';
+            emptyTitleEl.textContent = activeButtonRef.textContent.trim() + ': coming soon';
           }
         }
       }
