@@ -169,8 +169,8 @@ test('raas/index.html structure and content', () => {
     const raasContent = fs.readFileSync(raasPath, 'utf8');
 
     assert.ok(raasContent.includes('<!DOCTYPE html>'), 'Has doctype declaration');
-    assert.ok(raasContent.includes('<title>RAS XII - XV | Rohan Varshney</title>'), 'Has correct title');
-    assert.ok(raasContent.includes('<h1 class="title">RAS XII - XV<span class="cursor"></span></h1>'), 'Has correct main heading');
+    assert.ok(raasContent.includes('<title>Raas All Stars XII - XV | Rohan Varshney</title>'), 'Has correct title');
+    assert.ok(raasContent.includes('<h1 class="title">Raas All Stars XII - XV<span class="cursor"></span></h1>'), 'Has correct main heading');
     assert.ok(raasContent.includes('id="statistics"'), 'Has Statistics section');
     assert.ok(raasContent.includes('Statistics'), 'Has Statistics heading');
     assert.ok(raasContent.includes('<div class="stat-value">22</div>'), 'Has 22 Team Mixes stat');
@@ -181,7 +181,7 @@ test('raas/index.html structure and content', () => {
     assert.ok(raasContent.includes('<div class="stat-value">11</div>'), 'Has 11 Circuit Mixtapes stat');
     assert.ok(raasContent.includes('<div class="stat-label">Circuit Mixtapes</div>'), 'Has Circuit Mixtapes label without Ladders');
     assert.ok(raasContent.includes('<div class="stat-value">1,788</div>'), 'Has 1,788 Audio Bounces Exported stat');
-    assert.ok(raasContent.includes('<div class="stat-label">RAS Mixes</div>'), 'Has RAS Mixes card');
+    assert.ok(raasContent.includes('<div class="stat-label">Raas All Stars Mixes</div>'), 'Has Raas All Stars Mixes card');
     assert.ok(raasContent.includes('<div class="stat-value">6</div>'), 'Has 6 Years Mixing stat');
     assert.ok(raasContent.includes('<div class="stat-label">Years Mixing</div>'), 'Has Years Mixing card');
     assert.strictEqual(
@@ -235,34 +235,40 @@ test('raas/index.html structure and content', () => {
     assert.ok(raasContent.includes('id="all-project-files"'), 'All Project Files resource card has #all-project-files anchor');
     assert.ok(raasContent.includes('<ul class="hof-list">'), 'Hall Of Fame uses a bulletpoint list');
     assert.ok(!raasContent.includes('class="hof-card"'), 'Hall Of Fame does not use cards');
-    assert.ok(raasContent.includes('<h3 class="hof-group-title">RAS Team Mixes (7)</h3>'), 'Has RAS Team Mixes (7) subsection');
+    assert.ok(raasContent.includes('Raas All Stars</a> Team Mixes (7)</h3>'), 'Has Raas All Stars Team Mixes (7) subsection');
     assert.ok(raasContent.includes('<h3 class="hof-group-title">Competition Mixtapes (9)</h3>'), 'Has Competition Mixtapes (9) subsection');
     for (const [label, badge] of [
-        ['GT Ramblin\' Raas (2019&ndash;20 &middot; RAS XII)', 'hof-badge-mp3">MP3<'],
-        ['Dirty South Dandiya (2021&ndash;22 &middot; RAS XIV)', 'hof-badge-mp3">MP3<'],
-        ['Cornell Big Red Raas (2021&ndash;22 &middot; RAS XIV)', 'hof-badge-mp3">MP3<'],
-        ['UVA Hooraas (2021&ndash;22 &middot; RAS XIV)', 'hof-badge-mp3">MP3<'],
-        ['GT Ramblin\' Raas (2021&ndash;22 &middot; RAS XIV)', 'hof-badge-mp3">MP3<'],
-        ['GT Ramblin\' Raas (2022&ndash;23 &middot; RAS XV)', 'hof-badge-mp3">MP3<'],
-        ['RAS XII Mixtape (2019&ndash;20)', 'Full + 4 MP3s'],
-        ['RAS XIII: Raas Reboot Mixtape (2020&ndash;21)', 'Full + 3 MP3s'],
+        ['GT Ramblin\' Raas (2019&ndash;20 &middot; Raas All Stars XII)', 'hof-badge-mp3">MP3<'],
+        ['Dirty South Dandiya (2021&ndash;22 &middot; Raas All Stars XIV)', 'hof-badge-mp3">MP3<'],
+        ['Cornell Big Red Raas (2021&ndash;22 &middot; Raas All Stars XIV)', 'hof-badge-mp3">MP3<'],
+        ['UVA Hooraas (2021&ndash;22 &middot; Raas All Stars XIV)', 'hof-badge-mp3">MP3<'],
+        ['GT Ramblin\' Raas (2021&ndash;22 &middot; Raas All Stars XIV)', 'hof-badge-mp3">MP3<'],
+        ['GT Ramblin\' Raas (2022&ndash;23 &middot; Raas All Stars XV)', 'hof-badge-mp3">MP3<'],
+        ['Raas All Stars XII Mixtape (2019&ndash;20)', 'Full + 4 MP3s'],
+        ['Raas All Stars XIII: Raas Reboot Mixtape (2020&ndash;21)', 'Full + 3 MP3s'],
         ['DTX Dandiya Mixtape (2021&ndash;22)', 'Full + 2 MP3s'],
         ['Raas Rampage Mixtape (2021&ndash;22)', 'Full + 3 MP3s'],
         ['Raas Collab (2021&ndash;22)', 'Full + 9 MP3s'],
         ['Raas Rampage Mixtape (2022&ndash;23)', 'Full + 4 MP3s'],
         ['Raas Collab (2022&ndash;23)', 'Full + 3 MP3s'],
         ['Raas Chaos (2022&ndash;23)', '2 Track MP3s'],
-        ['RAS XV Album (2022&ndash;23)', '2 Track MP3s'],
+        ['Raas All Stars XV Album (2022&ndash;23)', '2 Track MP3s'],
     ]) {
         assert.ok(raasContent.includes(`<strong>${label}</strong>`), `Hall of Fame lists ${label}`);
         assert.ok(raasContent.includes(badge), `Hall of Fame marks MP3 status (${badge}) for ${label}`);
     }
-    assert.ok(raasContent.includes('<strong>Dirty South Dandiya (2022&ndash;23 &middot; RAS XV)</strong>'), 'Hall of Fame lists DSD 2022-23');
+    assert.ok(raasContent.includes('<strong>Dirty South Dandiya (2022&ndash;23 &middot; Raas All Stars XV)</strong>'), 'Hall of Fame lists DSD 2022-23');
     assert.ok(
         raasContent.includes('href="https://soundcloud.com/arunabh-chaudhuri/dirty-south-dandiya-ras-xv-2023-1st-place-ft-rova-1"') &&
         raasContent.includes('SoundCloud Only &nearr;'),
         'DSD 2022-23 links to SoundCloud Only'
     );
+    assert.strictEqual(
+        (raasContent.match(/href="https:\/\/raasallstars\.com"/g) || []).length,
+        3,
+        'Links out to official https://raasallstars.com website in hero, Hall of Fame, and Resources'
+    );
+    assert.ok(!/\bRAS\b/.test(raasContent), 'Replaces all visible uppercase RAS abbreviations with Raas All Stars');
     const hofLists = [...raasContent.matchAll(/<ul class="hof-list">([\s\S]*?)<\/ul>/g)];
     assert.strictEqual(hofLists.length, 2, 'Hall of Fame has 2 hof-list groups');
     assert.ok(hofLists.every((m) => !m[1].includes('&mdash;')), 'Hall Of Fame items omit descriptions after em dash');
@@ -2411,7 +2417,7 @@ test('assets/js/portfolio.js syncs song title and controls to Media Session and 
     const raas = runPlayerScenario({
         category: 'raas',
         pageUrl: 'https://rohanvarshney.github.io/raas/',
-        initialDocTitle: 'RAS XII - XV | Rohan Varshney',
+        initialDocTitle: 'Raas All Stars XII - XV | Rohan Varshney',
     });
     raas.playBtn.trigger('click');
     assert.strictEqual(raas.mediaSession.metadata.album, 'ROVA Raas', 'Uses ROVA Raas album on Raas page');

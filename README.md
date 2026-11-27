@@ -7,7 +7,7 @@ Personal website and ROVA music portfolio hosted on GitHub Pages at [rohanvarshn
 - `/` (`index.html`) — Home & links
 - `/dj/` (`dj/index.html`) — DJ ROVA bookings & press kit
 - `/production/` (`production/index.html`) — ROVA production portfolio & audio player
-- `/raas/` (`raas/index.html`) — RAS XII–XV archive & resources
+- `/raas/` (`raas/index.html`) — Raas All Stars XII–XV archive & resources
 
 ## Adding Audio Tracks
 
