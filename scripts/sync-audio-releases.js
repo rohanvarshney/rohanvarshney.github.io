@@ -345,7 +345,7 @@ function buildTrackMetadata(fullPath) {
   const isRaas = sectionKey === 'mashups' && subfolder === 'raas';
   const cover = isRaas ? 'RAAS' : section.cover;
 
-  const metaParts = isRaas ? ['Raas Mashup'] : [section.label];
+  const metaParts = isRaas ? [] : [section.label];
   if (!isRaas && subLabel) {
     metaParts.push(subLabel);
   }

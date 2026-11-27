@@ -230,16 +230,42 @@ test('raas/index.html structure and content', () => {
     assert.ok(!raasContent.includes('Qurbani'), 'GT Qurbani is removed from statistics and map');
     assert.ok(raasContent.includes('id="hall-of-fame"'), 'Has Hall Of Fame section');
     assert.ok(raasContent.includes('Hall of Fame'), 'Has Hall of Fame heading');
+    assert.ok(raasContent.includes('class="hof-actions"') && raasContent.includes('class="hof-download-btn"'), 'Has Hall of Fame top-right Download button');
+    assert.ok(raasContent.includes('href="#all-project-files"'), 'Hall of Fame Download button links to #all-project-files');
+    assert.ok(raasContent.includes('id="all-project-files"'), 'All Project Files resource card has #all-project-files anchor');
     assert.ok(raasContent.includes('<ul class="hof-list">'), 'Hall Of Fame uses a bulletpoint list');
     assert.ok(!raasContent.includes('class="hof-card"'), 'Hall Of Fame does not use cards');
-    assert.ok(raasContent.includes('<li><strong>DSD 2021-2022</strong></li>'), 'Has DSD 2021-2022 Hall Of Fame item without description');
-    assert.ok(raasContent.includes('<li><strong>GT 2022-2023</strong></li>'), 'Has GT 2022-2023 Hall Of Fame item without description');
-    assert.ok(raasContent.includes('<li><strong>RAS XIII: Raas Reboot (2021)</strong></li>'), 'Has RAS XIII: Raas Reboot (2021) Hall Of Fame item without description');
-    assert.ok(raasContent.includes('<li><strong>UCF 2019-2020</strong></li>'), 'Has UCF 2019-2020 Hall Of Fame item without description');
-    assert.ok(raasContent.includes('<li><strong>Raas Chaos Mixtape (2022)</strong></li>'), 'Has Raas Chaos Mixtape (2022) Hall Of Fame item without description');
-    assert.ok(raasContent.includes('<li><strong>GT 2019-2020</strong></li>'), 'Has GT 2019-2020 Hall Of Fame item without description');
-    const hofMatch = raasContent.match(/<ul class="hof-list">([\s\S]*?)<\/ul>/);
-    assert.ok(hofMatch && !hofMatch[1].includes('&mdash;'), 'Hall Of Fame items omit descriptions after em dash');
+    assert.ok(raasContent.includes('<h3 class="hof-group-title">RAS Team Mixes (7)</h3>'), 'Has RAS Team Mixes (7) subsection');
+    assert.ok(raasContent.includes('<h3 class="hof-group-title">Competition Mixtapes (9)</h3>'), 'Has Competition Mixtapes (9) subsection');
+    for (const [label, badge] of [
+        ['GT Ramblin\' Raas (2019&ndash;20 &middot; RAS XII)', 'hof-badge-mp3">MP3<'],
+        ['Dirty South Dandiya (2021&ndash;22 &middot; RAS XIV)', 'hof-badge-mp3">MP3<'],
+        ['Cornell Big Red Raas (2021&ndash;22 &middot; RAS XIV)', 'hof-badge-mp3">MP3<'],
+        ['UVA Hooraas (2021&ndash;22 &middot; RAS XIV)', 'hof-badge-mp3">MP3<'],
+        ['GT Ramblin\' Raas (2021&ndash;22 &middot; RAS XIV)', 'hof-badge-mp3">MP3<'],
+        ['GT Ramblin\' Raas (2022&ndash;23 &middot; RAS XV)', 'hof-badge-mp3">MP3<'],
+        ['RAS XII Mixtape (2019&ndash;20)', 'Full + 4 MP3s'],
+        ['RAS XIII: Raas Reboot Mixtape (2020&ndash;21)', 'Full + 3 MP3s'],
+        ['DTX Dandiya Mixtape (2021&ndash;22)', 'Full + 2 MP3s'],
+        ['Raas Rampage Mixtape (2021&ndash;22)', 'Full + 3 MP3s'],
+        ['Raas Collab (2021&ndash;22)', 'Full + 9 MP3s'],
+        ['Raas Rampage Mixtape (2022&ndash;23)', 'Full + 4 MP3s'],
+        ['Raas Collab (2022&ndash;23)', 'Full + 3 MP3s'],
+        ['Raas Chaos (2022&ndash;23)', '2 Track MP3s'],
+        ['RAS XV Album (2022&ndash;23)', '2 Track MP3s'],
+    ]) {
+        assert.ok(raasContent.includes(`<strong>${label}</strong>`), `Hall of Fame lists ${label}`);
+        assert.ok(raasContent.includes(badge), `Hall of Fame marks MP3 status (${badge}) for ${label}`);
+    }
+    assert.ok(raasContent.includes('<strong>Dirty South Dandiya (2022&ndash;23 &middot; RAS XV)</strong>'), 'Hall of Fame lists DSD 2022-23');
+    assert.ok(
+        raasContent.includes('href="https://soundcloud.com/arunabh-chaudhuri/dirty-south-dandiya-ras-xv-2023-1st-place-ft-rova-1"') &&
+        raasContent.includes('SoundCloud Only &nearr;'),
+        'DSD 2022-23 links to SoundCloud Only'
+    );
+    const hofLists = [...raasContent.matchAll(/<ul class="hof-list">([\s\S]*?)<\/ul>/g)];
+    assert.strictEqual(hofLists.length, 2, 'Hall of Fame has 2 hof-list groups');
+    assert.ok(hofLists.every((m) => !m[1].includes('&mdash;')), 'Hall Of Fame items omit descriptions after em dash');
     assert.ok(raasContent.includes('id="resources"'), 'Has Resources section');
     assert.ok(raasContent.includes('Resources'), 'Has Resources heading');
 
@@ -296,6 +322,7 @@ test('raas/index.html structure and content', () => {
     for (const relFile of raasDiskMp3s) {
         assert.ok(raasRenderedFiles.has(relFile), `Every Raas MP3 on disk is rendered in raas/index.html: ${relFile}`);
     }
+    assert.ok(!raasContent.includes('Raas Mashup &middot;'), 'Raas player and cards omit redundant Raas Mashup prefix');
 
     const raasPeakMatches = [...raasContent.matchAll(/data-peaks="([0-9,]+)"/g)];
     assert.strictEqual(raasPeakMatches.length, raasDiskMp3s.length + 1, 'Raas page has real data-peaks on featured waveform and all 11 rows');

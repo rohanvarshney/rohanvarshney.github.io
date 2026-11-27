@@ -563,6 +563,46 @@
       background-color: #fafafa;
     }
 
+    .hof-actions {
+      flex-shrink: 0;
+    }
+
+    .hof-download-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: #dc143c;
+      color: #fff;
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      transition: background-color 0.2s;
+      white-space: nowrap;
+    }
+
+    .hof-download-btn:hover {
+      background: #a50e2d;
+    }
+
+    .hof-group + .hof-group {
+      margin-top: 20px;
+      padding-top: 18px;
+      border-top: 1px solid #e2e2e2;
+    }
+
+    .hof-group-title {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
+    }
+
     .hof-list {
       list-style: none;
       display: flex;
@@ -576,6 +616,11 @@
       font-size: 0.9rem;
       color: #444;
       line-height: 1.55;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
     }
 
     .hof-list li::before {
@@ -584,6 +629,54 @@
       left: 0;
       color: #dc143c;
       font-weight: bold;
+    }
+
+    .hof-item-main {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .hof-champ {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #dc143c;
+    }
+
+    .hof-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+
+    .hof-badge-mp3 {
+      background-color: #fff5f7;
+      color: #dc143c;
+      border: 1px solid rgba(220, 20, 60, 0.35);
+    }
+
+    .hof-badge-external {
+      background-color: #fff;
+      color: #555;
+      border: 1px solid #ccc;
+      transition: border-color 0.2s, color 0.2s, background-color 0.2s;
+    }
+
+    .hof-badge-external:hover {
+      border-color: #dc143c;
+      color: #dc143c;
+      background-color: #fff5f7;
     }
 
     .hof-list strong {
@@ -599,7 +692,7 @@
 
     .section-head {
       display: flex;
-      align-items: baseline;
+      align-items: center;
       justify-content: space-between;
       gap: 16px;
       margin-bottom: 16px;
@@ -899,6 +992,12 @@
       border-color: #dc143c;
       background-color: #fff;
       transform: translateY(-2px);
+    }
+
+    #all-project-files:target {
+      border-color: #dc143c;
+      background-color: #fff;
+      box-shadow: 0 0 0 3px rgba(220, 20, 60, 0.16);
     }
 
     .resource-icon {
@@ -1382,16 +1481,96 @@
     </section>
 
     <section class="section" id="hall-of-fame">
-      <h2 class="section-title">Hall of Fame</h2>
+      <div class="section-head">
+        <h2 class="section-title">Hall of Fame</h2>
+        <div class="hof-actions">
+          <a href="#all-project-files" class="hof-download-btn"
+            data-analytics-event="raas_hof_click" data-analytics-category="raas"
+            data-analytics-label="Hall of Fame Download" data-analytics-status="live">
+            <i class="fa fa-download" aria-hidden="true"></i> Download
+          </a>
+        </div>
+      </div>
       <div class="hof-list-card">
-        <ul class="hof-list">
-          <li><strong>DSD 2021-2022</strong></li>
-          <li><strong>GT 2022-2023</strong></li>
-          <li><strong>RAS XIII: Raas Reboot (2021)</strong></li>
-          <li><strong>UCF 2019-2020</strong></li>
-          <li><strong>Raas Chaos Mixtape (2022)</strong></li>
-          <li><strong>GT 2019-2020</strong></li>
-        </ul>
+        <div class="hof-group">
+          <h3 class="hof-group-title">RAS Team Mixes (7)</h3>
+          <ul class="hof-list">
+            <li>
+              <span class="hof-item-main"><strong>GT Ramblin' Raas (2019&ndash;20 &middot; RAS XII)</strong></span>
+              <span class="hof-badge hof-badge-mp3">MP3</span>
+            </li>
+            <li>
+              <span class="hof-item-main"><strong>Dirty South Dandiya (2021&ndash;22 &middot; RAS XIV)</strong> <span class="hof-champ">1st Place</span></span>
+              <span class="hof-badge hof-badge-mp3">MP3</span>
+            </li>
+            <li>
+              <span class="hof-item-main"><strong>Cornell Big Red Raas (2021&ndash;22 &middot; RAS XIV)</strong></span>
+              <span class="hof-badge hof-badge-mp3">MP3</span>
+            </li>
+            <li>
+              <span class="hof-item-main"><strong>UVA Hooraas (2021&ndash;22 &middot; RAS XIV)</strong></span>
+              <span class="hof-badge hof-badge-mp3">MP3</span>
+            </li>
+            <li>
+              <span class="hof-item-main"><strong>GT Ramblin' Raas (2021&ndash;22 &middot; RAS XIV)</strong></span>
+              <span class="hof-badge hof-badge-mp3">MP3</span>
+            </li>
+            <li>
+              <span class="hof-item-main"><strong>GT Ramblin' Raas (2022&ndash;23 &middot; RAS XV)</strong></span>
+              <span class="hof-badge hof-badge-mp3">MP3</span>
+            </li>
+            <li>
+              <span class="hof-item-main"><strong>Dirty South Dandiya (2022&ndash;23 &middot; RAS XV)</strong> <span class="hof-champ">1st Place</span></span>
+              <a href="https://soundcloud.com/arunabh-chaudhuri/dirty-south-dandiya-ras-xv-2023-1st-place-ft-rova-1"
+                target="_blank" rel="noopener noreferrer" class="hof-badge hof-badge-external"
+                data-analytics-event="raas_hof_click" data-analytics-category="raas"
+                data-analytics-label="DSD 2022-23 SoundCloud" data-analytics-status="live">
+                SoundCloud Only &nearr;
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div class="hof-group">
+          <h3 class="hof-group-title">Competition Mixtapes (9)</h3>
+          <ul class="hof-list">
+            <li>
+              <span class="hof-item-main"><strong>RAS XII Mixtape (2019&ndash;20)</strong></span>
+              <span class="hof-badge hof-badge-mp3">Full + 4 MP3s</span>
+            </li>
+            <li>
+              <span class="hof-item-main"><strong>RAS XIII: Raas Reboot Mixtape (2020&ndash;21)</strong></span>
+              <span class="hof-badge hof-badge-mp3">Full + 3 MP3s</span>
+            </li>
+            <li>
+              <span class="hof-item-main"><strong>DTX Dandiya Mixtape (2021&ndash;22)</strong></span>
+              <span class="hof-badge hof-badge-mp3">Full + 2 MP3s</span>
+            </li>
+            <li>
+              <span class="hof-item-main"><strong>Raas Rampage Mixtape (2021&ndash;22)</strong></span>
+              <span class="hof-badge hof-badge-mp3">Full + 3 MP3s</span>
+            </li>
+            <li>
+              <span class="hof-item-main"><strong>Raas Collab (2021&ndash;22)</strong></span>
+              <span class="hof-badge hof-badge-mp3">Full + 9 MP3s</span>
+            </li>
+            <li>
+              <span class="hof-item-main"><strong>Raas Rampage Mixtape (2022&ndash;23)</strong></span>
+              <span class="hof-badge hof-badge-mp3">Full + 4 MP3s</span>
+            </li>
+            <li>
+              <span class="hof-item-main"><strong>Raas Collab (2022&ndash;23)</strong></span>
+              <span class="hof-badge hof-badge-mp3">Full + 3 MP3s</span>
+            </li>
+            <li>
+              <span class="hof-item-main"><strong>Raas Chaos (2022&ndash;23)</strong></span>
+              <span class="hof-badge hof-badge-mp3">2 Track MP3s</span>
+            </li>
+            <li>
+              <span class="hof-item-main"><strong>RAS XV Album (2022&ndash;23)</strong></span>
+              <span class="hof-badge hof-badge-mp3">2 Track MP3s</span>
+            </li>
+          </ul>
+        </div>
       </div>
     </section>
 
@@ -1414,7 +1593,7 @@
         <div class="player-body">
           <div class="player-kicker" data-player-kicker>Featured Track</div>
           <h3 class="player-title" data-player-title>Feel So Raas</h3>
-          <div class="player-meta" data-player-meta>Raas Mashup &middot; Feel So Close (Calvin Harris) &times; Ha Ha Re Ghaduliyo (Traditional Garba) &middot; 1:46</div>
+          <div class="player-meta" data-player-meta>Feel So Close (Calvin Harris) &times; Ha Ha Re Ghaduliyo (Traditional Garba) &middot; 1:46</div>
           <div class="player-controls">
             <button type="button" class="play-btn" data-play-toggle aria-label="Play Feel So Raas" aria-pressed="false">
               <i class="fa fa-play" aria-hidden="true"></i>
@@ -1434,7 +1613,7 @@
           <div class="cover" aria-hidden="true">RAAS</div>
           <div>
             <div class="release-title">Feel So Raas</div>
-            <div class="release-meta">Raas Mashup &middot; Feel So Close (Calvin Harris) &times; Ha Ha Re Ghaduliyo (Traditional Garba) &middot; 1:46</div>
+            <div class="release-meta">Feel So Close (Calvin Harris) &times; Ha Ha Re Ghaduliyo (Traditional Garba) &middot; 1:46</div>
           </div>
           <div class="release-links">
             <button type="button" class="release-play-btn" data-release-play aria-label="Play Feel So Raas" aria-pressed="false">
@@ -1447,7 +1626,7 @@
           <div class="cover" aria-hidden="true">RAAS</div>
           <div>
             <div class="release-title">Besharam Divya</div>
-            <div class="release-meta">Raas Mashup &middot; Besharam Rang (Shilpa Rao &amp; Vishal-Shekhar) &times; Aavya Divadiye Jagmagta Maa Na Norta (Traditional Garba) &middot; 1:52</div>
+            <div class="release-meta">Besharam Rang (Shilpa Rao &amp; Vishal-Shekhar) &times; Aavya Divadiye Jagmagta Maa Na Norta (Traditional Garba) &middot; 1:52</div>
           </div>
           <div class="release-links">
             <button type="button" class="release-play-btn" data-release-play aria-label="Play Besharam Divya" aria-pressed="false">
@@ -1460,7 +1639,7 @@
           <div class="cover" aria-hidden="true">RAAS</div>
           <div>
             <div class="release-title">Chunalida</div>
-            <div class="release-meta">Raas Mashup &middot; Chunari (Himali Vyas Naik) &times; Dholida (Jahnvi Shrimankar &amp; Shail Hada) &middot; 2:38</div>
+            <div class="release-meta">Chunari (Himali Vyas Naik) &times; Dholida (Jahnvi Shrimankar &amp; Shail Hada) &middot; 2:38</div>
           </div>
           <div class="release-links">
             <button type="button" class="release-play-btn" data-release-play aria-label="Play Chunalida" aria-pressed="false">
@@ -1473,7 +1652,7 @@
           <div class="cover" aria-hidden="true">RAAS</div>
           <div>
             <div class="release-title">Dankonteroopty</div>
-            <div class="release-meta">Raas Mashup &middot; Danko Vagyo (Traditional Raas) &times; MONTERO (Lil Nas X) &times; Whoopty (CJ) &middot; 1:17</div>
+            <div class="release-meta">Danko Vagyo (Traditional Raas) &times; MONTERO (Lil Nas X) &times; Whoopty (CJ) &middot; 1:17</div>
           </div>
           <div class="release-links">
             <button type="button" class="release-play-btn" data-release-play aria-label="Play Dankonteroopty" aria-pressed="false">
@@ -1486,7 +1665,7 @@
           <div class="cover" aria-hidden="true">RAAS</div>
           <div>
             <div class="release-title">Kanudina Psycho</div>
-            <div class="release-meta">Raas Mashup &middot; Kanuda Ni Morli Ma (Traditional Raas) &times; Psycho (Post Malone feat. Ty Dolla $ign) &middot; 2:22</div>
+            <div class="release-meta">Kanuda Ni Morli Ma (Traditional Raas) &times; Psycho (Post Malone feat. Ty Dolla $ign) &middot; 2:22</div>
           </div>
           <div class="release-links">
             <button type="button" class="release-play-btn" data-release-play aria-label="Play Kanudina Psycho" aria-pressed="false">
@@ -1499,7 +1678,7 @@
           <div class="cover" aria-hidden="true">RAAS</div>
           <div>
             <div class="release-title">Mogal Rumble</div>
-            <div class="release-meta">Raas Mashup &middot; Maa Mogal Ramva Aave Re (Jigardan Gadhavi) &times; Rumble (Skrillex, Fred again.. &amp; Flowdan) &middot; 1:24</div>
+            <div class="release-meta">Maa Mogal Ramva Aave Re (Jigardan Gadhavi) &times; Rumble (Skrillex, Fred again.. &amp; Flowdan) &middot; 1:24</div>
           </div>
           <div class="release-links">
             <button type="button" class="release-play-btn" data-release-play aria-label="Play Mogal Rumble" aria-pressed="false">
@@ -1512,7 +1691,7 @@
           <div class="cover" aria-hidden="true">RAAS</div>
           <div>
             <div class="release-title">Patang &times; Tu Meri</div>
-            <div class="release-meta">Raas Mashup &middot; Patang (Osman Mir) &times; Tu Meri (Vishal Dadlani &amp; Vishal-Shekhar) &middot; 1:04</div>
+            <div class="release-meta">Patang (Osman Mir) &times; Tu Meri (Vishal Dadlani &amp; Vishal-Shekhar) &middot; 1:04</div>
           </div>
           <div class="release-links">
             <button type="button" class="release-play-btn" data-release-play aria-label="Play Patang &times; Tu Meri" aria-pressed="false">
@@ -1525,7 +1704,7 @@
           <div class="cover" aria-hidden="true">RAAS</div>
           <div>
             <div class="release-title">Phool &times; Jai</div>
-            <div class="release-meta">Raas Mashup &middot; Phool Phool Venjo Ne (Abhita Patel) &times; Jai Jai Shivshankar (Vishal Dadlani, Benny Dayal &amp; Vishal-Shekhar) &middot; 0:51</div>
+            <div class="release-meta">Phool Phool Venjo Ne (Abhita Patel) &times; Jai Jai Shivshankar (Vishal Dadlani, Benny Dayal &amp; Vishal-Shekhar) &middot; 0:51</div>
           </div>
           <div class="release-links">
             <button type="button" class="release-play-btn" data-release-play aria-label="Play Phool &times; Jai" aria-pressed="false">
@@ -1538,7 +1717,7 @@
           <div class="cover" aria-hidden="true">RAAS</div>
           <div>
             <div class="release-title">Sachi (EDM Remix)</div>
-            <div class="release-meta">Raas Mashup &middot; Sachi Re Mari / Chhand (Bhoomi Trivedi &amp; Osman Mir) &middot; EDM Flip &middot; 1:40</div>
+            <div class="release-meta">Sachi Re Mari / Chhand (Bhoomi Trivedi &amp; Osman Mir) &middot; EDM Flip &middot; 1:40</div>
           </div>
           <div class="release-links">
             <button type="button" class="release-play-btn" data-release-play aria-label="Play Sachi (EDM Remix)" aria-pressed="false">
@@ -1551,7 +1730,7 @@
           <div class="cover" aria-hidden="true">RAAS</div>
           <div>
             <div class="release-title">Tongue Tied Greedy</div>
-            <div class="release-meta">Raas Mashup &middot; Tongue Tied (Grouplove) &times; Greedy (Tate McRae) &times; Asvaar (Aishwarya Majmudar) &middot; 1:59</div>
+            <div class="release-meta">Tongue Tied (Grouplove) &times; Greedy (Tate McRae) &times; Asvaar (Aishwarya Majmudar) &middot; 1:59</div>
           </div>
           <div class="release-links">
             <button type="button" class="release-play-btn" data-release-play aria-label="Play Tongue Tied Greedy" aria-pressed="false">
@@ -1564,7 +1743,7 @@
           <div class="cover" aria-hidden="true">RAAS</div>
           <div>
             <div class="release-title">VariD(o)NA</div>
-            <div class="release-meta">Raas Mashup &middot; Vaari Jaau Re (Jigardan Gadhavi) &times; Don Don (Daddy Yankee, Anuel AA &amp; Kendo Kaponi) &middot; 1:29</div>
+            <div class="release-meta">Vaari Jaau Re (Jigardan Gadhavi) &times; Don Don (Daddy Yankee, Anuel AA &amp; Kendo Kaponi) &middot; 1:29</div>
           </div>
           <div class="release-links">
             <button type="button" class="release-play-btn" data-release-play aria-label="Play VariD(o)NA" aria-pressed="false">
@@ -1579,7 +1758,7 @@
     <section class="section" id="resources">
       <h2 class="section-title">Resources</h2>
       <div class="resources">
-        <a href="https://drive.google.com/drive/folders/1RIb04DsH7YmGpx7YLLmsJvrYgw7L4jKg?usp=sharing" target="_blank" rel="noopener noreferrer" class="resource-card"
+        <a id="all-project-files" href="https://drive.google.com/drive/folders/1RIb04DsH7YmGpx7YLLmsJvrYgw7L4jKg?usp=sharing" target="_blank" rel="noopener noreferrer" class="resource-card"
           data-analytics-event="raas_resource_click" data-analytics-category="raas"
           data-analytics-label="All Project Files" data-analytics-status="live">
           <div class="resource-icon">
