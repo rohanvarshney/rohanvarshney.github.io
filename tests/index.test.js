@@ -257,6 +257,7 @@ test('raas/index.html structure and content', () => {
         assert.ok(raasContent.includes(`<strong>${label}</strong>`), `Hall of Fame lists ${label}`);
         assert.ok(raasContent.includes(badge), `Hall of Fame marks MP3 status (${badge}) for ${label}`);
     }
+    assert.ok(raasContent.includes('<strong>GT Ramblin\' Raas (2022&ndash;23 &middot; Raas All Stars XV)</strong> <span class="hof-champ">3rd Place</span>'), 'Tags GT 2022-23 as 3rd Place');
     assert.ok(raasContent.includes('<strong>Dirty South Dandiya (2022&ndash;23 &middot; Raas All Stars XV)</strong>'), 'Hall of Fame lists DSD 2022-23');
     assert.ok(
         raasContent.includes('href="https://soundcloud.com/arunabh-chaudhuri/dirty-south-dandiya-ras-xv-2023-1st-place-ft-rova-1"') &&
@@ -338,7 +339,8 @@ test('raas/index.html structure and content', () => {
         assert.ok(peaks.every((n) => Number.isInteger(n) && n >= 12 && n <= 100), 'All Raas peaks are integers in 12..100');
     }
 
-    assert.ok(raasContent.includes('<span class="resource-title">All Project Files</span>'), 'Has All Project Files section');
+    assert.ok(raasContent.includes('<span class="resource-title">All Project Files &amp; Hall of Fame</span>'), 'Has All Project Files & Hall of Fame section');
+    assert.ok(raasContent.includes('Hall of Fame MP3s and Logic Pro X project files'), 'All Project Files description mentions Hall of Fame MP3s');
     assert.ok(raasContent.includes('href="https://drive.google.com/drive/folders/1RIb04DsH7YmGpx7YLLmsJvrYgw7L4jKg?usp=sharing"'), 'Has All Project Files Google Drive link');
     assert.ok(raasContent.includes('data-analytics-label="All Project Files" data-analytics-status="live"'), 'Tracks All Project Files as live');
     assert.ok(raasContent.includes('View access by request only') && raasContent.includes('comment in your request'), 'Emphasizes view-access request and recommended comment for All Project Files');
