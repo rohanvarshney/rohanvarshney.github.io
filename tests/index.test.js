@@ -134,7 +134,7 @@ test('index.html structure and content', () => {
     );
 
     const expectedIconLabels = [
-        'Resumé',
+        'Résumé',
         'LinkedIn',
         'GitHub',
         'Instagram',
@@ -229,7 +229,7 @@ test('raas/index.html structure and content', () => {
     assert.ok(!raasContent.includes('Discarded Segments'), 'Fun Facts does not mention Discarded Segments');
     assert.ok(!raasContent.includes('Qurbani'), 'GT Qurbani is removed from statistics and map');
     assert.ok(raasContent.includes('id="hall-of-fame"'), 'Has Hall Of Fame section');
-    assert.ok(raasContent.includes('Hall Of Fame'), 'Has Hall Of Fame heading');
+    assert.ok(raasContent.includes('Hall of Fame'), 'Has Hall of Fame heading');
     assert.ok(raasContent.includes('<ul class="hof-list">'), 'Hall Of Fame uses a bulletpoint list');
     assert.ok(!raasContent.includes('class="hof-card"'), 'Hall Of Fame does not use cards');
     assert.ok(raasContent.includes('<li><strong>DSD 2021-2022</strong></li>'), 'Has DSD 2021-2022 Hall Of Fame item without description');
