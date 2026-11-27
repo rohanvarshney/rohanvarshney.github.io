@@ -152,6 +152,10 @@ const CURATED_TRACKS = {
     title: 'Phool × Jai',
     description: 'Phool Phool Venjo Ne (Abhita Patel) × Jai Jai Shivshankar (Vishal Dadlani, Benny Dayal & Vishal-Shekhar)',
   },
+  'mashups/raas/rangilo-rova.mp3': {
+    title: 'Rangilo (ROVA Remix)',
+    description: 'Rangilo Maro Dholna (Shubha Mudgal & Sukhwinder Singh) · Hype Edit',
+  },
   'mashups/raas/sachi-edm.mp3': {
     title: 'Sachi (EDM Remix)',
     description: 'Sachi Re Mari (Bhoomi Trivedi & Osman Mir) · EDM Flip',
@@ -173,10 +177,6 @@ const CURATED_TRACKS = {
   'remixes/khuda-jaane-urban.mp3': {
     title: 'Khuda Jaane (ROVA Remix)',
     description: 'Khuda Jaane (KK & Shilpa Rao) · Urban Edit',
-  },
-  'remixes/rangilo-rova.mp3': {
-    title: 'Rangilo (ROVA Remix)',
-    description: 'Rangilo Maro Dholna (Shubha Mudgal & Sukhwinder Singh) · Hype Edit',
   },
 
   // Performances

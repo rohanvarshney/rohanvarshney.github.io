@@ -311,7 +311,7 @@ test('raas/index.html structure and content', () => {
     const raasDiskMp3s = fs.readdirSync(raasAudioDir)
         .filter((f) => !f.startsWith('.') && f.toLowerCase().endsWith('.mp3'))
         .map((f) => `mashups/raas/${f}`);
-    assert.strictEqual(raasDiskMp3s.length, 11, 'Discovers all 11 Raas MP3 files under assets/audio/mashups/raas/');
+    assert.strictEqual(raasDiskMp3s.length, 12, 'Discovers all 12 Raas MP3 files under assets/audio/mashups/raas/');
 
     const raasRowMatches = [...raasListMatch[1].matchAll(/<li class="release(?:\s+is-active)?"[^>]*data-audio-file="([^"]+)"[^>]*>[\s\S]*?<\/li>/g)];
     assert.strictEqual(raasRowMatches.length, raasDiskMp3s.length, 'Raas #raas-release-list renders one card per Raas MP3 on disk');
@@ -335,7 +335,7 @@ test('raas/index.html structure and content', () => {
     assert.ok(!raasContent.includes('Raas Mashup &middot;'), 'Raas player and cards omit redundant Raas Mashup prefix');
 
     const raasPeakMatches = [...raasContent.matchAll(/data-peaks="([0-9,]+)"/g)];
-    assert.strictEqual(raasPeakMatches.length, raasDiskMp3s.length + 1, 'Raas page has real data-peaks on featured waveform and all 11 rows');
+    assert.strictEqual(raasPeakMatches.length, raasDiskMp3s.length + 1, 'Raas page has real data-peaks on featured waveform and all 12 rows');
     for (const match of raasPeakMatches) {
         const peaks = match[1].split(',').map((n) => Number(n.trim()));
         assert.strictEqual(peaks.length, 80, 'Each Raas data-peaks attribute has 80 bars');
@@ -653,7 +653,7 @@ test('production/index.html structure and content', () => {
         }
     }
     walkMp3s(audioRoot);
-    assert.strictEqual(diskMp3s.length, 23, 'Discovers all 23 non-Raas uploaded MP3 files under assets/audio/');
+    assert.strictEqual(diskMp3s.length, 22, 'Discovers all 22 non-Raas uploaded MP3 files under assets/audio/');
 
     assert.strictEqual(
         (prodContent.match(/data-release-play/g) || []).length,
@@ -710,7 +710,7 @@ test('production/index.html structure and content', () => {
 
     // Real 80-bar waveform peaks and empty-state banner instead of placeholder cards
     const peakMatches = [...prodContent.matchAll(/data-peaks="([0-9,]+)"/g)];
-    assert.strictEqual(peakMatches.length, diskMp3s.length + 1, 'Has real data-peaks on featured waveform and all 34 release rows');
+    assert.strictEqual(peakMatches.length, diskMp3s.length + 1, 'Has real data-peaks on featured waveform and all 22 release rows');
     for (const match of peakMatches) {
         const peaks = match[1].split(',').map((n) => Number(n.trim()));
         assert.strictEqual(peaks.length, 80, 'Each data-peaks attribute has 80 bars');
