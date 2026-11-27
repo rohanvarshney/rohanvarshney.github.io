@@ -739,11 +739,13 @@
     [data-audio-player] .waveform {
       cursor: pointer;
       user-select: none;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
     }
 
     .waveform span {
-      flex: 1;
-      min-width: 2px;
+      flex: 1 1 0;
+      min-width: 0;
       border-radius: 2px;
       background: rgba(255, 255, 255, 0.28);
       transition: background-color 0.12s;
@@ -1412,7 +1414,7 @@
         <div class="player-body">
           <div class="player-kicker" data-player-kicker>Featured Track</div>
           <h3 class="player-title" data-player-title>Feel So Raas</h3>
-          <div class="player-meta" data-player-meta>Raas Mashup &middot; Feel So Close &times; Raas Blend &middot; 1:46</div>
+          <div class="player-meta" data-player-meta>Raas Mashup &middot; Feel So Close (Calvin Harris) &times; Ha Ha Re Ghaduliyo (Traditional Garba) &middot; 1:46</div>
           <div class="player-controls">
             <button type="button" class="play-btn" data-play-toggle aria-label="Play Feel So Raas" aria-pressed="false">
               <i class="fa fa-play" aria-hidden="true"></i>
@@ -1432,7 +1434,7 @@
           <div class="cover" aria-hidden="true">RAAS</div>
           <div>
             <div class="release-title">Feel So Raas</div>
-            <div class="release-meta">Raas Mashup &middot; Feel So Close &times; Raas Blend &middot; 1:46</div>
+            <div class="release-meta">Raas Mashup &middot; Feel So Close (Calvin Harris) &times; Ha Ha Re Ghaduliyo (Traditional Garba) &middot; 1:46</div>
           </div>
           <div class="release-links">
             <button type="button" class="release-play-btn" data-release-play aria-label="Play Feel So Raas" aria-pressed="false">
@@ -1445,7 +1447,7 @@
           <div class="cover" aria-hidden="true">RAAS</div>
           <div>
             <div class="release-title">Besharam Divya</div>
-            <div class="release-meta">Raas Mashup &middot; Besharam &times; Divya &middot; 1:52</div>
+            <div class="release-meta">Raas Mashup &middot; Besharam Rang (Shilpa Rao &amp; Vishal-Shekhar) &times; Aavya Divadiye Jagmagta Maa Na Norta (Traditional Garba) &middot; 1:52</div>
           </div>
           <div class="release-links">
             <button type="button" class="release-play-btn" data-release-play aria-label="Play Besharam Divya" aria-pressed="false">
@@ -1458,7 +1460,7 @@
           <div class="cover" aria-hidden="true">RAAS</div>
           <div>
             <div class="release-title">Chunalida</div>
-            <div class="release-meta">Raas Mashup &middot; Gujarati Folk Mashup &middot; 2:38</div>
+            <div class="release-meta">Raas Mashup &middot; Chunari (Himali Vyas Naik) &times; Dholida (Jahnvi Shrimankar &amp; Shail Hada) &middot; 2:38</div>
           </div>
           <div class="release-links">
             <button type="button" class="release-play-btn" data-release-play aria-label="Play Chunalida" aria-pressed="false">
@@ -1471,7 +1473,7 @@
           <div class="cover" aria-hidden="true">RAAS</div>
           <div>
             <div class="release-title">Dankonteroopty</div>
-            <div class="release-meta">Raas Mashup &middot; Raas Fusion Mashup &middot; 1:17</div>
+            <div class="release-meta">Raas Mashup &middot; Danko Vagyo (Traditional Raas) &times; MONTERO (Lil Nas X) &times; Whoopty (CJ) &middot; 1:17</div>
           </div>
           <div class="release-links">
             <button type="button" class="release-play-btn" data-release-play aria-label="Play Dankonteroopty" aria-pressed="false">
@@ -1484,7 +1486,7 @@
           <div class="cover" aria-hidden="true">RAAS</div>
           <div>
             <div class="release-title">Kanudina Psycho</div>
-            <div class="release-meta">Raas Mashup &middot; Kanudina &times; Psycho &middot; 2:22</div>
+            <div class="release-meta">Raas Mashup &middot; Kanuda Ni Morli Ma (Traditional Raas) &times; Psycho (Post Malone feat. Ty Dolla $ign) &middot; 2:22</div>
           </div>
           <div class="release-links">
             <button type="button" class="release-play-btn" data-release-play aria-label="Play Kanudina Psycho" aria-pressed="false">
@@ -1497,7 +1499,7 @@
           <div class="cover" aria-hidden="true">RAAS</div>
           <div>
             <div class="release-title">Mogal Rumble</div>
-            <div class="release-meta">Raas Mashup &middot; Mogal &times; Rumble &middot; 1:24</div>
+            <div class="release-meta">Raas Mashup &middot; Maa Mogal Ramva Aave Re (Jigardan Gadhavi) &times; Rumble (Skrillex, Fred again.. &amp; Flowdan) &middot; 1:24</div>
           </div>
           <div class="release-links">
             <button type="button" class="release-play-btn" data-release-play aria-label="Play Mogal Rumble" aria-pressed="false">
@@ -1510,7 +1512,7 @@
           <div class="cover" aria-hidden="true">RAAS</div>
           <div>
             <div class="release-title">Patang &times; Tu Meri</div>
-            <div class="release-meta">Raas Mashup &middot; Patang &times; Tu Meri &middot; 1:04</div>
+            <div class="release-meta">Raas Mashup &middot; Patang (Osman Mir) &times; Tu Meri (Vishal Dadlani &amp; Vishal-Shekhar) &middot; 1:04</div>
           </div>
           <div class="release-links">
             <button type="button" class="release-play-btn" data-release-play aria-label="Play Patang &times; Tu Meri" aria-pressed="false">
@@ -1523,10 +1525,23 @@
           <div class="cover" aria-hidden="true">RAAS</div>
           <div>
             <div class="release-title">Phool &times; Jai</div>
-            <div class="release-meta">Raas Mashup &middot; Phool &times; Jai &middot; 0:51</div>
+            <div class="release-meta">Raas Mashup &middot; Phool Phool Venjo Ne (Abhita Patel) &times; Jai Jai Shivshankar (Vishal Dadlani, Benny Dayal &amp; Vishal-Shekhar) &middot; 0:51</div>
           </div>
           <div class="release-links">
             <button type="button" class="release-play-btn" data-release-play aria-label="Play Phool &times; Jai" aria-pressed="false">
+              <i class="fa fa-play" aria-hidden="true"></i>
+            </button>
+          </div>
+        </li>
+        <li class="release" data-category="mashup" data-subcategory="raas" data-audio-file="mashups/raas/sachi-edm.mp3" data-track-duration="1:40" data-seed="611"
+          data-peaks="12,12,12,12,12,18,21,21,27,32,40,64,67,69,67,73,71,74,72,63,71,69,82,72,77,76,84,74,92,83,83,75,77,65,72,63,44,51,47,65,66,56,62,70,81,86,82,84,87,83,84,87,80,84,83,93,92,89,90,91,89,91,90,87,91,100,60,65,57,53,64,50,17,17,16,15,12,12,12,12">
+          <div class="cover" aria-hidden="true">RAAS</div>
+          <div>
+            <div class="release-title">Sachi (EDM Remix)</div>
+            <div class="release-meta">Raas Mashup &middot; Sachi Re Mari / Chhand (Bhoomi Trivedi &amp; Osman Mir) &middot; EDM Flip &middot; 1:40</div>
+          </div>
+          <div class="release-links">
+            <button type="button" class="release-play-btn" data-release-play aria-label="Play Sachi (EDM Remix)" aria-pressed="false">
               <i class="fa fa-play" aria-hidden="true"></i>
             </button>
           </div>
@@ -1536,7 +1551,7 @@
           <div class="cover" aria-hidden="true">RAAS</div>
           <div>
             <div class="release-title">Tongue Tied Greedy</div>
-            <div class="release-meta">Raas Mashup &middot; Tongue Tied &times; Greedy &middot; 1:59</div>
+            <div class="release-meta">Raas Mashup &middot; Tongue Tied (Grouplove) &times; Greedy (Tate McRae) &times; Asvaar (Aishwarya Majmudar) &middot; 1:59</div>
           </div>
           <div class="release-links">
             <button type="button" class="release-play-btn" data-release-play aria-label="Play Tongue Tied Greedy" aria-pressed="false">
@@ -1549,7 +1564,7 @@
           <div class="cover" aria-hidden="true">RAAS</div>
           <div>
             <div class="release-title">VariD(o)NA</div>
-            <div class="release-meta">Raas Mashup &middot; Vari &times; DNA &middot; 1:29</div>
+            <div class="release-meta">Raas Mashup &middot; Vaari Jaau Re (Jigardan Gadhavi) &times; Don Don (Daddy Yankee, Anuel AA &amp; Kendo Kaponi) &middot; 1:29</div>
           </div>
           <div class="release-links">
             <button type="button" class="release-play-btn" data-release-play aria-label="Play VariD(o)NA" aria-pressed="false">

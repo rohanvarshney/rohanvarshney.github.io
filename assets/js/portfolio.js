@@ -299,32 +299,93 @@
     });
   }
 
+  function getWaveformWidth(wave) {
+    if (!wave) {
+      return 0;
+    }
+    if (typeof wave.getBoundingClientRect === 'function') {
+      var rect = wave.getBoundingClientRect();
+      if (rect && rect.width > 0) {
+        return rect.width;
+      }
+    }
+    return wave.clientWidth || 0;
+  }
+
+  function getWaveformBarCount(wave, requestedBars) {
+    var waveWidth = getWaveformWidth(wave);
+    if (!waveWidth || waveWidth <= 0) {
+      return requestedBars;
+    }
+    var gap = 2;
+    if (typeof window.getComputedStyle === 'function') {
+      var style = window.getComputedStyle(wave);
+      if (style) {
+        var parsedGap = parseFloat(style.columnGap || style.gap);
+        if (isFinite(parsedGap) && parsedGap >= 0) {
+          gap = parsedGap;
+        }
+      }
+    }
+    var minBarWidth = 2;
+    var maxBars = Math.max(1, Math.floor((waveWidth + gap) / (minBarWidth + gap)));
+    return Math.min(requestedBars, maxBars);
+  }
+
+  function resamplePeaks(values, targetCount) {
+    if (!values || !values.length || targetCount >= values.length) {
+      return values;
+    }
+    var resampled = [];
+    for (var i = 0; i < targetCount; i++) {
+      var start = Math.floor((i * values.length) / targetCount);
+      var end = Math.max(start + 1, Math.floor(((i + 1) * values.length) / targetCount));
+      var peak = 0;
+      for (var j = start; j < end && j < values.length; j++) {
+        if (values[j] > peak) {
+          peak = values[j];
+        }
+      }
+      resampled.push(peak);
+    }
+    return resampled;
+  }
+
   function renderWaveform(wave) {
     if (!wave) {
       return;
     }
     var peaks = parsePeaks(wave.getAttribute('data-peaks'));
-    var bars = peaks ? peaks.length : parseInt(wave.getAttribute('data-bars') || '72', 10);
+    var requestedBars = peaks ? peaks.length : parseInt(wave.getAttribute('data-bars') || '72', 10);
     var progress = parseFloat(wave.getAttribute('data-progress') || '0');
     var rand = seededRandom(parseInt(wave.getAttribute('data-seed') || '7', 10));
+    var values = [];
+    if (peaks) {
+      values = peaks;
+    } else {
+      for (var i = 0; i < requestedBars; i++) {
+        var envelope = 0.45 + 0.55 * Math.sin((i / requestedBars) * Math.PI);
+        values.push(Math.max(0.12, envelope * (0.35 + rand() * 0.65)));
+      }
+    }
+    var targetBars = getWaveformBarCount(wave, requestedBars);
+    var barHeights = resamplePeaks(values, targetBars);
     var fragment = document.createDocumentFragment();
     wave.textContent = '';
-    for (var i = 0; i < bars; i++) {
-      var height;
-      if (peaks) {
-        height = peaks[i];
-      } else {
-        var envelope = 0.45 + 0.55 * Math.sin((i / bars) * Math.PI);
-        height = Math.max(0.12, envelope * (0.35 + rand() * 0.65));
-      }
+    for (var k = 0; k < barHeights.length; k++) {
       var bar = document.createElement('span');
-      bar.style.height = Math.round(height * 100) + '%';
-      if (i / bars < progress) {
-        bar.className = 'played';
+      bar.style.height = Math.round(barHeights[k] * 100) + '%';
+      if (progress > 0 && k / barHeights.length < progress) {
+        if (bar.classList) {
+          bar.classList.add('played');
+        } else {
+          bar.className = 'played';
+        }
       }
       fragment.appendChild(bar);
     }
     wave.appendChild(fragment);
+    wave._renderedBarCount = barHeights.length;
   }
 
   function setWaveformProgress(wave, ratio) {
@@ -349,9 +410,41 @@
   }
 
   function initWaveforms() {
-    document.querySelectorAll('[data-waveform]').forEach(function (wave) {
+    var waves = document.querySelectorAll('[data-waveform]');
+    waves.forEach(function (wave) {
       renderWaveform(wave);
     });
+
+    function syncWaveformSize(wave) {
+      if (!wave) {
+        return;
+      }
+      var peaks = parsePeaks(wave.getAttribute('data-peaks'));
+      var requestedBars = peaks ? peaks.length : parseInt(wave.getAttribute('data-bars') || '72', 10);
+      var nextBars = getWaveformBarCount(wave, requestedBars);
+      if (nextBars !== wave._renderedBarCount) {
+        renderWaveform(wave);
+      }
+    }
+
+    if (typeof window.ResizeObserver === 'function') {
+      var observer = new window.ResizeObserver(function (entries) {
+        entries.forEach(function (entry) {
+          syncWaveformSize(entry.target);
+        });
+      });
+      waves.forEach(function (wave) {
+        observer.observe(wave);
+      });
+    } else if (typeof window.addEventListener === 'function') {
+      var resizeTimer = null;
+      window.addEventListener('resize', function () {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function () {
+          waves.forEach(syncWaveformSize);
+        }, 100);
+      });
+    }
   }
 
   function formatTime(seconds) {

@@ -275,7 +275,7 @@ test('raas/index.html structure and content', () => {
     const raasDiskMp3s = fs.readdirSync(raasAudioDir)
         .filter((f) => !f.startsWith('.') && f.toLowerCase().endsWith('.mp3'))
         .map((f) => `mashups/raas/${f}`);
-    assert.strictEqual(raasDiskMp3s.length, 10, 'Discovers all 10 Raas MP3 files under assets/audio/mashups/raas/');
+    assert.strictEqual(raasDiskMp3s.length, 11, 'Discovers all 11 Raas MP3 files under assets/audio/mashups/raas/');
 
     const raasRowMatches = [...raasListMatch[1].matchAll(/<li class="release(?:\s+is-active)?"[^>]*data-audio-file="([^"]+)"[^>]*>[\s\S]*?<\/li>/g)];
     assert.strictEqual(raasRowMatches.length, raasDiskMp3s.length, 'Raas #raas-release-list renders one card per Raas MP3 on disk');
@@ -298,7 +298,7 @@ test('raas/index.html structure and content', () => {
     }
 
     const raasPeakMatches = [...raasContent.matchAll(/data-peaks="([0-9,]+)"/g)];
-    assert.strictEqual(raasPeakMatches.length, raasDiskMp3s.length + 1, 'Raas page has real data-peaks on featured waveform and all 10 rows');
+    assert.strictEqual(raasPeakMatches.length, raasDiskMp3s.length + 1, 'Raas page has real data-peaks on featured waveform and all 11 rows');
     for (const match of raasPeakMatches) {
         const peaks = match[1].split(',').map((n) => Number(n.trim()));
         assert.strictEqual(peaks.length, 80, 'Each Raas data-peaks attribute has 80 bars');
@@ -587,7 +587,7 @@ test('production/index.html structure and content', () => {
         }
     }
     walkMp3s(audioRoot);
-    assert.strictEqual(diskMp3s.length, 24, 'Discovers all 24 non-Raas uploaded MP3 files under assets/audio/');
+    assert.strictEqual(diskMp3s.length, 23, 'Discovers all 23 non-Raas uploaded MP3 files under assets/audio/');
 
     assert.strictEqual(
         (prodContent.match(/data-release-play/g) || []).length,
@@ -1861,4 +1861,235 @@ test('assets/css/portfolio.css hero graphics animate on mobile and reduced motio
     assert.match(mobileMatch[1], /\.arr-ruler\s*\{[^}]*grid-template-columns:\s*50px repeat\(8,\s*1fr\);/, 'Aligns .arr-ruler to 50px on mobile');
     assert.match(mobileMatch[1], /\.arr-lane\s*\{[^}]*grid-template-columns:\s*50px 1fr;/, 'Aligns .arr-lane to 50px on mobile');
     assert.match(mobileMatch[1], /\.playhead\s*\{[^}]*left:\s*50px;/, 'Aligns .playhead track start to 50px on mobile');
+});
+
+test('waveform downsamples to mobile width so finger tap aligns with played bars', () => {
+    const cssPath = path.join(__dirname, '..', 'assets', 'css', 'portfolio.css');
+    const cssContent = fs.readFileSync(cssPath, 'utf8');
+    const raasPath = path.join(__dirname, '..', 'raas', 'index.html');
+    const raasContent = fs.readFileSync(raasPath, 'utf8');
+
+    [
+        { label: 'assets/css/portfolio.css', content: cssContent },
+        { label: 'raas/index.html', content: raasContent },
+    ].forEach(({ label, content }) => {
+        const waveSpanMatch = content.match(/\.waveform span\s*\{([^}]*)\}/);
+        assert.ok(waveSpanMatch, `${label} defines .waveform span`);
+        assert.match(waveSpanMatch[1], /min-width:\s*0;/, `${label} sets min-width: 0 on .waveform span`);
+        assert.doesNotMatch(waveSpanMatch[1], /min-width:\s*2px;/, `${label} does not force min-width: 2px on .waveform span`);
+
+        const audioWaveMatch = content.match(/\[data-audio-player\]\s*\.waveform\s*\{([^}]*)\}/);
+        assert.ok(audioWaveMatch, `${label} defines [data-audio-player] .waveform`);
+        assert.match(audioWaveMatch[1], /touch-action:\s*manipulation;/, `${label} sets touch-action: manipulation on interactive waveform`);
+    });
+
+    const jsPath = path.join(__dirname, '..', 'assets', 'js', 'portfolio.js');
+    const portfolioJs = fs.readFileSync(jsPath, 'utf8');
+
+    function createMockClassList(initial = []) {
+        const set = new Set(initial);
+        return {
+            add(c) { set.add(c); },
+            remove(c) { set.delete(c); },
+            toggle(c, force) {
+                if (force === undefined) {
+                    if (set.has(c)) { set.delete(c); return false; }
+                    set.add(c); return true;
+                }
+                if (force) set.add(c); else set.delete(c);
+                return force;
+            },
+            contains(c) { return set.has(c); },
+        };
+    }
+
+    function createMockElement(tag, { attrs = {}, classes = [], textContent = '' } = {}) {
+        const attrMap = Object.assign({}, attrs);
+        const listeners = {};
+        const children = [];
+        let _text = textContent;
+        const el = {
+            tagName: tag.toUpperCase(),
+            style: {},
+            hidden: false,
+            children,
+            classList: createMockClassList(classes),
+            get className() { return attrMap.class || ''; },
+            set className(val) { attrMap.class = val; },
+            get textContent() { return _text; },
+            set textContent(val) {
+                _text = String(val);
+                if (val === '') children.length = 0;
+            },
+            getAttribute(name) {
+                return Object.prototype.hasOwnProperty.call(attrMap, name) ? attrMap[name] : null;
+            },
+            setAttribute(name, val) {
+                attrMap[name] = String(val);
+            },
+            removeAttribute(name) {
+                delete attrMap[name];
+            },
+            hasAttribute(name) {
+                return Object.prototype.hasOwnProperty.call(attrMap, name);
+            },
+            appendChild(child) {
+                if (child && child._isFragment) {
+                    child.children.forEach((c) => children.push(c));
+                } else {
+                    children.push(child);
+                }
+                return child;
+            },
+            addEventListener(type, fn) {
+                listeners[type] = listeners[type] || [];
+                listeners[type].push(fn);
+            },
+            trigger(type, eventObj) {
+                (listeners[type] || []).forEach((fn) => fn(eventObj || {}));
+            },
+            querySelectorAll(selector) {
+                if (selector === 'span') return children;
+                return [];
+            },
+            querySelector() {
+                return null;
+            },
+        };
+        return el;
+    }
+
+    const peaks80 = Array.from({ length: 80 }, (_, i) => ((i % 10) + 1) * 10).join(',');
+    let waveRect = { left: 100, width: 160 };
+    const wave = createMockElement('div', {
+        attrs: {
+            'data-waveform': '',
+            'data-peaks': peaks80,
+            'data-bars': '80',
+            'data-progress': '0',
+            role: 'slider',
+        },
+    });
+    wave.getBoundingClientRect = () => waveRect;
+
+    const playBtn = createMockElement('button', { attrs: { 'data-play-toggle': '' } });
+    const player = createMockElement('article', {
+        attrs: {
+            'data-audio-player': '',
+            'data-audio-base': '../assets/audio/',
+            'data-audio-file': 'test-track.mp3',
+            'data-track-title': 'Test Track',
+            'data-track-duration': '2:00',
+        },
+    });
+    player.querySelector = (sel) => {
+        if (sel === '[data-play-toggle]') return playBtn;
+        if (sel === '[data-waveform]') return wave;
+        return null;
+    };
+
+    const createdAudios = [];
+    class MockAudio {
+        constructor() {
+            this.preload = '';
+            this.src = '';
+            this.currentTime = 0;
+            this.duration = 120;
+            this.paused = true;
+            this.ended = false;
+            this._listeners = {};
+            createdAudios.push(this);
+        }
+        addEventListener(type, fn) {
+            this._listeners[type] = this._listeners[type] || [];
+            this._listeners[type].push(fn);
+        }
+        emit(type) {
+            (this._listeners[type] || []).forEach((fn) => fn({}));
+        }
+        play() {
+            this.paused = false;
+            this.ended = false;
+            this.emit('loadedmetadata');
+            this.emit('playing');
+            return Promise.resolve();
+        }
+        pause() {
+            this.paused = true;
+            this.emit('pause');
+        }
+    }
+
+    let resizeObserverCallback = null;
+    const observedTargets = [];
+    class MockResizeObserver {
+        constructor(cb) {
+            resizeObserverCallback = cb;
+        }
+        observe(target) {
+            observedTargets.push(target);
+        }
+    }
+
+    let domReadyHandler = null;
+    const sandbox = {
+        Audio: MockAudio,
+        ResizeObserver: MockResizeObserver,
+        getComputedStyle() {
+            return { columnGap: '2px', gap: '2px' };
+        },
+        location: { href: 'https://rohanvarshney.github.io/production/' },
+        isSecureContext: true,
+        document: {
+            title: 'ROVA Production',
+            body: { getAttribute() { return ''; } },
+            addEventListener(type, fn) {
+                if (type === 'DOMContentLoaded') domReadyHandler = fn;
+            },
+            querySelector() { return null; },
+            querySelectorAll(sel) {
+                if (sel === '[data-waveform]') return [wave];
+                if (sel === '[data-audio-player]') return [player];
+                return [];
+            },
+            getElementById() { return null; },
+            createDocumentFragment() {
+                return { _isFragment: true, children: [], appendChild(c) { this.children.push(c); } };
+            },
+            createElement(tag) {
+                return createMockElement(tag);
+            },
+        },
+        setTimeout() { return 1; },
+        clearTimeout() {},
+    };
+    sandbox.window = sandbox;
+
+    vm.createContext(sandbox);
+    vm.runInContext(portfolioJs, sandbox);
+    domReadyHandler();
+
+    // Mobile width 160px with 2px bars + 2px gap -> Math.floor((160 + 2) / 4) = 40 bars
+    assert.strictEqual(wave.children.length, 40, 'Downsamples 80 peaks to 40 bars at 160px mobile width');
+    assert.deepStrictEqual(observedTargets, [wave], 'Observes waveform with ResizeObserver');
+
+    // Click at 25% of visible width (left=100, width=160, clientX=140 -> ratio 0.25)
+    wave.trigger('click', { clientX: 140 });
+    assert.strictEqual(createdAudios.length, 1, 'Creates Audio instance on seek');
+    assert.strictEqual(createdAudios[0].currentTime, 30, 'Seeks audio.currentTime to 25% of 120s');
+    const playedAt25 = wave.children.filter((bar) => bar.classList.contains('played')).length;
+    assert.strictEqual(playedAt25, 10, 'Marks 10 of 40 bars (25%) as played when tapping at 25%');
+
+    // Click at 50% of visible width (clientX=180 -> ratio 0.5)
+    wave.trigger('click', { clientX: 180 });
+    assert.strictEqual(createdAudios[0].currentTime, 60, 'Seeks audio.currentTime to 50% of 120s');
+    const playedAt50 = wave.children.filter((bar) => bar.classList.contains('played')).length;
+    assert.strictEqual(playedAt50, 20, 'Marks 20 of 40 bars (50%) as played when tapping at 50%');
+
+    // Widen container to desktop width (500px) and trigger ResizeObserver
+    waveRect = { left: 100, width: 500 };
+    resizeObserverCallback([{ target: wave }]);
+    assert.strictEqual(wave.children.length, 80, 'Restores all 80 bars when widened to desktop width');
+    const playedAfterResize = wave.children.filter((bar) => bar.classList.contains('played')).length;
+    assert.strictEqual(playedAfterResize, 40, 'Preserves 50% played bar ratio (40 of 80 bars) after resize');
 });

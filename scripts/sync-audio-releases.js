@@ -43,146 +43,146 @@ const CURATED_TRACKS = {
   },
   'mashups/pure usa/animalistic time.mp3': {
     title: 'Animalistic Time',
-    description: 'Animals × Time Blend',
+    description: 'Animals (Martin Garrix) × Time of Our Lives (Pitbull & Ne-Yo)',
   },
   'mashups/pure usa/beggin-medley.mp3': {
     title: "Beggin' Medley",
-    description: "Beggin' Mashup Medley",
+    description: "Beggin' (Måneskin) × Beauty and a Beat (Justin Bieber) × Moves Like Jagger (Maroon 5)",
   },
   'mashups/pure usa/cataclysmic_faint.mp3': {
     title: 'Cataclysmic Faint',
-    description: 'Cataclysmic × Faint',
+    description: 'The Catalyst × Faint (Linkin Park)',
   },
   'mashups/pure usa/ghosts-have-done.mp3': {
     title: 'Ghosts Have Done',
-    description: "Ghosts × What I've Done",
+    description: "Ghost Town (Adam Lambert) × What I've Done (Linkin Park)",
   },
   'mashups/pure usa/saxobeat-on-the-floor.mp3': {
     title: 'Saxobeat On The Floor',
-    description: 'Mr. Saxobeat × On The Floor',
+    description: 'Mr. Saxobeat (Alexandra Stan) × On the Floor (Jennifer Lopez & Pitbull)',
   },
   'mashups/pure usa/the-floor-has-levels.mp3': {
     title: 'The Floor Has Levels',
-    description: 'On The Floor × Levels',
+    description: 'On the Floor (Jennifer Lopez & Pitbull) × Levels (Avicii)',
   },
 
   // Mashups — Fusion
   'mashups/fusion/airplanes-945.mp3': {
     title: 'Airplanes × 9:45',
-    description: 'Airplanes × 9:45',
+    description: 'Airplanes (B.o.B feat. Hayley Williams) × 9:45 (Prabh Singh)',
   },
   'mashups/fusion/beautiful-raat.mp3': {
     title: 'Beautiful Raat',
-    description: 'English × Hindi Crossover Mashup',
+    description: 'Aaj Ki Raat (Madhubanti Bagchi & Sachin-Jigar) × Beautiful Escape (Tom Misch feat. Zak Abel)',
   },
   'mashups/fusion/don-n-night.mp3': {
     title: "Don 'N' Night",
-    description: 'Don × Night Crossover Mashup',
+    description: "Main Hoon Don (Shaan) × Day 'N' Nite (Kid Cudi & Crookers)",
   },
   'mashups/fusion/helpless-gulaab.mp3': {
     title: 'Helpless Gulaab',
-    description: 'Helpless × Gulaab',
+    description: 'Akhiyaan Gulaab (Mitraz) × Helpless (John Mayer)',
   },
   'mashups/fusion/is-shiela-worth-it.mp3': {
     title: 'Is Sheila Worth It',
-    description: 'Sheila Ki Jawani × Worth It',
+    description: 'Sheila Ki Jawani (Sunidhi Chauhan & Vishal-Shekhar) × Worth It (Fifth Harmony feat. Kid Ink)',
   },
   'mashups/fusion/laila-main-la-mama.mp3': {
     title: 'Laila Main La Mama',
-    description: 'Laila Main Laila × La Mama',
+    description: 'Laila Main Laila (Pawni Pandey) × La Mamá de la Mamá (El Alfa, CJ & El Cherry Scom)',
   },
   'mashups/fusion/lrad-zindigani.mp3': {
     title: 'LRAD Zindagani',
-    description: 'LRAD × Zindagani',
+    description: 'Ek Toh Kum Zindagani (Neha Kakkar) × LRAD (Knife Party)',
   },
   'mashups/fusion/prabhu-ka-naam-medley.mp3': {
     title: 'Prabhu Ka Naam Medley',
-    description: 'Prabhu Ka Naam Fusion Medley',
+    description: 'Leke Prabhu Ka Naam (Arijit Singh & Pritam) × Everybody (Logic) × Lil Bit (K Camp) × KMT (Drake) × Limitless (Martin Garrix & Mesto)',
   },
   'mashups/fusion/tanhayee-stars.mp3': {
     title: 'Tanhayee Stars',
-    description: 'Tanhayee × Stars',
+    description: 'Tanhayee (Sonu Nigam) × All the Stars (Kendrick Lamar & SZA)',
   },
   'mashups/fusion/tere-pyaar-i-want-you.mp3': {
     title: 'Tere Pyaar × I Want You',
-    description: 'Tere Pyaar × I Want You',
+    description: 'Tere Pyaar Mein (Arijit Singh & Pritam) × I Want You to Know (Zedd feat. Selena Gomez)',
   },
   'mashups/fusion/ye-mera-dil-enless-summer.mp3': {
     title: 'Ye Mera Dil × Endless Summer',
-    description: 'Yeh Mera Dil × Endless Summer',
+    description: 'Yeh Mera Dil (Sunidhi Chauhan) × Endless Summer (Alan Walker & Zak Abel)',
   },
 
   // Mashups — Pure Desi
   'mashups/pure desi/dekhe-dance.mp3': {
     title: 'Dekhe Dance',
-    description: 'Bollywood Dance Mashup',
+    description: 'Khwab Dekhe (Monali Thakur & Pritam) × Dance (F1rstman feat. H-Dhami, Juggy D, Mumzy Stranger & Raxstar)',
   },
 
   // Mashups — Raas
   'mashups/raas/besharam-divya.mp3': {
     title: 'Besharam Divya',
-    description: 'Besharam × Divya',
+    description: 'Besharam Rang (Shilpa Rao & Vishal-Shekhar) × Aavya Divadiye Jagmagta Maa Na Norta (Traditional Garba)',
   },
   'mashups/raas/chunalida.mp3': {
     title: 'Chunalida',
-    description: 'Gujarati Folk Mashup',
+    description: 'Chunari (Himali Vyas Naik) × Dholida (Jahnvi Shrimankar & Shail Hada)',
   },
   'mashups/raas/dankeroopty.mp3': {
     title: 'Dankonteroopty',
-    description: 'Raas Fusion Mashup',
+    description: 'Danko Vagyo (Traditional Raas) × MONTERO (Lil Nas X) × Whoopty (CJ)',
   },
   'mashups/raas/feel-so-raas.mp3': {
     title: 'Feel So Raas',
-    description: 'Feel So Close × Raas Blend',
+    description: 'Feel So Close (Calvin Harris) × Ha Ha Re Ghaduliyo (Traditional Garba)',
     featured: true,
   },
   'mashups/raas/kanudina-psycho.mp3': {
     title: 'Kanudina Psycho',
-    description: 'Kanudina × Psycho',
+    description: 'Kanuda Ni Morli Ma (Traditional Raas) × Psycho (Post Malone feat. Ty Dolla $ign)',
   },
   'mashups/raas/mogal-rumble.mp3': {
     title: 'Mogal Rumble',
-    description: 'Mogal × Rumble',
+    description: 'Maa Mogal Ramva Aave Re (Jigardan Gadhavi) × Rumble (Skrillex, Fred again.. & Flowdan)',
   },
   'mashups/raas/patang-tu-meri.mp3': {
     title: 'Patang × Tu Meri',
-    description: 'Patang × Tu Meri',
+    description: 'Patang (Osman Mir) × Tu Meri (Vishal Dadlani & Vishal-Shekhar)',
   },
   'mashups/raas/phool-jai.mp3': {
     title: 'Phool × Jai',
-    description: 'Phool × Jai',
+    description: 'Phool Phool Venjo Ne (Abhita Patel) × Jai Jai Shivshankar (Vishal Dadlani, Benny Dayal & Vishal-Shekhar)',
+  },
+  'mashups/raas/sachi-edm.mp3': {
+    title: 'Sachi (EDM Remix)',
+    description: 'Sachi Re Mari / Chhand (Bhoomi Trivedi & Osman Mir) · EDM Flip',
   },
   'mashups/raas/tongue-tied-greedy.mp3': {
     title: 'Tongue Tied Greedy',
-    description: 'Tongue Tied × Greedy',
+    description: 'Tongue Tied (Grouplove) × Greedy (Tate McRae) × Asvaar (Aishwarya Majmudar)',
   },
   'mashups/raas/vari-dna.mp3': {
     title: 'VariD(o)NA',
-    description: 'Vari × DNA',
+    description: 'Vaari Jaau Re (Jigardan Gadhavi) × Don Don (Daddy Yankee, Anuel AA & Kendo Kaponi)',
   },
 
   // Remixes
   'remixes/ghoomaremix.mp3': {
     title: 'Ghoomar (ROVA Remix)',
-    description: 'Club Edit',
+    description: 'Ghoomar (Shreya Ghoshal & Swaroop Khan) · Club Edit',
   },
   'remixes/khuda-jaane-urban.mp3': {
     title: 'Khuda Jaane (Urban Remix)',
-    description: 'Urban Edit',
+    description: 'Khuda Jaane (KK & Shilpa Rao) · Urban Edit',
   },
   'remixes/rangilo-rova.mp3': {
     title: 'Rangilo (ROVA Remix)',
-    description: 'ROVA Flip',
-  },
-  'remixes/sachi-edm.mp3': {
-    title: 'Sachi (EDM Remix)',
-    description: 'EDM Flip',
+    description: 'Rangilo Maro Dholna (Shubha Mudgal & Sukhwinder Singh) · ROVA Flip',
   },
 
   // Performances
   'performances/zerena-time-to-disco.mp3': {
     title: 'Zerena — Time To Disco',
-    description: 'Custom Stage Routine',
+    description: "It's The Time To Disco (Vasundhara Das, KK, Shaan & Loy Mendonsa) · Custom Stage Routine",
   },
 };
 
