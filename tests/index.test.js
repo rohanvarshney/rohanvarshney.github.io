@@ -1829,3 +1829,36 @@ test('assets/js/portfolio.js applies initially pressed non-all filter on page lo
     assert.strictEqual(items[2].hidden, false, 'Shows mashup when Mashups is selected');
     assert.strictEqual(subFilterGroup.hidden, false, 'Shows mashup sub-filter when Mashups is selected');
 });
+
+test('assets/css/portfolio.css hero graphics animate on mobile and reduced motion', () => {
+    const cssPath = path.join(__dirname, '..', 'assets', 'css', 'portfolio.css');
+    const cssContent = fs.readFileSync(cssPath, 'utf8');
+
+    const reducedMotionMatch = cssContent.match(/@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{([\s\S]*?\n)\}/);
+    assert.ok(reducedMotionMatch, 'Has @media (prefers-reduced-motion: reduce) block');
+    assert.ok(reducedMotionMatch[1].includes('scroll-behavior: auto;'), 'Keeps scroll-behavior: auto in reduced-motion');
+    assert.ok(reducedMotionMatch[1].includes('.reveal'), 'Keeps .reveal immediate visibility in reduced-motion');
+    assert.ok(!reducedMotionMatch[1].includes('animation: none !important'), 'Does not globally disable hero graphic animations in reduced-motion');
+
+    assert.match(
+        cssContent,
+        /\.hero-visual\s*\{[^}]*min-width:\s*0;/,
+        'Sets min-width: 0 on .hero-visual for mobile grid containment'
+    );
+    assert.match(
+        cssContent,
+        /\.arr-meters span\s*\{[^}]*height:\s*100%;/,
+        'Sets height: 100% on .arr-meters span so meter bars do not collapse under align-items: flex-end'
+    );
+    assert.match(
+        cssContent,
+        /@keyframes playhead\s*\{[\s\S]*?from\s*\{\s*left:\s*0%;\s*\}[\s\S]*?to\s*\{\s*left:\s*100%;\s*\}/,
+        'Uses percentage-only units in @keyframes playhead for Safari compatibility'
+    );
+
+    const mobileMatch = cssContent.match(/@media\s*\(max-width:\s*560px\)\s*\{([\s\S]*?\n)\}/);
+    assert.ok(mobileMatch, 'Has @media (max-width: 560px) block');
+    assert.match(mobileMatch[1], /\.arr-ruler\s*\{[^}]*grid-template-columns:\s*50px repeat\(8,\s*1fr\);/, 'Aligns .arr-ruler to 50px on mobile');
+    assert.match(mobileMatch[1], /\.arr-lane\s*\{[^}]*grid-template-columns:\s*50px 1fr;/, 'Aligns .arr-lane to 50px on mobile');
+    assert.match(mobileMatch[1], /\.playhead\s*\{[^}]*left:\s*50px;/, 'Aligns .playhead track start to 50px on mobile');
+});

@@ -225,6 +225,10 @@ img {
   align-items: center;
 }
 
+.hero-visual {
+  min-width: 0;
+}
+
 .eyebrow {
   font-size: 0.78rem;
   color: var(--muted);
@@ -512,6 +516,7 @@ img {
   height: 100%;
   transform: translateX(0);
   animation: dj-wave-scroll 7.62s linear infinite;
+  will-change: transform;
 }
 
 .dj-wave-svg {
@@ -596,6 +601,7 @@ img {
   );
   transform: rotate(-28deg);
   animation: dj-spin 3.81s linear infinite;
+  will-change: transform;
 }
 
 .dj-deck.is-b .dj-platter-rot {
@@ -2019,6 +2025,7 @@ details.faq .faq-body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
   font-size: 0.7rem;
   color: #aaa;
   text-transform: uppercase;
@@ -2029,6 +2036,19 @@ details.faq .faq-body {
 .arr-top .arr-dots {
   display: flex;
   gap: 5px;
+  flex-shrink: 0;
+}
+
+.arr-top > span:nth-child(2) {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.arr-top > span:last-child {
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .arr-top .arr-dots span {
@@ -2118,15 +2138,27 @@ details.faq .faq-body {
   top: -4px;
   bottom: -4px;
   left: 62px;
+  right: 0;
+  pointer-events: none;
+}
+
+.playhead::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0%;
   width: 2px;
+  margin-left: -1px;
   background: #fff;
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
   animation: playhead 9s linear infinite;
+  will-change: left;
 }
 
 @keyframes playhead {
   from {
-    left: 62px;
+    left: 0%;
   }
 
   to {
@@ -2144,10 +2176,12 @@ details.faq .faq-body {
 
 .arr-meters span {
   flex: 1;
+  height: 100%;
   background: linear-gradient(to top, var(--red), #ff7a93 70%, #ffd166);
   border-radius: 2px;
   animation: meter 1.2s ease-in-out infinite alternate;
   transform-origin: bottom;
+  will-change: transform;
 }
 
 @keyframes meter {
@@ -2401,16 +2435,10 @@ details.faq .faq-body {
     scroll-behavior: auto;
   }
 
-  *,
-  *::before,
-  *::after {
-    animation: none !important;
-    transition: none !important;
-  }
-
   .reveal {
     opacity: 1;
     transform: none;
+    transition: none;
   }
 }
 
@@ -2462,12 +2490,26 @@ details.faq .faq-body {
     height: 31px;
   }
 
-  .dj-rig {
+  .dj-rig,
+  .arrangement {
     padding: 14px 12px 16px;
   }
 
-  .dj-top {
+  .dj-top,
+  .arr-top {
     font-size: 0.64rem;
+  }
+
+  .arr-ruler {
+    grid-template-columns: 50px repeat(8, 1fr);
+  }
+
+  .arr-lane {
+    grid-template-columns: 50px 1fr;
+  }
+
+  .playhead {
+    left: 50px;
   }
 
   .dj-console {
