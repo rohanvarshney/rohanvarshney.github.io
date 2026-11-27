@@ -126,6 +126,7 @@ const CURATED_TRACKS = {
   'mashups/raas/chunalida.mp3': {
     title: 'Chunalida',
     description: 'Chunari (Himali Vyas Naik) × Dholida (Jahnvi Shrimankar & Shail Hada)',
+    featured: true,
   },
   'mashups/raas/dankeroopty.mp3': {
     title: 'Dankonteroopty',
@@ -134,7 +135,6 @@ const CURATED_TRACKS = {
   'mashups/raas/feel-so-raas.mp3': {
     title: 'Feel So Raas',
     description: 'Feel So Close (Calvin Harris) × Ha Ha Re Ghaduliyo (Traditional Garba)',
-    featured: true,
   },
   'mashups/raas/kanudina-psycho.mp3': {
     title: 'Kanudina Psycho',

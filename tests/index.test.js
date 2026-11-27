@@ -295,9 +295,9 @@ test('raas/index.html structure and content', () => {
 
     const raasPlayerMatch = raasContent.match(/<article class="player"[\s\S]*?<\/article>/);
     assert.ok(raasPlayerMatch, 'Raas page has featured player article');
-    assert.ok(raasPlayerMatch[0].includes('data-audio-file="mashups/raas/feel-so-raas.mp3"'), 'Raas featured player wires feel-so-raas.mp3');
+    assert.ok(raasPlayerMatch[0].includes('data-audio-file="mashups/raas/chunalida.mp3"'), 'Raas featured player wires chunalida.mp3');
     assert.ok(raasPlayerMatch[0].includes('aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>'), 'Raas featured player waveform div is intact');
-    assert.ok(raasPlayerMatch[0].includes('<span class="player-time" data-player-time aria-live="off">0:00 / 1:46</span>'), 'Raas featured player time span is intact');
+    assert.ok(raasPlayerMatch[0].includes('<span class="player-time" data-player-time aria-live="off">0:00 / 2:38</span>'), 'Raas featured player time span is intact');
     assert.ok(!raasPlayerMatch[0].includes('<li') && !raasPlayerMatch[0].includes('RAAS-AUDIO:'), 'Raas featured player contains no list items or sync markers');
 
     const raasListMatch = raasContent.match(/<ul class="release-list" id="raas-release-list">([\s\S]*?)<\/ul>/);
