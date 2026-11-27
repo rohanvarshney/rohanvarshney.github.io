@@ -154,7 +154,7 @@ const CURATED_TRACKS = {
   },
   'mashups/raas/sachi-edm.mp3': {
     title: 'Sachi (EDM Remix)',
-    description: 'Sachi Re Mari / Chhand (Bhoomi Trivedi & Osman Mir) · EDM Flip',
+    description: 'Sachi Re Mari (Bhoomi Trivedi & Osman Mir) · EDM Flip',
   },
   'mashups/raas/tongue-tied-greedy.mp3': {
     title: 'Tongue Tied Greedy',
