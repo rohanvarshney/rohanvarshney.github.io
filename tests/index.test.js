@@ -381,6 +381,13 @@ test('raas/index.html structure and content', () => {
     assert.ok(raasContent.includes('class="footer-social"'), 'Footer has footer-social container');
     assert.ok(raasContent.includes('href="../dj/"'), 'Footer cross-links to DJing');
     assert.ok(raasContent.includes('href="../production/"'), 'Footer cross-links to Production');
+    assert.ok(
+        raasContent.includes('class="footer-disclaimer"') &&
+        raasContent.includes('non-monetized') &&
+        raasContent.includes('not for download or distribution') &&
+        raasContent.includes('mailto:rohanvar@gmail.com?subject=Audio%20Removal%20Request'),
+        'Raas footer includes non-monetized copyright & removal notice'
+    );
 });
 
 test('dj/index.html structure and content', () => {
@@ -512,6 +519,13 @@ test('production/index.html structure and content', () => {
     assert.ok(prodContent.includes('src="../assets/freehand-signature-3.png"'), 'Has freehand signature logo in header');
     assert.ok(prodContent.includes('href="../dj/"'), 'Cross-links to DJing');
     assert.ok(prodContent.includes('href="../raas/"'), 'Cross-links to Raas / Garba');
+    assert.ok(
+        prodContent.includes('class="footer-disclaimer"') &&
+        prodContent.includes('non-monetized') &&
+        prodContent.includes('not for download or distribution') &&
+        prodContent.includes('mailto:rohanvar@gmail.com?subject=Audio%20Removal%20Request'),
+        'Production footer includes non-monetized copyright & removal notice'
+    );
     assert.ok(prodContent.includes('src="../assets/js/analytics.js"'), 'Includes analytics script');
     assert.ok(prodContent.includes('src="../assets/js/portfolio.js"'), 'Includes portfolio script');
     assert.ok(prodContent.includes('years of production and practice'), 'Production page highlights years of production and practice');
@@ -1204,6 +1218,7 @@ test('SEO metadata, JSON-LD schema, sitemap.xml, and robots.txt', () => {
     const robots = fs.readFileSync(path.join(__dirname, '..', 'robots.txt'), 'utf8');
     assert.ok(robots.includes('User-agent: *'), 'robots.txt allows all user agents');
     assert.ok(robots.includes('Allow: /'), 'robots.txt allows root');
+    assert.ok(robots.includes('Disallow: /assets/audio/'), 'robots.txt disallows raw audio directory indexing');
     assert.ok(robots.includes('Sitemap: https://rohanvarshney.github.io/sitemap.xml'), 'robots.txt points to sitemap.xml');
 });
 

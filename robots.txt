@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /assets/audio/
 
 Sitemap: https://rohanvarshney.github.io/sitemap.xml
