@@ -145,7 +145,17 @@
         data-track-list="#release-list">
         <div class="cover" data-player-cover aria-hidden="true">MASHUP</div>
         <div class="player-body">
-          <div class="player-kicker" data-player-kicker>Featured Track</div>
+          <div class="player-top">
+            <div class="player-kicker" data-player-kicker>Featured Track</div>
+            <div class="player-modes" role="group" aria-label="Playback mode">
+              <button type="button" class="player-mode-btn" data-playback-mode="loop" aria-pressed="false" title="Loop current track">
+                <i class="fa fa-repeat" aria-hidden="true"></i> Loop
+              </button>
+              <button type="button" class="player-mode-btn" data-playback-mode="continue" aria-pressed="false" title="Continue to next track in selection">
+                <i class="fa fa-step-forward" aria-hidden="true"></i> Continue
+              </button>
+            </div>
+          </div>
           <h3 class="player-title" data-player-title>Move Like I Do</h3>
           <div class="player-meta" data-player-meta>Mashup &middot; Western &middot; Moves Like Jagger (Maroon 5) &times; Like I Do (David Guetta &amp; Martin Garrix) &middot; 2:52</div>
           <div class="player-controls">

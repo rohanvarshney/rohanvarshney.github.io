@@ -1304,6 +1304,55 @@ button.chip[aria-pressed='true'] {
   margin-bottom: 8px;
 }
 
+.player-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-bottom: 8px;
+}
+
+.player-top .player-kicker {
+  margin-bottom: 0;
+}
+
+.player-modes {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.player-mode-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.05);
+  color: #ccc;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  cursor: pointer;
+  line-height: 1.4;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.player-mode-btn:hover {
+  border-color: rgba(255, 77, 109, 0.75);
+  color: #fff;
+}
+
+.player-mode-btn[aria-pressed="true"] {
+  background: var(--red);
+  border-color: var(--red);
+  color: #fff;
+}
+
 .player-title {
   font-family: var(--sans);
   font-size: 1.35rem;

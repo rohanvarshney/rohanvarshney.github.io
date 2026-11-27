@@ -858,6 +858,55 @@
       margin-bottom: 8px;
     }
 
+    .player-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px 12px;
+      margin-bottom: 8px;
+    }
+
+    .player-top .player-kicker {
+      margin-bottom: 0;
+    }
+
+    .player-modes {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .player-mode-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      background: rgba(255, 255, 255, 0.05);
+      color: #ccc;
+      font-family: 'Courier New', 'Monaco', monospace;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      cursor: pointer;
+      line-height: 1.4;
+      transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+    }
+
+    .player-mode-btn:hover {
+      border-color: rgba(255, 77, 109, 0.75);
+      color: #fff;
+    }
+
+    .player-mode-btn[aria-pressed="true"] {
+      background: #dc143c;
+      border-color: #dc143c;
+      color: #fff;
+    }
+
     .player-title {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
       font-size: 1.35rem;
@@ -1745,7 +1794,17 @@
         data-track-list="#raas-release-list">
         <div class="cover" data-player-cover aria-hidden="true">RAAS</div>
         <div class="player-body">
-          <div class="player-kicker" data-player-kicker>Featured Track</div>
+          <div class="player-top">
+            <div class="player-kicker" data-player-kicker>Featured Track</div>
+            <div class="player-modes" role="group" aria-label="Playback mode">
+              <button type="button" class="player-mode-btn" data-playback-mode="loop" aria-pressed="false" title="Loop current track">
+                <i class="fa fa-repeat" aria-hidden="true"></i> Loop
+              </button>
+              <button type="button" class="player-mode-btn" data-playback-mode="continue" aria-pressed="false" title="Continue to next track in selection">
+                <i class="fa fa-step-forward" aria-hidden="true"></i> Continue
+              </button>
+            </div>
+          </div>
           <h3 class="player-title" data-player-title>Chunalida</h3>
           <div class="player-meta" data-player-meta>Chunari (Himali Vyas Naik) &times; Dholida (Jahnvi Shrimankar &amp; Shail Hada) &middot; 2:38</div>
           <div class="player-controls">

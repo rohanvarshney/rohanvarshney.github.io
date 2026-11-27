@@ -515,6 +515,16 @@
       var trackListSelector = player.getAttribute('data-track-list');
       var trackList = trackListSelector ? document.querySelector(trackListSelector) : null;
       var rowButtons = trackList ? trackList.querySelectorAll('[data-release-play]') : [];
+      var modeButtons = player.querySelectorAll
+        ? Array.prototype.slice.call(player.querySelectorAll('[data-playback-mode]'))
+        : [];
+      var playbackMode = 'off';
+      modeButtons.forEach(function (btn) {
+        var mode = btn.getAttribute('data-playback-mode');
+        if (btn.getAttribute('aria-pressed') === 'true' && (mode === 'loop' || mode === 'continue')) {
+          playbackMode = mode;
+        }
+      });
 
       var audio = null;
       var loadedUrl = '';
@@ -591,21 +601,44 @@
         }
       }
 
-      function stepTrack(delta) {
+      function getVisiblePlayableRows() {
         if (!trackList || !trackList.querySelectorAll) {
-          return;
+          return [];
         }
-        var rows = Array.prototype.slice
+        return Array.prototype.slice
           .call(trackList.querySelectorAll('.release[data-audio-file], .release[data-audio-src]'))
           .filter(function (row) {
             return !row.hidden;
           });
-        if (rows.length <= 1) {
-          return;
+      }
+
+      function stepTrack(delta) {
+        var rows = getVisiblePlayableRows();
+        if (!rows.length) {
+          return false;
         }
         var currentIndex = rows.indexOf(activeRow);
-        var nextIndex = currentIndex === -1 ? 0 : (currentIndex + delta + rows.length) % rows.length;
+        if (rows.length === 1 && currentIndex === 0) {
+          return false;
+        }
+        var nextIndex = currentIndex === -1
+          ? (delta >= 0 ? 0 : rows.length - 1)
+          : (currentIndex + delta + rows.length) % rows.length;
         loadTrackFromRow(rows[nextIndex], true);
+        return true;
+      }
+
+      function syncPlaybackMode() {
+        modeButtons.forEach(function (btn) {
+          var isSelected = btn.getAttribute('data-playback-mode') === playbackMode;
+          btn.setAttribute('aria-pressed', String(isSelected));
+          if (btn.classList) {
+            btn.classList.toggle('is-active', isSelected);
+          }
+        });
+        if (audio) {
+          audio.loop = playbackMode === 'loop';
+        }
       }
 
       function registerMediaSessionHandlers() {
@@ -737,6 +770,7 @@
         }
         audio = new window.Audio();
         audio.preload = 'none';
+        audio.loop = playbackMode === 'loop';
 
         audio.addEventListener('loadstart', function () {
           isLoading = true;
@@ -781,6 +815,22 @@
         });
         audio.addEventListener('ended', function () {
           isLoading = false;
+          if (playbackMode === 'loop') {
+            audio.currentTime = 0;
+            setWaveformProgress(wave, 0);
+            updateTimeDisplay(0, audio.duration);
+            var loopPromise = audio.play();
+            if (loopPromise && typeof loopPromise.catch === 'function') {
+              loopPromise.catch(function () {
+                syncPlayState();
+              });
+            }
+            syncPlayState();
+            return;
+          }
+          if (playbackMode === 'continue' && stepTrack(1)) {
+            return;
+          }
           setWaveformProgress(wave, 0);
           updateTimeDisplay(0, audio.duration);
           syncPlayState();
@@ -832,6 +882,7 @@
           instance.src = currentUrl;
           syncPlayState();
         }
+        instance.loop = playbackMode === 'loop';
         if (instance.paused || instance.ended) {
           track(player.getAttribute('data-analytics-event') || 'production_audio_play', {
             event_category: player.getAttribute('data-analytics-category') || 'production',
@@ -1018,6 +1069,18 @@
         });
       });
 
+      modeButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+          var mode = button.getAttribute('data-playback-mode');
+          if (mode !== 'loop' && mode !== 'continue') {
+            return;
+          }
+          playbackMode = playbackMode === mode ? 'off' : mode;
+          syncPlaybackMode();
+        });
+      });
+
+      syncPlaybackMode();
       syncPlayState();
     });
   }

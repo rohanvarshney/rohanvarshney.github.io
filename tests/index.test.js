@@ -303,6 +303,9 @@ test('raas/index.html structure and content', () => {
     assert.ok(raasPlayerMatch[0].includes('aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>'), 'Raas featured player waveform div is intact');
     assert.ok(raasPlayerMatch[0].includes('<span class="player-time" data-player-time aria-live="off">0:00 / 2:38</span>'), 'Raas featured player time span is intact');
     assert.ok(!raasPlayerMatch[0].includes('<li') && !raasPlayerMatch[0].includes('RAAS-AUDIO:'), 'Raas featured player contains no list items or sync markers');
+    assert.ok(raasPlayerMatch[0].includes('data-playback-mode="loop" aria-pressed="false"'), 'Raas player includes Loop toggle defaulting to off');
+    assert.ok(raasPlayerMatch[0].includes('data-playback-mode="continue" aria-pressed="false"'), 'Raas player includes Continue toggle defaulting to off');
+    assert.ok(raasContent.includes('.player-mode-btn[aria-pressed="true"]'), 'Raas CSS styles active playback mode toggle');
 
     const raasListMatch = raasContent.match(/<ul class="release-list" id="raas-release-list">([\s\S]*?)<\/ul>/);
     assert.ok(raasListMatch, 'Raas page has #raas-release-list container');
@@ -560,6 +563,8 @@ test('production/index.html structure and content', () => {
     assert.ok(featuredPlayerMatch[0].includes('<span class="player-time" data-player-time aria-live="off">0:00 / 2:52</span>'), 'Featured player time span is intact');
     assert.ok(!featuredPlayerMatch[0].includes('<li') && !featuredPlayerMatch[0].includes('AUDIO-RELEASES:'), 'Featured player contains no list items or sync markers');
     assert.ok(!featuredPlayerMatch[0].includes('data-category='), 'Featured player has no data-category so category filters never hide it');
+    assert.ok(featuredPlayerMatch[0].includes('data-playback-mode="loop" aria-pressed="false"'), 'Production player includes Loop toggle defaulting to off');
+    assert.ok(featuredPlayerMatch[0].includes('data-playback-mode="continue" aria-pressed="false"'), 'Production player includes Continue toggle defaulting to off');
     assert.strictEqual((prodContent.match(/<!-- AUDIO-RELEASES:START -->/g) || []).length, 1, 'Has exactly one AUDIO-RELEASES:START marker');
     assert.strictEqual((prodContent.match(/<!-- AUDIO-RELEASES:END -->/g) || []).length, 1, 'Has exactly one AUDIO-RELEASES:END marker');
     assert.ok(
@@ -705,6 +710,7 @@ test('production/index.html structure and content', () => {
 
     const cssContent = fs.readFileSync(path.join(__dirname, '..', 'assets', 'css', 'portfolio.css'), 'utf8');
     assert.ok(cssContent.includes('.player-links a[hidden]'), 'CSS hides hidden player Spotify link');
+    assert.ok(cssContent.includes('.player-mode-btn[aria-pressed="true"]'), 'CSS styles active playback mode toggle');
     assert.ok(cssContent.includes('.release.release-embed[hidden]'), 'CSS hides filtered-out Spotify embed rows');
     assert.ok(cssContent.includes('.chips[hidden]'), 'CSS hides hidden sub-filter chip groups');
 
@@ -2456,4 +2462,293 @@ test('assets/js/portfolio.js syncs song title and controls to Media Session and 
     raas.playBtn.trigger('click');
     assert.strictEqual(raas.mediaSession.metadata.album, 'ROVA Raas', 'Uses ROVA Raas album on Raas page');
     assert.strictEqual(raas.sandbox.document.title, '▶ Airplanes × 9:45 | ROVA', 'Updates Raas tab title while playing');
+});
+
+test('assets/js/portfolio.js playback mode toggles loop, continue within visible selection, or off', () => {
+    const portfolioPath = path.join(__dirname, '..', 'assets', 'js', 'portfolio.js');
+    const portfolioJs = fs.readFileSync(portfolioPath, 'utf8');
+
+    function createMockClassList(initial = []) {
+        const set = new Set(initial);
+        return {
+            add(c) { set.add(c); },
+            remove(c) { set.delete(c); },
+            toggle(c, force) {
+                if (force === undefined) {
+                    if (set.has(c)) { set.delete(c); return false; }
+                    set.add(c); return true;
+                }
+                if (force) set.add(c); else set.delete(c);
+                return Boolean(force);
+            },
+            contains(c) { return set.has(c); },
+        };
+    }
+
+    function createMockElement(tag, { attrs = {}, classes = [], textContent = '' } = {}) {
+        const attrMap = Object.assign({}, attrs);
+        const listeners = {};
+        const children = [];
+        let _text = textContent;
+        return {
+            tagName: tag.toUpperCase(),
+            style: {},
+            hidden: false,
+            children,
+            classList: createMockClassList(classes),
+            get className() { return attrMap.class || ''; },
+            set className(val) { attrMap.class = val; },
+            get textContent() { return _text; },
+            set textContent(val) {
+                _text = String(val);
+                if (val === '') children.length = 0;
+            },
+            getAttribute(name) {
+                return Object.prototype.hasOwnProperty.call(attrMap, name) ? attrMap[name] : null;
+            },
+            setAttribute(name, val) {
+                attrMap[name] = String(val);
+            },
+            removeAttribute(name) {
+                delete attrMap[name];
+            },
+            hasAttribute(name) {
+                return Object.prototype.hasOwnProperty.call(attrMap, name);
+            },
+            appendChild(child) {
+                if (child && child._isFragment) {
+                    child.children.forEach((c) => children.push(c));
+                } else {
+                    children.push(child);
+                }
+                return child;
+            },
+            addEventListener(type, fn) {
+                listeners[type] = listeners[type] || [];
+                listeners[type].push(fn);
+            },
+            trigger(type, eventObj) {
+                (listeners[type] || []).forEach((fn) => fn(eventObj || {}));
+            },
+            querySelectorAll(selector) {
+                if (selector === 'span') return children;
+                return [];
+            },
+            querySelector() {
+                return null;
+            },
+        };
+    }
+
+    function makeRow({ file, title, meta, duration, active, hidden = false }) {
+        const row = createMockElement('li', {
+            attrs: { 'data-audio-file': file, 'data-track-duration': duration, 'data-seed': '11' },
+            classes: active ? ['release', 'is-active'] : ['release'],
+        });
+        row.hidden = hidden;
+        const rowTitle = createMockElement('div', { textContent: title });
+        const rowMeta = createMockElement('div', { textContent: meta });
+        const rowBtn = createMockElement('button', { attrs: { 'data-release-play': '' } });
+        row.querySelector = (sel) => {
+            if (sel === '.release-title') return rowTitle;
+            if (sel === '.release-meta') return rowMeta;
+            return null;
+        };
+        return { row, rowBtn };
+    }
+
+    const row1 = makeRow({ file: 'mashups/western/a.mp3', title: 'Track A', meta: 'Meta A', duration: '1:00', active: true });
+    const row2 = makeRow({ file: 'mashups/western/b.mp3', title: 'Track B (Hidden)', meta: 'Meta B', duration: '1:10', active: false, hidden: true });
+    const row3 = makeRow({ file: 'mashups/western/c.mp3', title: 'Track C', meta: 'Meta C', duration: '1:20', active: false });
+
+    const releaseList = createMockElement('ul', { attrs: { id: 'release-list' } });
+    releaseList.querySelector = (sel) => {
+        if (sel === '.release.is-active') return [row1.row, row2.row, row3.row].find((r) => r.classList.contains('is-active')) || null;
+        return null;
+    };
+    releaseList.querySelectorAll = (sel) => {
+        if (sel === '[data-release-play]') return [row1.rowBtn, row2.rowBtn, row3.rowBtn];
+        if (sel === '.release.is-active') return [row1.row, row2.row, row3.row].filter((r) => r.classList.contains('is-active'));
+        if (sel === '.release[data-audio-file], .release[data-audio-src]') return [row1.row, row2.row, row3.row];
+        return [];
+    };
+
+    const playBtn = createMockElement('button', { attrs: { 'data-play-toggle': '' } });
+    const loopBtn = createMockElement('button', { attrs: { 'data-playback-mode': 'loop', 'aria-pressed': 'false' } });
+    const continueBtn = createMockElement('button', { attrs: { 'data-playback-mode': 'continue', 'aria-pressed': 'false' } });
+    const wave = createMockElement('div', { attrs: { 'data-waveform': '', 'data-bars': '10', 'data-progress': '0' } });
+    wave.getBoundingClientRect = () => ({ left: 0, width: 200 });
+    const titleEl = createMockElement('h3', { attrs: { 'data-player-title': '' }, textContent: 'Track A' });
+    const timeEl = createMockElement('span', { attrs: { 'data-player-time': '' }, textContent: '0:00 / 1:00' });
+
+    const player = createMockElement('article', {
+        attrs: {
+            'data-audio-player': '',
+            'data-audio-base': '../assets/audio/',
+            'data-audio-file': 'mashups/western/a.mp3',
+            'data-track-title': 'Track A',
+            'data-track-duration': '1:00',
+            'data-track-list': '#release-list',
+        },
+    });
+    player.querySelector = (sel) => {
+        if (sel === '[data-play-toggle]') return playBtn;
+        if (sel === '[data-waveform]') return wave;
+        if (sel === '[data-player-title]') return titleEl;
+        if (sel === '[data-player-time]') return timeEl;
+        return null;
+    };
+    player.querySelectorAll = (sel) => {
+        if (sel === '[data-playback-mode]') return [loopBtn, continueBtn];
+        return [];
+    };
+
+    const createdAudios = [];
+    class MockAudio {
+        constructor() {
+            this.preload = '';
+            this.src = '';
+            this.loop = false;
+            this.currentTime = 0;
+            this.duration = 60;
+            this.paused = true;
+            this.ended = false;
+            this._listeners = {};
+            this.playCalls = 0;
+            createdAudios.push(this);
+        }
+        addEventListener(type, fn) {
+            this._listeners[type] = this._listeners[type] || [];
+            this._listeners[type].push(fn);
+        }
+        emit(type) {
+            (this._listeners[type] || []).forEach((fn) => fn({}));
+        }
+        play() {
+            this.playCalls++;
+            this.paused = false;
+            this.ended = false;
+            this.emit('playing');
+            return Promise.resolve();
+        }
+        pause() {
+            this.paused = true;
+            this.emit('pause');
+        }
+    }
+
+    let domReadyHandler = null;
+    const sandbox = {
+        Audio: MockAudio,
+        location: { href: 'https://rohanvarshney.github.io/production/' },
+        isSecureContext: true,
+        document: {
+            title: 'ROVA Production',
+            body: { getAttribute() { return ''; } },
+            addEventListener(type, fn) {
+                if (type === 'DOMContentLoaded') domReadyHandler = fn;
+            },
+            querySelector(sel) {
+                if (sel === '#release-list') return releaseList;
+                return null;
+            },
+            querySelectorAll(sel) {
+                if (sel === '[data-waveform]') return [wave];
+                if (sel === '[data-audio-player]') return [player];
+                return [];
+            },
+            getElementById() { return null; },
+            createDocumentFragment() {
+                return { _isFragment: true, children: [], appendChild(c) { this.children.push(c); } };
+            },
+            createElement(tag) {
+                return createMockElement(tag);
+            },
+        },
+        setTimeout() { return 1; },
+        clearTimeout() {},
+    };
+    sandbox.window = sandbox;
+
+    vm.createContext(sandbox);
+    vm.runInContext(portfolioJs, sandbox);
+    domReadyHandler();
+
+    // 1. Default mode is off: track ends and stops without replaying or advancing
+    playBtn.trigger('click');
+    const audio = createdAudios[0];
+    assert.strictEqual(audio.loop, false, 'Audio loop defaults to false');
+    assert.strictEqual(loopBtn.getAttribute('aria-pressed'), 'false', 'Loop button defaults to unpressed');
+    assert.strictEqual(continueBtn.getAttribute('aria-pressed'), 'false', 'Continue button defaults to unpressed');
+    audio.currentTime = 60;
+    audio.paused = true;
+    audio.ended = true;
+    audio.emit('ended');
+    assert.strictEqual(audio.playCalls, 1, 'Off mode does not replay on ended');
+    assert.strictEqual(titleEl.textContent, 'Track A', 'Off mode does not switch track on ended');
+
+    // 2. Toggle Loop ON: sets audio.loop = true and replays same track on ended
+    loopBtn.trigger('click');
+    assert.strictEqual(loopBtn.getAttribute('aria-pressed'), 'true', 'Loop button becomes pressed');
+    assert.strictEqual(continueBtn.getAttribute('aria-pressed'), 'false', 'Continue button stays unpressed');
+    assert.strictEqual(audio.loop, true, 'Enables native audio.loop when Loop is active');
+    audio.currentTime = 60;
+    audio.paused = true;
+    audio.ended = true;
+    audio.emit('ended');
+    assert.strictEqual(audio.playCalls, 2, 'Loop mode replays same track on ended');
+    assert.strictEqual(audio.currentTime, 0, 'Loop mode resets currentTime to 0');
+    assert.strictEqual(titleEl.textContent, 'Track A', 'Loop mode keeps same track');
+
+    // 3. Click Continue while Loop is active: mutually exclusive switch
+    continueBtn.trigger('click');
+    assert.strictEqual(loopBtn.getAttribute('aria-pressed'), 'false', 'Switching to Continue deactivates Loop');
+    assert.strictEqual(continueBtn.getAttribute('aria-pressed'), 'true', 'Continue button becomes pressed');
+    assert.strictEqual(audio.loop, false, 'Disables native audio.loop when Continue is active');
+
+    // 4. Continue skips hidden row2 and advances from Track A -> Track C
+    audio.paused = true;
+    audio.ended = true;
+    audio.emit('ended');
+    assert.strictEqual(titleEl.textContent, 'Track C', 'Continue skips hidden row and advances to Track C');
+    assert.strictEqual(audio.src, '../assets/audio/mashups/western/c.mp3', 'Loads next visible track MP3');
+
+    // 5. Continue wraps from last visible track (Track C) -> first visible track (Track A)
+    audio.paused = true;
+    audio.ended = true;
+    audio.emit('ended');
+    assert.strictEqual(titleEl.textContent, 'Track A', 'Continue wraps from last visible track to first visible track');
+
+    // 6. If active track (Track A) becomes hidden by a filter switch, Continue advances to first visible track (Track C)
+    row1.row.hidden = true;
+    audio.paused = true;
+    audio.ended = true;
+    audio.emit('ended');
+    assert.strictEqual(titleEl.textContent, 'Track C', 'Continue moves into visible selection if active track was hidden');
+
+    // 7. If only 1 visible playable track exists and it is active, Continue stops cleanly rather than looping
+    const playCallsBeforeSingleStop = audio.playCalls;
+    audio.paused = true;
+    audio.ended = true;
+    audio.emit('ended');
+    assert.strictEqual(audio.playCalls, playCallsBeforeSingleStop, 'Continue stops cleanly when only 1 visible track exists');
+
+    // 8. If 0 visible playable tracks exist, Continue stops cleanly
+    row3.row.hidden = true;
+    audio.paused = true;
+    audio.ended = true;
+    audio.emit('ended');
+    assert.strictEqual(audio.playCalls, playCallsBeforeSingleStop, 'Continue stops cleanly when 0 visible playable tracks exist');
+
+    // 9. Clicking active Continue toggles mode back to off
+    row1.row.hidden = false;
+    row3.row.hidden = false;
+    continueBtn.trigger('click');
+    assert.strictEqual(loopBtn.getAttribute('aria-pressed'), 'false', 'Loop remains unpressed when toggling Continue off');
+    assert.strictEqual(continueBtn.getAttribute('aria-pressed'), 'false', 'Clicking active Continue returns to off');
+    const playCallsBeforeOff = audio.playCalls;
+    audio.paused = true;
+    audio.ended = true;
+    audio.emit('ended');
+    assert.strictEqual(audio.playCalls, playCallsBeforeOff, 'Off mode stops cleanly after toggling Continue off');
 });
