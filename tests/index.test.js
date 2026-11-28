@@ -341,6 +341,7 @@ test('raas/index.html structure and content', () => {
     assert.strictEqual(raasFiles[1], 'mashups/raas/tongue-tied-greedy.mp3', 'Tongue Tied Greedy is second in Raas mashups');
     assert.strictEqual(raasFiles[5], 'mashups/raas/besharam-divya.mp3', 'Besharam Rang × Aavya Divya is sixth in Raas mashups');
     assert.ok(raasContent.includes('<div class="release-title">Besharam Rang &times; Aavya Divya</div>'), 'Besharam Rang × Aavya Divya title is rendered in Raas mashups');
+    assert.ok(raasContent.includes('<div class="release-title">Phool Phool &times; Jai Jai</div>'), 'Phool Phool × Jai Jai title is rendered in Raas mashups');
     assert.strictEqual(raasFiles[6], 'mashups/raas/vari-dna.mp3', 'VariD(o)NA is seventh in Raas mashups');
     assert.ok(!raasContent.includes('Raas Mashup &middot;'), 'Raas player and cards omit redundant Raas Mashup prefix');
 

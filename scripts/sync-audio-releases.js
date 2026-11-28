@@ -178,7 +178,7 @@ const CURATED_TRACKS = {
     order: 9,
   },
   'mashups/raas/phool-jai.mp3': {
-    title: 'Phool × Jai',
+    title: 'Phool Phool × Jai Jai',
     description: 'Phool Phool Venjo Ne (Abhita Patel) × Jai Jai Shivshankar (Vishal Dadlani, Benny Dayal & Vishal-Shekhar)',
     order: 10,
   },
