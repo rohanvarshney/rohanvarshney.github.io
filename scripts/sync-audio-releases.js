@@ -158,7 +158,7 @@ const CURATED_TRACKS = {
     order: 5,
   },
   'mashups/raas/besharam-divya.mp3': {
-    title: 'Besharam Divya',
+    title: 'Besharam Rang × Aavya Divya',
     description: 'Besharam Rang (Shilpa Rao & Vishal-Shekhar) × Aavya Divadiye Jagmagta Maa Na Norta (Traditional Garba)',
     order: 6,
   },
