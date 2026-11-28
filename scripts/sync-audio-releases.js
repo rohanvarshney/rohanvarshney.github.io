@@ -68,13 +68,14 @@ const CURATED_TRACKS = {
   },
 
   // Mashups — Indo-Western Fusion
-  'mashups/indo-western-fusion/airplanes-945.mp3': {
-    title: 'Airplanes × 9:45',
-    description: 'Airplanes (B.o.B feat. Hayley Williams) × 9:45 (Prabh Singh)',
-  },
   'mashups/indo-western-fusion/beautiful-raat.mp3': {
     title: 'Beautiful Raat',
     description: 'Aaj Ki Raat (Madhubanti Bagchi & Sachin-Jigar) × Beautiful Escape (Tom Misch feat. Zak Abel)',
+    order: 1,
+  },
+  'mashups/indo-western-fusion/airplanes-945.mp3': {
+    title: 'Airplanes × 9:45',
+    description: 'Airplanes (B.o.B feat. Hayley Williams) × 9:45 (Prabh Singh)',
   },
   'mashups/indo-western-fusion/don-n-night.mp3': {
     title: "Don 'N' Night",
