@@ -719,8 +719,9 @@ test('production/index.html structure and content', () => {
         .filter((relFile) => relFile.startsWith('mashups/indo-western-fusion/'));
     assert.strictEqual(fusionFiles[0], 'mashups/indo-western-fusion/beautiful-raat.mp3', 'Beautiful Raat is first in Indo-Western Fusion mashups');
     assert.strictEqual(fusionFiles[2], 'mashups/indo-western-fusion/tere-pyaar-i-want-you.mp3', 'Tere Pyaar × I Want You is third in Indo-Western Fusion mashups');
+    assert.strictEqual(fusionFiles[6], 'mashups/indo-western-fusion/ye-mera-dil-enless-summer.mp3', 'Ye Mera Dil × Endless Summer is seventh in Indo-Western Fusion mashups');
     assert.strictEqual(fusionFiles[9], 'mashups/indo-western-fusion/don-n-night.mp3', "Don 'N' Night is tenth in Indo-Western Fusion mashups");
-    assert.strictEqual(fusionFiles[10], 'mashups/indo-western-fusion/ye-mera-dil-enless-summer.mp3', 'Ye Mera Dil × Endless Summer remains eleventh in Indo-Western Fusion mashups');
+    assert.strictEqual(fusionFiles[10], 'mashups/indo-western-fusion/lrad-zindigani.mp3', 'LRAD Zindagani is eleventh in Indo-Western Fusion mashups');
 
     const cssContent = fs.readFileSync(path.join(__dirname, '..', 'assets', 'css', 'portfolio.css'), 'utf8');
     assert.ok(cssContent.includes('.player-links a[hidden]'), 'CSS hides hidden player Spotify link');

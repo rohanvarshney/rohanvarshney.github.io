@@ -98,9 +98,9 @@ const CURATED_TRACKS = {
     description: 'Laila Main Laila (Pawni Pandey) × La Mamá de la Mamá (El Alfa, CJ & El Cherry Scom)',
     order: 6,
   },
-  'mashups/indo-western-fusion/lrad-zindigani.mp3': {
-    title: 'LRAD Zindagani',
-    description: 'Ek Toh Kum Zindagani (Neha Kakkar) × LRAD (Knife Party)',
+  'mashups/indo-western-fusion/ye-mera-dil-enless-summer.mp3': {
+    title: 'Ye Mera Dil × Endless Summer',
+    description: 'Yeh Mera Dil (Sunidhi Chauhan) × Endless Summer (Alan Walker & Zak Abel)',
     order: 7,
   },
   'mashups/indo-western-fusion/prabhu-ka-naam-medley.mp3': {
@@ -118,9 +118,9 @@ const CURATED_TRACKS = {
     description: "Main Hoon Don (Shaan) × Day 'N' Nite (Kid Cudi & Crookers)",
     order: 10,
   },
-  'mashups/indo-western-fusion/ye-mera-dil-enless-summer.mp3': {
-    title: 'Ye Mera Dil × Endless Summer',
-    description: 'Yeh Mera Dil (Sunidhi Chauhan) × Endless Summer (Alan Walker & Zak Abel)',
+  'mashups/indo-western-fusion/lrad-zindigani.mp3': {
+    title: 'LRAD Zindagani',
+    description: 'Ek Toh Kum Zindagani (Neha Kakkar) × LRAD (Knife Party)',
     order: 11,
   },
 
