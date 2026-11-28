@@ -188,7 +188,7 @@ const CURATED_TRACKS = {
     order: 11,
   },
   'mashups/raas/sachi-edm.mp3': {
-    title: 'Sachi (EDM Remix)',
+    title: 'Sachi Re Mari (Live EDM Remix)',
     description: 'Sachi Re Mari (Bhoomi Trivedi & Osman Mir) · EDM Flip',
     order: 12,
   },
