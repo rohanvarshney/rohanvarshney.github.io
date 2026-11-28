@@ -544,8 +544,78 @@
       var retriedExpiredUrl = false;
       var originalDocTitle = document.title;
       var didSetDocTitle = false;
-      var playerAlbum = player.getAttribute('data-analytics-category') === 'raas' ? 'ROVA Raas' : 'ROVA Production';
+      var analyticsCategory = player.getAttribute('data-analytics-category') || 'production';
+      var playEventName = player.getAttribute('data-analytics-event') || 'production_audio_play';
+      var audioEventPrefix = /_play$/.test(playEventName)
+        ? playEventName.replace(/_play$/, '')
+        : analyticsCategory + '_audio';
+      var playerAlbum = analyticsCategory === 'raas' ? 'ROVA Raas' : 'ROVA Production';
       var mediaHandlersRegistered = false;
+      var hasStartedTrack = false;
+      var loopCount = 0;
+
+      function getCurrentTrackFile() {
+        if (activeRow && activeRow.getAttribute) {
+          return activeRow.getAttribute('data-audio-file') || activeRow.getAttribute('data-audio-src') || '';
+        }
+        return player.getAttribute('data-audio-file') || player.getAttribute('data-audio-src') || '';
+      }
+
+      function getCurrentTrackPosition() {
+        var rows = getVisiblePlayableRows();
+        var idx = activeRow ? rows.indexOf(activeRow) : -1;
+        return idx !== -1 ? idx + 1 : null;
+      }
+
+      function getTrackAnalyticsParams(extra) {
+        var params = {
+          event_category: analyticsCategory,
+          event_label: currentTitle,
+          track_title: currentTitle,
+          track_file: getCurrentTrackFile(),
+          track_category: activeRow && activeRow.getAttribute ? (activeRow.getAttribute('data-category') || '') : '',
+          track_subcategory: activeRow && activeRow.getAttribute ? (activeRow.getAttribute('data-subcategory') || '') : '',
+          track_duration: currentDurationLabel,
+          playback_mode: playbackMode,
+          is_featured: Boolean(initialActiveRow && activeRow === initialActiveRow),
+        };
+        var pos = getCurrentTrackPosition();
+        if (pos !== null) {
+          params.track_position = pos;
+        }
+        if (audio && loadedUrl === currentUrl && isFinite(audio.duration) && audio.duration > 0) {
+          var durSec = Math.round(audio.duration);
+          var posSec = Math.max(0, Math.min(durSec, Math.round(audio.currentTime || 0)));
+          params.duration_seconds = durSec;
+          params.position_seconds = posSec;
+          params.percent_played = Math.max(0, Math.min(100, Math.round(((audio.currentTime || 0) / audio.duration) * 100)));
+        }
+        if (extra) {
+          Object.assign(params, extra);
+        }
+        return params;
+      }
+
+      function trackAudioError(errorType, extra) {
+        track(
+          audioEventPrefix + '_error',
+          getTrackAnalyticsParams(Object.assign({ error_type: errorType }, extra || {}))
+        );
+      }
+
+      function pauseWithTracking(source) {
+        if (!audio || audio.paused) {
+          return;
+        }
+        track(
+          audioEventPrefix + '_pause',
+          getTrackAnalyticsParams({
+            pause_source: source || 'main_player',
+            loop_count: loopCount,
+          })
+        );
+        audio.pause();
+      }
 
       function resolveMediaArtworkUrl() {
         var coverImg = coverEl && coverEl.querySelector ? coverEl.querySelector('img') : null;
@@ -612,7 +682,7 @@
           });
       }
 
-      function stepTrack(delta) {
+      function stepTrack(delta, source) {
         var rows = getVisiblePlayableRows();
         if (!rows.length) {
           return false;
@@ -624,7 +694,7 @@
         var nextIndex = currentIndex === -1
           ? (delta >= 0 ? 0 : rows.length - 1)
           : (currentIndex + delta + rows.length) % rows.length;
-        loadTrackFromRow(rows[nextIndex], true);
+        loadTrackFromRow(rows[nextIndex], true, source);
         return true;
       }
 
@@ -637,7 +707,8 @@
           }
         });
         if (audio) {
-          audio.loop = playbackMode === 'loop';
+          // Keep native audio.loop disabled so track end fires 'ended' and loop replays are tracked.
+          audio.loop = false;
         }
       }
 
@@ -658,48 +729,73 @@
 
         bindHandler('play', function () {
           if (!audio || audio.paused || audio.ended) {
-            togglePlay();
+            togglePlay('media_session_play');
           }
         });
         bindHandler('pause', function () {
-          if (audio && !audio.paused) {
-            audio.pause();
-          }
+          pauseWithTracking('media_session_pause');
         });
         bindHandler('seekbackward', function (details) {
           if (audio && loadedUrl === currentUrl && isFinite(audio.duration) && audio.duration > 0) {
+            var fromSeconds = Math.round(audio.currentTime || 0);
             var offset = (details && details.seekOffset) || 10;
             var nextTime = Math.max(0, audio.currentTime - offset);
             audio.currentTime = nextTime;
             setWaveformProgress(wave, nextTime / audio.duration);
             updateTimeDisplay(nextTime, audio.duration);
             updateMediaSessionPosition();
+            track(
+              audioEventPrefix + '_seek',
+              getTrackAnalyticsParams({
+                seek_source: 'media_session_seekbackward',
+                from_seconds: fromSeconds,
+                to_seconds: Math.round(nextTime),
+              })
+            );
           }
         });
         bindHandler('seekforward', function (details) {
           if (audio && loadedUrl === currentUrl && isFinite(audio.duration) && audio.duration > 0) {
+            var fromSeconds = Math.round(audio.currentTime || 0);
             var offset = (details && details.seekOffset) || 10;
             var nextTime = Math.min(audio.duration, audio.currentTime + offset);
             audio.currentTime = nextTime;
             setWaveformProgress(wave, nextTime / audio.duration);
             updateTimeDisplay(nextTime, audio.duration);
             updateMediaSessionPosition();
+            track(
+              audioEventPrefix + '_seek',
+              getTrackAnalyticsParams({
+                seek_source: 'media_session_seekforward',
+                from_seconds: fromSeconds,
+                to_seconds: Math.round(nextTime),
+              })
+            );
           }
         });
         bindHandler('seekto', function (details) {
           if (details && typeof details.seekTime === 'number' && audio && loadedUrl === currentUrl && isFinite(audio.duration) && audio.duration > 0) {
+            var fromSeconds = Math.round(audio.currentTime || 0);
             var nextTime = Math.max(0, Math.min(audio.duration, details.seekTime));
             audio.currentTime = nextTime;
             setWaveformProgress(wave, nextTime / audio.duration);
             updateTimeDisplay(nextTime, audio.duration);
             updateMediaSessionPosition();
+            track(
+              audioEventPrefix + '_seek',
+              getTrackAnalyticsParams({
+                seek_source: 'media_session_seekto',
+                from_seconds: fromSeconds,
+                to_seconds: Math.round(nextTime),
+              })
+            );
           }
         });
         bindHandler('previoustrack', function () {
-          stepTrack(-1);
+          stepTrack(-1, 'media_session_prev');
         });
         bindHandler('nexttrack', function () {
-          stepTrack(1);
+          stepTrack(1, 'media_session_next');
         });
       }
 
@@ -770,7 +866,7 @@
         }
         audio = new window.Audio();
         audio.preload = 'none';
-        audio.loop = playbackMode === 'loop';
+        audio.loop = false;
 
         audio.addEventListener('loadstart', function () {
           isLoading = true;
@@ -815,22 +911,47 @@
         });
         audio.addEventListener('ended', function () {
           isLoading = false;
+          var completeExtra = { loop_count: loopCount, percent_played: 100 };
+          if (isFinite(audio.duration) && audio.duration > 0) {
+            completeExtra.position_seconds = Math.round(audio.duration);
+          }
+          track(audioEventPrefix + '_complete', getTrackAnalyticsParams(completeExtra));
+
           if (playbackMode === 'loop') {
+            loopCount += 1;
             audio.currentTime = 0;
             setWaveformProgress(wave, 0);
             updateTimeDisplay(0, audio.duration);
+            hasStartedTrack = true;
+            track(
+              playEventName,
+              getTrackAnalyticsParams({
+                play_source: 'loop_auto',
+                loop_count: loopCount,
+                position_seconds: 0,
+                percent_played: 0,
+              })
+            );
             var loopPromise = audio.play();
             if (loopPromise && typeof loopPromise.catch === 'function') {
-              loopPromise.catch(function () {
+              loopPromise.catch(function (err) {
+                if (err && err.name === 'AbortError') {
+                  return;
+                }
+                trackAudioError('play_rejected', {
+                  error_name: (err && err.name) || 'Error',
+                });
                 syncPlayState();
               });
             }
             syncPlayState();
             return;
           }
-          if (playbackMode === 'continue' && stepTrack(1)) {
+          if (playbackMode === 'continue' && stepTrack(1, 'continue_auto')) {
             return;
           }
+          hasStartedTrack = false;
+          loopCount = 0;
           setWaveformProgress(wave, 0);
           updateTimeDisplay(0, audio.duration);
           syncPlayState();
@@ -850,9 +971,16 @@
             }
             return;
           }
+          var errorExtra = {};
+          if (audio.error && typeof audio.error.code === 'number') {
+            errorExtra.error_code = audio.error.code;
+          }
+          trackAudioError('media_error', errorExtra);
           loadedUrl = '';
           pendingSeekRatio = null;
           pendingResumeTime = null;
+          hasStartedTrack = false;
+          loopCount = 0;
           isLoading = false;
           syncPlayState();
           var hasSpotifyLink = Boolean(spotifyEl && !spotifyEl.hidden && spotifyEl.getAttribute('href') && spotifyEl.getAttribute('href') !== '#');
@@ -866,7 +994,7 @@
         return audio;
       }
 
-      function togglePlay() {
+      function togglePlay(source, extraParams) {
         if (!currentUrl) {
           showToast('Audio preview coming soon!');
           return;
@@ -875,19 +1003,33 @@
         if (!instance) {
           return;
         }
-        if (loadedUrl !== currentUrl) {
+        var isNewLoad = loadedUrl !== currentUrl;
+        if (isNewLoad) {
           loadedUrl = currentUrl;
           retriedExpiredUrl = false;
           isLoading = true;
           instance.src = currentUrl;
           syncPlayState();
         }
-        instance.loop = playbackMode === 'loop';
+        instance.loop = false;
         if (instance.paused || instance.ended) {
-          track(player.getAttribute('data-analytics-event') || 'production_audio_play', {
-            event_category: player.getAttribute('data-analytics-category') || 'production',
-            event_label: currentTitle,
-          });
+          var isResume = hasStartedTrack && !instance.ended && !isNewLoad;
+          if (!isResume && isNewLoad) {
+            loopCount = 0;
+          }
+          hasStartedTrack = true;
+          track(
+            isResume ? audioEventPrefix + '_resume' : playEventName,
+            getTrackAnalyticsParams(
+              Object.assign(
+                {
+                  play_source: source || 'main_player',
+                  loop_count: loopCount,
+                },
+                extraParams || {}
+              )
+            )
+          );
           updateMediaSessionMetadata();
           registerMediaSessionHandlers();
           var playPromise = instance.play();
@@ -896,16 +1038,19 @@
               if (err && err.name === 'AbortError') {
                 return;
               }
+              trackAudioError('play_rejected', {
+                error_name: (err && err.name) || 'Error',
+              });
               isLoading = false;
               syncPlayState();
             });
           }
         } else {
-          instance.pause();
+          pauseWithTracking(source || 'main_player');
         }
       }
 
-      function loadTrackFromRow(row, autoPlay) {
+      function loadTrackFromRow(row, autoPlay, source) {
         if (!row) {
           return;
         }
@@ -939,6 +1084,8 @@
         pendingSeekRatio = null;
         pendingResumeTime = null;
         retriedExpiredUrl = false;
+        hasStartedTrack = false;
+        loopCount = 0;
 
         if (kickerEl) {
           kickerEl.textContent =
@@ -996,26 +1143,35 @@
         syncPlayState();
 
         if (autoPlay) {
-          togglePlay();
+          togglePlay(source || 'track_list_row');
         }
       }
 
-      function seekToRatio(ratio) {
+      function seekToRatio(ratio, source) {
         var clamped = Math.max(0, Math.min(1, ratio));
         setWaveformProgress(wave, clamped);
         if (audio && loadedUrl === currentUrl && isFinite(audio.duration) && audio.duration > 0) {
+          var fromSeconds = Math.round(audio.currentTime || 0);
           audio.currentTime = clamped * audio.duration;
           updateTimeDisplay(audio.currentTime, audio.duration);
           updateMediaSessionPosition();
+          track(
+            audioEventPrefix + '_seek',
+            getTrackAnalyticsParams({
+              seek_source: source || 'waveform_click',
+              from_seconds: fromSeconds,
+              to_seconds: Math.round(audio.currentTime),
+            })
+          );
         } else {
           pendingSeekRatio = clamped;
-          togglePlay();
+          togglePlay('waveform_seek', { seek_percent: Math.round(clamped * 100) });
         }
       }
 
       if (playBtn) {
         playBtn.addEventListener('click', function () {
-          togglePlay();
+          togglePlay('main_player');
         });
       }
 
@@ -1026,30 +1182,48 @@
             return;
           }
           var ratio = (event.clientX - rect.left) / rect.width;
-          seekToRatio(ratio);
+          seekToRatio(ratio, 'waveform_click');
         });
         wave.addEventListener('keydown', function (event) {
           if (event.key === ' ' || event.key === 'Enter') {
             event.preventDefault();
-            togglePlay();
+            togglePlay('waveform_keyboard');
           } else if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
             if (audio && loadedUrl === currentUrl && isFinite(audio.duration) && audio.duration > 0) {
               event.preventDefault();
+              var fromSeconds = Math.round(audio.currentTime || 0);
               var delta = event.key === 'ArrowRight' ? 5 : -5;
               var nextTime = Math.max(0, Math.min(audio.duration, audio.currentTime + delta));
               audio.currentTime = nextTime;
               setWaveformProgress(wave, nextTime / audio.duration);
               updateTimeDisplay(nextTime, audio.duration);
               updateMediaSessionPosition();
+              track(
+                audioEventPrefix + '_seek',
+                getTrackAnalyticsParams({
+                  seek_source: 'waveform_keyboard',
+                  from_seconds: fromSeconds,
+                  to_seconds: Math.round(nextTime),
+                })
+              );
             }
           } else if (event.key === 'Home' || event.key === 'End') {
             if (audio && loadedUrl === currentUrl && isFinite(audio.duration) && audio.duration > 0) {
               event.preventDefault();
+              var homeEndFrom = Math.round(audio.currentTime || 0);
               var targetTime = event.key === 'End' ? audio.duration : 0;
               audio.currentTime = targetTime;
               setWaveformProgress(wave, targetTime / audio.duration);
               updateTimeDisplay(targetTime, audio.duration);
               updateMediaSessionPosition();
+              track(
+                audioEventPrefix + '_seek',
+                getTrackAnalyticsParams({
+                  seek_source: 'waveform_keyboard',
+                  from_seconds: homeEndFrom,
+                  to_seconds: Math.round(targetTime),
+                })
+              );
             }
           }
         });
@@ -1062,9 +1236,9 @@
             return;
           }
           if (row === activeRow) {
-            togglePlay();
+            togglePlay('track_list_row');
           } else {
-            loadTrackFromRow(row, true);
+            loadTrackFromRow(row, true, 'track_list_row');
           }
         });
       });
@@ -1075,8 +1249,18 @@
           if (mode !== 'loop' && mode !== 'continue') {
             return;
           }
+          var previousMode = playbackMode;
           playbackMode = playbackMode === mode ? 'off' : mode;
           syncPlaybackMode();
+          track(
+            audioEventPrefix + '_mode_change',
+            getTrackAnalyticsParams({
+              event_label: playbackMode,
+              previous_mode: previousMode,
+              playback_mode: playbackMode,
+              button_clicked: mode,
+            })
+          );
         });
       });
 
@@ -1154,6 +1338,14 @@
       buttons.forEach(function (button) {
         button.addEventListener('click', function () {
           applyFilter(button);
+          track('release_filter_click', {
+            event_category: group.getAttribute('data-analytics-category') || 'production',
+            event_label: button.textContent.trim(),
+            filter_type: 'category',
+            filter_value: activeFilter,
+            active_filter: activeFilter,
+            active_subfilter: activeSubfilter,
+          });
         });
       });
 
@@ -1166,6 +1358,14 @@
               b.setAttribute('aria-pressed', String(b === subBtn));
             });
             updateVisibility();
+            track('release_filter_click', {
+              event_category: group.getAttribute('data-analytics-category') || 'production',
+              event_label: subBtn.textContent.trim(),
+              filter_type: 'subcategory',
+              filter_value: activeSubfilter,
+              active_filter: activeFilter,
+              active_subfilter: activeSubfilter,
+            });
           });
         });
       });

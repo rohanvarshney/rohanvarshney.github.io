@@ -2708,11 +2708,11 @@ test('assets/js/portfolio.js playback mode toggles loop, continue within visible
     assert.strictEqual(audio.playCalls, 1, 'Off mode does not replay on ended');
     assert.strictEqual(titleEl.textContent, 'Track A', 'Off mode does not switch track on ended');
 
-    // 2. Toggle Loop ON: sets audio.loop = true and replays same track on ended
+    // 2. Toggle Loop ON: keeps native audio.loop disabled so Loop replays fire ended and get tracked
     loopBtn.trigger('click');
     assert.strictEqual(loopBtn.getAttribute('aria-pressed'), 'true', 'Loop button becomes pressed');
     assert.strictEqual(continueBtn.getAttribute('aria-pressed'), 'false', 'Continue button stays unpressed');
-    assert.strictEqual(audio.loop, true, 'Enables native audio.loop when Loop is active');
+    assert.strictEqual(audio.loop, false, 'Keeps native audio.loop disabled so Loop replays fire ended and get tracked');
     audio.currentTime = 60;
     audio.paused = true;
     audio.ended = true;
@@ -2772,4 +2772,510 @@ test('assets/js/portfolio.js playback mode toggles loop, continue within visible
     audio.ended = true;
     audio.emit('ended');
     assert.strictEqual(audio.playCalls, playCallsBeforeOff, 'Off mode stops cleanly after toggling Continue off');
+});
+
+test('assets/js/portfolio.js tracks full audio player lifecycle, loop/continue auto-plays, pauses, seeks, errors, and filter clicks', async () => {
+    const portfolioPath = path.join(__dirname, '..', 'assets', 'js', 'portfolio.js');
+    const portfolioJs = fs.readFileSync(portfolioPath, 'utf8');
+
+    function createMockClassList(initial = []) {
+        const set = new Set(initial);
+        return {
+            add(c) { set.add(c); },
+            remove(c) { set.delete(c); },
+            toggle(c, force) {
+                if (force === undefined) {
+                    if (set.has(c)) { set.delete(c); return false; }
+                    set.add(c); return true;
+                }
+                if (force) set.add(c); else set.delete(c);
+                return Boolean(force);
+            },
+            contains(c) { return set.has(c); },
+        };
+    }
+
+    function createMockElement(tag, { attrs = {}, classes = [], textContent = '' } = {}) {
+        const attrMap = Object.assign({}, attrs);
+        const listeners = {};
+        const children = [];
+        let _text = textContent;
+        return {
+            tagName: tag.toUpperCase(),
+            style: {},
+            hidden: false,
+            children,
+            classList: createMockClassList(classes),
+            get className() { return attrMap.class || ''; },
+            set className(val) { attrMap.class = val; },
+            get textContent() { return _text; },
+            set textContent(val) {
+                _text = String(val);
+                if (val === '') children.length = 0;
+            },
+            getAttribute(name) {
+                return Object.prototype.hasOwnProperty.call(attrMap, name) ? attrMap[name] : null;
+            },
+            setAttribute(name, val) {
+                attrMap[name] = String(val);
+            },
+            removeAttribute(name) {
+                delete attrMap[name];
+            },
+            hasAttribute(name) {
+                return Object.prototype.hasOwnProperty.call(attrMap, name);
+            },
+            appendChild(child) {
+                if (child && child._isFragment) {
+                    child.children.forEach((c) => children.push(c));
+                } else {
+                    children.push(child);
+                }
+                return child;
+            },
+            addEventListener(type, fn) {
+                listeners[type] = listeners[type] || [];
+                listeners[type].push(fn);
+            },
+            trigger(type, eventObj) {
+                (listeners[type] || []).forEach((fn) => fn(eventObj || {}));
+            },
+            querySelectorAll(selector) {
+                if (selector === 'span') return children;
+                return [];
+            },
+            querySelector() {
+                return null;
+            },
+        };
+    }
+
+    function runFullScenario({ analyticsEvent, analyticsCategory, pageUrl }) {
+        const trackedEvents = [];
+        const createdAudios = [];
+        let rejectNextPlayWith = null;
+
+        function makeRow({ file, title, category, subcategory, duration, active }) {
+            const row = createMockElement('li', {
+                attrs: Object.assign(
+                    {
+                        'data-category': category,
+                        'data-audio-file': file,
+                        'data-track-duration': duration,
+                        'data-seed': '11',
+                    },
+                    subcategory ? { 'data-subcategory': subcategory } : {}
+                ),
+                classes: active ? ['release', 'is-active'] : ['release'],
+            });
+            const rowTitle = createMockElement('div', { textContent: title });
+            const rowMeta = createMockElement('div', { textContent: title + ' meta' });
+            const rowBtn = createMockElement('button', { attrs: { 'data-release-play': '' } });
+            row.querySelector = (sel) => {
+                if (sel === '.release-title') return rowTitle;
+                if (sel === '.release-meta') return rowMeta;
+                return null;
+            };
+            return { row, rowBtn };
+        }
+
+        const row1 = makeRow({
+            file: 'mashups/western/move-like-i-do.mp3',
+            title: 'Move Like I Do',
+            category: 'mashup',
+            subcategory: 'western',
+            duration: '2:52',
+            active: true,
+        });
+        const row2 = makeRow({
+            file: 'mashups/western/the-floor-has-levels.mp3',
+            title: 'The Floor Has Levels',
+            category: 'mashup',
+            subcategory: 'western',
+            duration: '4:04',
+            active: false,
+        });
+
+        const releaseList = createMockElement('ul', { attrs: { id: 'release-list' } });
+        releaseList.querySelector = (sel) => {
+            if (sel === '.release.is-active') return [row1.row, row2.row].find((r) => r.classList.contains('is-active')) || null;
+            return null;
+        };
+        releaseList.querySelectorAll = (sel) => {
+            if (sel === '[data-release-play]') return [row1.rowBtn, row2.rowBtn];
+            if (sel === '.release.is-active') return [row1.row, row2.row].filter((r) => r.classList.contains('is-active'));
+            if (sel === '.release[data-audio-file], .release[data-audio-src]') return [row1.row, row2.row];
+            return [];
+        };
+
+        row1.rowBtn.closest = (sel) => (sel === '.release' ? row1.row : null);
+        row2.rowBtn.closest = (sel) => (sel === '.release' ? row2.row : null);
+
+        const playBtn = createMockElement('button', { attrs: { 'data-play-toggle': '' } });
+        const loopBtn = createMockElement('button', { attrs: { 'data-playback-mode': 'loop', 'aria-pressed': 'false' } });
+        const continueBtn = createMockElement('button', { attrs: { 'data-playback-mode': 'continue', 'aria-pressed': 'false' } });
+        const wave = createMockElement('div', { attrs: { 'data-waveform': '', 'data-bars': '10', 'data-progress': '0' } });
+        wave.getBoundingClientRect = () => ({ left: 0, width: 200 });
+        const titleEl = createMockElement('h3', { attrs: { 'data-player-title': '' }, textContent: 'Move Like I Do' });
+        const timeEl = createMockElement('span', { attrs: { 'data-player-time': '' }, textContent: '0:00 / 2:52' });
+
+        const playerAttrs = {
+            'data-audio-player': '',
+            'data-audio-base': '../assets/audio/',
+            'data-audio-file': 'mashups/western/move-like-i-do.mp3',
+            'data-track-title': 'Move Like I Do',
+            'data-track-duration': '2:52',
+            'data-track-list': '#release-list',
+        };
+        if (analyticsEvent) playerAttrs['data-analytics-event'] = analyticsEvent;
+        if (analyticsCategory) playerAttrs['data-analytics-category'] = analyticsCategory;
+
+        const player = createMockElement('article', { attrs: playerAttrs });
+        player.querySelector = (sel) => {
+            if (sel === '[data-play-toggle]') return playBtn;
+            if (sel === '[data-waveform]') return wave;
+            if (sel === '[data-player-title]') return titleEl;
+            if (sel === '[data-player-time]') return timeEl;
+            return null;
+        };
+        player.querySelectorAll = (sel) => {
+            if (sel === '[data-playback-mode]') return [loopBtn, continueBtn];
+            return [];
+        };
+
+        const chips = [
+            createMockElement('button', { attrs: { 'data-filter': 'all', 'aria-pressed': 'true' }, textContent: 'All' }),
+            createMockElement('button', { attrs: { 'data-filter': 'original', 'aria-pressed': 'false' }, textContent: 'Originals' }),
+            createMockElement('button', { attrs: { 'data-filter': 'mashup', 'aria-pressed': 'false' }, textContent: 'Mashups' }),
+        ];
+        const subChips = [
+            createMockElement('button', { attrs: { 'data-subfilter': 'all', 'aria-pressed': 'true' }, textContent: 'All Mashups' }),
+            createMockElement('button', { attrs: { 'data-subfilter': 'western', 'aria-pressed': 'false' }, textContent: 'Western' }),
+        ];
+        const filterGroup = createMockElement('div', {
+            attrs: { 'data-filter-group': '#release-list' },
+        });
+        filterGroup.querySelectorAll = (sel) => (sel === '[data-filter]' ? chips : []);
+        const subFilterGroup = createMockElement('div', {
+            attrs: { 'data-subfilter-group': '#release-list', 'data-subfilter-for': 'mashup' },
+        });
+        subFilterGroup.hidden = true;
+        subFilterGroup.querySelectorAll = (sel) => (sel === '[data-subfilter]' ? subChips : []);
+
+        class MockAudio {
+            constructor() {
+                this.preload = '';
+                this.src = '';
+                this.loop = false;
+                this.currentTime = 0;
+                this.duration = 100;
+                this.playbackRate = 1;
+                this.paused = true;
+                this.ended = false;
+                this.error = null;
+                this._listeners = {};
+                createdAudios.push(this);
+            }
+            addEventListener(type, fn) {
+                this._listeners[type] = this._listeners[type] || [];
+                this._listeners[type].push(fn);
+            }
+            emit(type) {
+                (this._listeners[type] || []).forEach((fn) => fn({}));
+            }
+            play() {
+                if (rejectNextPlayWith) {
+                    const err = rejectNextPlayWith;
+                    rejectNextPlayWith = null;
+                    return Promise.reject(err);
+                }
+                this.paused = false;
+                this.ended = false;
+                this.emit('loadedmetadata');
+                this.emit('playing');
+                return Promise.resolve();
+            }
+            pause() {
+                this.paused = true;
+                this.emit('pause');
+            }
+        }
+
+        const actionHandlers = {};
+        const mediaSession = {
+            metadata: null,
+            playbackState: 'none',
+            setActionHandler(action, fn) { actionHandlers[action] = fn; },
+            setPositionState() {},
+        };
+        class MockMediaMetadata {
+            constructor(init) { Object.assign(this, init); }
+        }
+
+        let domReadyHandler = null;
+        const sandbox = {
+            Audio: MockAudio,
+            MediaMetadata: MockMediaMetadata,
+            URL,
+            navigator: { mediaSession },
+            location: { href: pageUrl },
+            isSecureContext: true,
+            trackAnalyticsEvent(name, params) {
+                trackedEvents.push({ name, params });
+            },
+            document: {
+                title: 'ROVA',
+                body: { getAttribute() { return ''; } },
+                addEventListener(type, fn) { if (type === 'DOMContentLoaded') domReadyHandler = fn; },
+                querySelector(sel) { return sel === '#release-list' ? releaseList : null; },
+                querySelectorAll(sel) {
+                    if (sel === '[data-waveform]') return [wave];
+                    if (sel === '[data-audio-player]') return [player];
+                    if (sel === '[data-filter-group]') return [filterGroup];
+                    if (sel === '[data-subfilter-group]') return [subFilterGroup];
+                    if (sel === '#release-list [data-category]') return [row1.row, row2.row];
+                    return [];
+                },
+                getElementById() { return null; },
+                createDocumentFragment() {
+                    return { _isFragment: true, children: [], appendChild(c) { this.children.push(c); } };
+                },
+                createElement(tag) { return createMockElement(tag); },
+            },
+            setTimeout() { return 1; },
+            clearTimeout() {},
+        };
+        sandbox.window = sandbox;
+
+        vm.createContext(sandbox);
+        vm.runInContext(portfolioJs, sandbox);
+        domReadyHandler();
+
+        return {
+            trackedEvents,
+            createdAudios,
+            playBtn,
+            loopBtn,
+            continueBtn,
+            wave,
+            row1,
+            row2,
+            chips,
+            subChips,
+            actionHandlers,
+            setRejectNextPlay(err) { rejectNextPlayWith = err; },
+        };
+    }
+
+    const prod = runFullScenario({ pageUrl: 'https://rohanvarshney.github.io/production/' });
+
+    // Initial page load does not fire filter click events
+    assert.strictEqual(prod.trackedEvents.length, 0, 'Does not emit analytics events on initial load');
+
+    // 1. Main player play
+    prod.playBtn.trigger('click');
+    const audio = prod.createdAudios[0];
+    assert.strictEqual(prod.trackedEvents[0].name, 'production_audio_play');
+    assert.deepStrictEqual(
+        {
+            play_source: prod.trackedEvents[0].params.play_source,
+            track_file: prod.trackedEvents[0].params.track_file,
+            track_category: prod.trackedEvents[0].params.track_category,
+            track_subcategory: prod.trackedEvents[0].params.track_subcategory,
+            track_position: prod.trackedEvents[0].params.track_position,
+            is_featured: prod.trackedEvents[0].params.is_featured,
+            playback_mode: prod.trackedEvents[0].params.playback_mode,
+            loop_count: prod.trackedEvents[0].params.loop_count,
+        },
+        {
+            play_source: 'main_player',
+            track_file: 'mashups/western/move-like-i-do.mp3',
+            track_category: 'mashup',
+            track_subcategory: 'western',
+            track_position: 1,
+            is_featured: true,
+            playback_mode: 'off',
+            loop_count: 0,
+        },
+        'Tracks initial main_player play with full metadata'
+    );
+
+    // 2. Seek via waveform click & keyboard
+    audio.currentTime = 20;
+    prod.wave.trigger('click', { clientX: 100 }); // 50% of 200px -> 50s
+    const clickSeekEvt = prod.trackedEvents[prod.trackedEvents.length - 1];
+    assert.strictEqual(clickSeekEvt.name, 'production_audio_seek');
+    assert.strictEqual(clickSeekEvt.params.seek_source, 'waveform_click');
+    assert.strictEqual(clickSeekEvt.params.from_seconds, 20);
+    assert.strictEqual(clickSeekEvt.params.to_seconds, 50);
+
+    prod.wave.trigger('keydown', { key: 'ArrowRight', preventDefault() {} });
+    const keySeekEvt = prod.trackedEvents[prod.trackedEvents.length - 1];
+    assert.strictEqual(keySeekEvt.name, 'production_audio_seek');
+    assert.strictEqual(keySeekEvt.params.seek_source, 'waveform_keyboard');
+    assert.strictEqual(keySeekEvt.params.from_seconds, 50);
+    assert.strictEqual(keySeekEvt.params.to_seconds, 55);
+
+    // 3. Pause via active row button -> emits production_audio_pause with progress
+    prod.row1.rowBtn.trigger('click');
+    const pauseEvt = prod.trackedEvents[prod.trackedEvents.length - 1];
+    assert.strictEqual(pauseEvt.name, 'production_audio_pause');
+    assert.strictEqual(pauseEvt.params.pause_source, 'track_list_row');
+    assert.strictEqual(pauseEvt.params.position_seconds, 55);
+    assert.strictEqual(pauseEvt.params.duration_seconds, 100);
+    assert.strictEqual(pauseEvt.params.percent_played, 55);
+
+    // 4. Resume via main player button -> emits production_audio_resume (not play)
+    prod.playBtn.trigger('click');
+    const resumeEvt = prod.trackedEvents[prod.trackedEvents.length - 1];
+    assert.strictEqual(resumeEvt.name, 'production_audio_resume');
+    assert.strictEqual(resumeEvt.params.play_source, 'main_player');
+
+    // 5. Loop mode toggle + 2 automatic loop replays
+    prod.loopBtn.trigger('click');
+    const loopModeEvt = prod.trackedEvents[prod.trackedEvents.length - 1];
+    assert.strictEqual(loopModeEvt.name, 'production_audio_mode_change');
+    assert.strictEqual(loopModeEvt.params.previous_mode, 'off');
+    assert.strictEqual(loopModeEvt.params.playback_mode, 'loop');
+    assert.strictEqual(loopModeEvt.params.button_clicked, 'loop');
+
+    audio.paused = true;
+    audio.ended = true;
+    audio.emit('ended');
+    const loop1Complete = prod.trackedEvents[prod.trackedEvents.length - 2];
+    const loop1Play = prod.trackedEvents[prod.trackedEvents.length - 1];
+    assert.strictEqual(loop1Complete.name, 'production_audio_complete');
+    assert.strictEqual(loop1Complete.params.loop_count, 0);
+    assert.strictEqual(loop1Complete.params.percent_played, 100);
+    assert.strictEqual(loop1Play.name, 'production_audio_play');
+    assert.strictEqual(loop1Play.params.play_source, 'loop_auto');
+    assert.strictEqual(loop1Play.params.loop_count, 1);
+
+    audio.paused = true;
+    audio.ended = true;
+    audio.emit('ended');
+    const loop2Complete = prod.trackedEvents[prod.trackedEvents.length - 2];
+    const loop2Play = prod.trackedEvents[prod.trackedEvents.length - 1];
+    assert.strictEqual(loop2Complete.name, 'production_audio_complete');
+    assert.strictEqual(loop2Complete.params.loop_count, 1);
+    assert.strictEqual(loop2Play.name, 'production_audio_play');
+    assert.strictEqual(loop2Play.params.play_source, 'loop_auto');
+    assert.strictEqual(loop2Play.params.loop_count, 2);
+
+    // 6. Switch to Continue mode + automatic next track on ended
+    prod.continueBtn.trigger('click');
+    const contModeEvt = prod.trackedEvents[prod.trackedEvents.length - 1];
+    assert.strictEqual(contModeEvt.name, 'production_audio_mode_change');
+    assert.strictEqual(contModeEvt.params.previous_mode, 'loop');
+    assert.strictEqual(contModeEvt.params.playback_mode, 'continue');
+
+    audio.paused = true;
+    audio.ended = true;
+    audio.emit('ended');
+    const contComplete = prod.trackedEvents[prod.trackedEvents.length - 2];
+    const contPlay = prod.trackedEvents[prod.trackedEvents.length - 1];
+    assert.strictEqual(contComplete.name, 'production_audio_complete');
+    assert.strictEqual(contComplete.params.track_file, 'mashups/western/move-like-i-do.mp3');
+    assert.strictEqual(contPlay.name, 'production_audio_play');
+    assert.strictEqual(contPlay.params.play_source, 'continue_auto');
+    assert.strictEqual(contPlay.params.playback_mode, 'continue');
+    assert.strictEqual(contPlay.params.track_file, 'mashups/western/the-floor-has-levels.mp3');
+    assert.strictEqual(contPlay.params.track_position, 2);
+    assert.strictEqual(contPlay.params.is_featured, false);
+    assert.strictEqual(contPlay.params.loop_count, 0);
+
+    // 7. Toggle Continue off -> ended -> fresh play is production_audio_play (not resume)
+    prod.continueBtn.trigger('click');
+    const offModeEvt = prod.trackedEvents[prod.trackedEvents.length - 1];
+    assert.strictEqual(offModeEvt.name, 'production_audio_mode_change');
+    assert.strictEqual(offModeEvt.params.playback_mode, 'off');
+
+    audio.paused = true;
+    audio.ended = true;
+    audio.emit('ended');
+    assert.strictEqual(prod.trackedEvents[prod.trackedEvents.length - 1].name, 'production_audio_complete');
+
+    prod.playBtn.trigger('click');
+    assert.strictEqual(prod.trackedEvents[prod.trackedEvents.length - 1].name, 'production_audio_play');
+
+    // 8. Switching rows while playing does not emit spurious pause
+    const lenBeforeRowSwitch = prod.trackedEvents.length;
+    prod.row1.rowBtn.trigger('click');
+    const rowSwitchEvts = prod.trackedEvents.slice(lenBeforeRowSwitch);
+    assert.strictEqual(rowSwitchEvts.length, 1, 'Row switch while playing emits only 1 event');
+    assert.strictEqual(rowSwitchEvts[0].name, 'production_audio_play');
+    assert.strictEqual(rowSwitchEvts[0].params.play_source, 'track_list_row');
+
+    // 9. Media Session handlers track next, prev, seekto, pause, play (resume)
+    prod.actionHandlers.nexttrack();
+    assert.strictEqual(prod.trackedEvents[prod.trackedEvents.length - 1].params.play_source, 'media_session_next');
+    prod.actionHandlers.previoustrack();
+    assert.strictEqual(prod.trackedEvents[prod.trackedEvents.length - 1].params.play_source, 'media_session_prev');
+    prod.actionHandlers.seekto({ seekTime: 40 });
+    assert.strictEqual(prod.trackedEvents[prod.trackedEvents.length - 1].name, 'production_audio_seek');
+    assert.strictEqual(prod.trackedEvents[prod.trackedEvents.length - 1].params.seek_source, 'media_session_seekto');
+    prod.actionHandlers.pause();
+    assert.strictEqual(prod.trackedEvents[prod.trackedEvents.length - 1].name, 'production_audio_pause');
+    assert.strictEqual(prod.trackedEvents[prod.trackedEvents.length - 1].params.pause_source, 'media_session_pause');
+    prod.actionHandlers.play();
+    assert.strictEqual(prod.trackedEvents[prod.trackedEvents.length - 1].name, 'production_audio_resume');
+    assert.strictEqual(prod.trackedEvents[prod.trackedEvents.length - 1].params.play_source, 'media_session_play');
+
+    // 10. Errors: media_error, play_rejected, and AbortError ignored
+    audio.currentTime = 0;
+    audio.error = { code: 4 };
+    audio.emit('error');
+    const mediaErrEvt = prod.trackedEvents[prod.trackedEvents.length - 1];
+    assert.strictEqual(mediaErrEvt.name, 'production_audio_error');
+    assert.strictEqual(mediaErrEvt.params.error_type, 'media_error');
+    assert.strictEqual(mediaErrEvt.params.error_code, 4);
+
+    audio.paused = true;
+    prod.setRejectNextPlay(Object.assign(new Error('Not allowed'), { name: 'NotAllowedError' }));
+    prod.playBtn.trigger('click');
+    await Promise.resolve();
+    const rejErrEvt = prod.trackedEvents[prod.trackedEvents.length - 1];
+    assert.strictEqual(rejErrEvt.name, 'production_audio_error');
+    assert.strictEqual(rejErrEvt.params.error_type, 'play_rejected');
+    assert.strictEqual(rejErrEvt.params.error_name, 'NotAllowedError');
+
+    const countBeforeAbort = prod.trackedEvents.length;
+    audio.paused = true;
+    prod.setRejectNextPlay(Object.assign(new Error('Aborted'), { name: 'AbortError' }));
+    prod.playBtn.trigger('click');
+    await Promise.resolve();
+    assert.strictEqual(prod.trackedEvents.length - countBeforeAbort, 1, 'AbortError does not emit production_audio_error');
+
+    // 11. Filter & sub-filter clicks emit release_filter_click
+    prod.chips[2].trigger('click');
+    const catFilterEvt = prod.trackedEvents[prod.trackedEvents.length - 1];
+    assert.strictEqual(catFilterEvt.name, 'release_filter_click');
+    assert.strictEqual(catFilterEvt.params.filter_type, 'category');
+    assert.strictEqual(catFilterEvt.params.filter_value, 'mashup');
+    assert.strictEqual(catFilterEvt.params.event_label, 'Mashups');
+
+    prod.subChips[1].trigger('click');
+    const subFilterEvt = prod.trackedEvents[prod.trackedEvents.length - 1];
+    assert.strictEqual(subFilterEvt.name, 'release_filter_click');
+    assert.strictEqual(subFilterEvt.params.filter_type, 'subcategory');
+    assert.strictEqual(subFilterEvt.params.filter_value, 'western');
+    assert.strictEqual(subFilterEvt.params.event_label, 'Western');
+
+    // 12. Raas player uses raas_audio_* event prefix and event_category: 'raas'
+    const raas = runFullScenario({
+        analyticsEvent: 'raas_audio_play',
+        analyticsCategory: 'raas',
+        pageUrl: 'https://rohanvarshney.github.io/raas/',
+    });
+    raas.playBtn.trigger('click');
+    assert.strictEqual(raas.trackedEvents[0].name, 'raas_audio_play');
+    assert.strictEqual(raas.trackedEvents[0].params.event_category, 'raas');
+    raas.loopBtn.trigger('click');
+    assert.strictEqual(raas.trackedEvents[1].name, 'raas_audio_mode_change');
+    raas.createdAudios[0].paused = true;
+    raas.createdAudios[0].ended = true;
+    raas.createdAudios[0].emit('ended');
+    assert.strictEqual(raas.trackedEvents[2].name, 'raas_audio_complete');
+    assert.strictEqual(raas.trackedEvents[3].name, 'raas_audio_play');
+    assert.strictEqual(raas.trackedEvents[3].params.play_source, 'loop_auto');
 });
