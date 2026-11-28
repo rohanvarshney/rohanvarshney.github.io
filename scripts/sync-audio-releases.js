@@ -76,42 +76,52 @@ const CURATED_TRACKS = {
   'mashups/indo-western-fusion/airplanes-945.mp3': {
     title: 'Airplanes × 9:45',
     description: 'Airplanes (B.o.B feat. Hayley Williams) × 9:45 (Prabh Singh)',
-  },
-  'mashups/indo-western-fusion/don-n-night.mp3': {
-    title: "Don 'N' Night",
-    description: "Main Hoon Don (Shaan) × Day 'N' Nite (Kid Cudi & Crookers)",
-  },
-  'mashups/indo-western-fusion/helpless-gulaab.mp3': {
-    title: 'Helpless Gulaab',
-    description: 'Akhiyaan Gulaab (Mitraz) × Helpless (John Mayer)',
-  },
-  'mashups/indo-western-fusion/is-shiela-worth-it.mp3': {
-    title: 'Is Sheila Worth It',
-    description: 'Sheila Ki Jawani (Sunidhi Chauhan & Vishal-Shekhar) × Worth It (Fifth Harmony feat. Kid Ink)',
-  },
-  'mashups/indo-western-fusion/laila-main-la-mama.mp3': {
-    title: 'Laila Main La Mama',
-    description: 'Laila Main Laila (Pawni Pandey) × La Mamá de la Mamá (El Alfa, CJ & El Cherry Scom)',
-  },
-  'mashups/indo-western-fusion/lrad-zindigani.mp3': {
-    title: 'LRAD Zindagani',
-    description: 'Ek Toh Kum Zindagani (Neha Kakkar) × LRAD (Knife Party)',
-  },
-  'mashups/indo-western-fusion/prabhu-ka-naam-medley.mp3': {
-    title: 'Prabhu Ka Naam Medley',
-    description: 'Leke Prabhu Ka Naam (Arijit Singh & Pritam) × Everybody (Logic) × Lil Bit (K Camp) × KMT (Drake) × Limitless (Martin Garrix & Mesto)',
-  },
-  'mashups/indo-western-fusion/tanhayee-stars.mp3': {
-    title: 'Tanhayee Stars',
-    description: 'Tanhayee (Sonu Nigam) × All the Stars (Kendrick Lamar & SZA)',
+    order: 2,
   },
   'mashups/indo-western-fusion/tere-pyaar-i-want-you.mp3': {
     title: 'Tere Pyaar × I Want You',
     description: 'Tere Pyaar Mein (Arijit Singh & Pritam) × I Want You to Know (Zedd feat. Selena Gomez)',
+    order: 3,
+  },
+  'mashups/indo-western-fusion/helpless-gulaab.mp3': {
+    title: 'Helpless Gulaab',
+    description: 'Akhiyaan Gulaab (Mitraz) × Helpless (John Mayer)',
+    order: 4,
+  },
+  'mashups/indo-western-fusion/is-shiela-worth-it.mp3': {
+    title: 'Is Sheila Worth It',
+    description: 'Sheila Ki Jawani (Sunidhi Chauhan & Vishal-Shekhar) × Worth It (Fifth Harmony feat. Kid Ink)',
+    order: 5,
+  },
+  'mashups/indo-western-fusion/laila-main-la-mama.mp3': {
+    title: 'Laila Main La Mama',
+    description: 'Laila Main Laila (Pawni Pandey) × La Mamá de la Mamá (El Alfa, CJ & El Cherry Scom)',
+    order: 6,
+  },
+  'mashups/indo-western-fusion/lrad-zindigani.mp3': {
+    title: 'LRAD Zindagani',
+    description: 'Ek Toh Kum Zindagani (Neha Kakkar) × LRAD (Knife Party)',
+    order: 7,
+  },
+  'mashups/indo-western-fusion/prabhu-ka-naam-medley.mp3': {
+    title: 'Prabhu Ka Naam Medley',
+    description: 'Leke Prabhu Ka Naam (Arijit Singh & Pritam) × Everybody (Logic) × Lil Bit (K Camp) × KMT (Drake) × Limitless (Martin Garrix & Mesto)',
+    order: 8,
+  },
+  'mashups/indo-western-fusion/tanhayee-stars.mp3': {
+    title: 'Tanhayee Stars',
+    description: 'Tanhayee (Sonu Nigam) × All the Stars (Kendrick Lamar & SZA)',
+    order: 9,
+  },
+  'mashups/indo-western-fusion/don-n-night.mp3': {
+    title: "Don 'N' Night",
+    description: "Main Hoon Don (Shaan) × Day 'N' Nite (Kid Cudi & Crookers)",
+    order: 10,
   },
   'mashups/indo-western-fusion/ye-mera-dil-enless-summer.mp3': {
     title: 'Ye Mera Dil × Endless Summer',
     description: 'Yeh Mera Dil (Sunidhi Chauhan) × Endless Summer (Alan Walker & Zak Abel)',
+    order: 11,
   },
 
   // Mashups — Desi
