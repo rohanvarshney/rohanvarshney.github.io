@@ -131,54 +131,66 @@ const CURATED_TRACKS = {
   },
 
   // Mashups — Raas
-  'mashups/raas/besharam-divya.mp3': {
-    title: 'Besharam Divya',
-    description: 'Besharam Rang (Shilpa Rao & Vishal-Shekhar) × Aavya Divadiye Jagmagta Maa Na Norta (Traditional Garba)',
-  },
   'mashups/raas/chunalida.mp3': {
     title: 'Chunalida',
     description: 'Chunari (Himali Vyas Naik) × Dholida (Jahnvi Shrimankar & Shail Hada)',
     featured: true,
-  },
-  'mashups/raas/dankeroopty.mp3': {
-    title: 'Dankonteroopty',
-    description: 'Danko Vagyo (Traditional Raas) × MONTERO (Lil Nas X) × Whoopty (CJ)',
-  },
-  'mashups/raas/feel-so-raas.mp3': {
-    title: 'Feel So Raas',
-    description: 'Feel So Close (Calvin Harris) × Ha Ha Re Ghaduliyo (Traditional Garba)',
-  },
-  'mashups/raas/kanudina-psycho.mp3': {
-    title: 'Kanudina Psycho',
-    description: 'Kanuda Ni Morli Ma (Traditional Raas) × Psycho (Post Malone feat. Ty Dolla $ign)',
-  },
-  'mashups/raas/mogal-rumble.mp3': {
-    title: 'Mogal Rumble',
-    description: 'Maa Mogal Ramva Aave Re (Jigardan Gadhavi) × Rumble (Skrillex, Fred again.. & Flowdan)',
-  },
-  'mashups/raas/patang-tu-meri.mp3': {
-    title: 'Patang × Tu Meri',
-    description: 'Patang (Osman Mir) × Tu Meri (Vishal Dadlani & Vishal-Shekhar)',
-  },
-  'mashups/raas/phool-jai.mp3': {
-    title: 'Phool × Jai',
-    description: 'Phool Phool Venjo Ne (Abhita Patel) × Jai Jai Shivshankar (Vishal Dadlani, Benny Dayal & Vishal-Shekhar)',
-  },
-  'mashups/raas/rangilo-rova.mp3': {
-    title: 'Rangilo (ROVA Remix)',
-    description: 'Rangilo Maro Dholna (Shubha Mudgal & Sukhwinder Singh) · Hype Edit',
-  },
-  'mashups/raas/sachi-edm.mp3': {
-    title: 'Sachi (EDM Remix)',
-    description: 'Sachi Re Mari (Bhoomi Trivedi & Osman Mir) · EDM Flip',
+    order: 1,
   },
   'mashups/raas/tongue-tied-greedy.mp3': {
     title: 'Tongue Tied Greedy',
     description: 'Tongue Tied (Grouplove) × Greedy (Tate McRae) × Asvaar (Aishwarya Majmudar)',
+    order: 2,
+  },
+  'mashups/raas/dankeroopty.mp3': {
+    title: 'Dankonteroopty',
+    description: 'Danko Vagyo (Traditional Raas) × MONTERO (Lil Nas X) × Whoopty (CJ)',
+    order: 3,
+  },
+  'mashups/raas/feel-so-raas.mp3': {
+    title: 'Feel So Raas',
+    description: 'Feel So Close (Calvin Harris) × Ha Ha Re Ghaduliyo (Traditional Garba)',
+    order: 4,
+  },
+  'mashups/raas/kanudina-psycho.mp3': {
+    title: 'Kanudina Psycho',
+    description: 'Kanuda Ni Morli Ma (Traditional Raas) × Psycho (Post Malone feat. Ty Dolla $ign)',
+    order: 5,
+  },
+  'mashups/raas/besharam-divya.mp3': {
+    title: 'Besharam Divya',
+    description: 'Besharam Rang (Shilpa Rao & Vishal-Shekhar) × Aavya Divadiye Jagmagta Maa Na Norta (Traditional Garba)',
+    order: 6,
   },
   'mashups/raas/vari-dna.mp3': {
     title: 'VariD(o)NA',
     description: 'Vaari Jaau Re (Jigardan Gadhavi) × Don Don (Daddy Yankee, Anuel AA & Kendo Kaponi)',
+    order: 7,
+  },
+  'mashups/raas/mogal-rumble.mp3': {
+    title: 'Mogal Rumble',
+    description: 'Maa Mogal Ramva Aave Re (Jigardan Gadhavi) × Rumble (Skrillex, Fred again.. & Flowdan)',
+    order: 8,
+  },
+  'mashups/raas/patang-tu-meri.mp3': {
+    title: 'Patang × Tu Meri',
+    description: 'Patang (Osman Mir) × Tu Meri (Vishal Dadlani & Vishal-Shekhar)',
+    order: 9,
+  },
+  'mashups/raas/phool-jai.mp3': {
+    title: 'Phool × Jai',
+    description: 'Phool Phool Venjo Ne (Abhita Patel) × Jai Jai Shivshankar (Vishal Dadlani, Benny Dayal & Vishal-Shekhar)',
+    order: 10,
+  },
+  'mashups/raas/rangilo-rova.mp3': {
+    title: 'Rangilo (ROVA Remix)',
+    description: 'Rangilo Maro Dholna (Shubha Mudgal & Sukhwinder Singh) · Hype Edit',
+    order: 11,
+  },
+  'mashups/raas/sachi-edm.mp3': {
+    title: 'Sachi (EDM Remix)',
+    description: 'Sachi Re Mari (Bhoomi Trivedi & Osman Mir) · EDM Flip',
+    order: 12,
   },
 
   // Remixes

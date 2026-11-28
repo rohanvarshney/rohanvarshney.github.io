@@ -335,6 +335,12 @@ test('raas/index.html structure and content', () => {
     for (const relFile of raasDiskMp3s) {
         assert.ok(raasRenderedFiles.has(relFile), `Every Raas MP3 on disk is rendered in raas/index.html: ${relFile}`);
     }
+
+    const raasFiles = raasRowMatches.map(([, relFile]) => relFile);
+    assert.strictEqual(raasFiles[0], 'mashups/raas/chunalida.mp3', 'Chunalida is first in Raas mashups');
+    assert.strictEqual(raasFiles[1], 'mashups/raas/tongue-tied-greedy.mp3', 'Tongue Tied Greedy is second in Raas mashups');
+    assert.strictEqual(raasFiles[5], 'mashups/raas/besharam-divya.mp3', 'Besharam Divya is sixth in Raas mashups');
+    assert.strictEqual(raasFiles[6], 'mashups/raas/vari-dna.mp3', 'VariD(o)NA is seventh in Raas mashups');
     assert.ok(!raasContent.includes('Raas Mashup &middot;'), 'Raas player and cards omit redundant Raas Mashup prefix');
 
     const raasPeakMatches = [...raasContent.matchAll(/data-peaks="([0-9,]+)"/g)];
