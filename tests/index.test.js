@@ -708,6 +708,12 @@ test('production/index.html structure and content', () => {
         assert.ok(renderedFiles.has(relFile), `Every MP3 on disk is rendered in production/index.html: ${relFile}`);
     }
 
+    const westernFiles = rowMatches
+        .map(([, relFile]) => relFile)
+        .filter((relFile) => relFile.startsWith('mashups/western/'));
+    assert.strictEqual(westernFiles[0], 'mashups/western/move-like-i-do.mp3', 'Move Like I Do is first in Western mashups');
+    assert.strictEqual(westernFiles[1], 'mashups/western/the-floor-has-levels.mp3', 'The Floor Has Levels is second in Western mashups');
+
     const cssContent = fs.readFileSync(path.join(__dirname, '..', 'assets', 'css', 'portfolio.css'), 'utf8');
     assert.ok(cssContent.includes('.player-links a[hidden]'), 'CSS hides hidden player Spotify link');
     assert.ok(cssContent.includes('.player-mode-btn[aria-pressed="true"]'), 'CSS styles active playback mode toggle');

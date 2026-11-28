@@ -41,6 +41,11 @@ const CURATED_TRACKS = {
     seed: 29,
     featured: true,
   },
+  'mashups/western/the-floor-has-levels.mp3': {
+    title: 'The Floor Has Levels',
+    description: 'On the Floor (Jennifer Lopez & Pitbull) × Levels (Avicii)',
+    order: 2,
+  },
   'mashups/western/animalistic time.mp3': {
     title: 'Animalistic Time',
     description: 'Animals (Martin Garrix) × Time of Our Lives (Pitbull & Ne-Yo)',
@@ -60,10 +65,6 @@ const CURATED_TRACKS = {
   'mashups/western/saxobeat-on-the-floor.mp3': {
     title: 'Saxobeat On The Floor',
     description: 'Mr. Saxobeat (Alexandra Stan) × On the Floor (Jennifer Lopez & Pitbull)',
-  },
-  'mashups/western/the-floor-has-levels.mp3': {
-    title: 'The Floor Has Levels',
-    description: 'On the Floor (Jennifer Lopez & Pitbull) × Levels (Avicii)',
   },
 
   // Mashups — Indo-Western Fusion
@@ -368,6 +369,7 @@ function buildTrackMetadata(fullPath) {
     peaks: peaks.join(','),
     seed,
     featured: Boolean(curated && curated.featured),
+    order: curated && Number.isFinite(curated.order) ? curated.order : Infinity,
   };
 }
 
@@ -389,6 +391,9 @@ function compareTracks(a, b) {
   }
   if (a.featured !== b.featured) {
     return a.featured ? -1 : 1;
+  }
+  if (a.order !== b.order) {
+    return a.order - b.order;
   }
   return a.title.localeCompare(b.title);
 }
